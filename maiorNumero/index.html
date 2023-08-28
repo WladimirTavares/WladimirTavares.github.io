@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Botões e Números Secretos</title>
+    <script>
+                
+        let selectList = document.getElementById('button-list');
+        
+        let secretNumbers = [];
+        let clickedButtons = [];
+
+        function generateSecretNumbers() {
+            secretNumbers = [];
+            for (let i = 0; i < 5; i++) {
+                let randomNumber = Math.floor(Math.random() * 100) + 1; // Generate a random number between 1 and 100
+                secretNumbers.push(randomNumber);
+            }
+        }
+
+        
+        function handleClick(button, index) {
+            button.disabled = true;
+            clickedButtons.push(index);
+
+            if (clickedButtons.length === 2) {
+                let largerButtonIndex = secretNumbers[clickedButtons[0]] > secretNumbers[clickedButtons[1]] ? clickedButtons[0] : clickedButtons[1];
+                let smallerButtonIndex = secretNumbers[clickedButtons[0]] > secretNumbers[clickedButtons[1]] ? clickedButtons[1] : clickedButtons[0];
+                
+                let largerButtonNumber = largerButtonIndex + 1;
+                let smallerButtonNumber = smallerButtonIndex + 1;
+                
+                
+                
+                
+                let button1 = document.getElementById('button1');
+                let button2 = document.getElementById('button2');
+                let button3 = document.getElementById('button3');
+                let button4 = document.getElementById('button4');
+                let button5 = document.getElementById('button5');
+                
+
+                button1.disabled = false
+                button2.disabled = false
+                button3.disabled = false
+                button4.disabled = false
+                button5.disabled = false
+                
+
+                let textarea = document.getElementById('myTextarea')
+
+                textarea.value += `O botão ${largerButtonNumber} é maior que o botão ${smallerButtonNumber}.\n`
+
+
+                clickedButtons = [] 
+                
+                
+                
+            }
+        }
+
+        function checkLargest() {
+            let textarea = document.getElementById('myTextarea')
+
+            let selectList = document.getElementById('button-list');
+            let selectedValue = selectList.value;
+
+            textarea.value += `Você selecionou  o botão ${selectedValue}.\n`
+        
+            
+            
+            let maxValue = Math.max(...secretNumbers);
+            let selectedIndex = secretNumbers.indexOf(maxValue) + 1;
+
+            if (selectedValue == selectedIndex.toString()) {
+                textarea.value += `Parabéns! Você acertou o botão ${selectedValue} associado ao maior valor.\n`
+                for (let i = 0; i < secretNumbers.length; i++) {
+                    textarea.value += `O número secreto ${i+1} é ${secretNumbers[i]}.\n`                
+                }
+                generateSecretNumbers();  
+
+            } else {
+                textarea.value += `Tente novamente!\n`
+            }
+        }
+    </script>
+</head>
+<body onload="generateSecretNumbers()">
+    <h1>Botões e Números Secretos</h1>
+
+    Cada botão está associado a um valor secreto. <br> 
+    A cada dois botões selecionados, você receberá uma informação do tipo: <br>
+    "O botão X é maior que o botão Y." <br>
+    Encontre o maior botão associado ao maior valor. <br> <br>
+
+    Botões: <br>
+
+    <button id="button1" onclick="handleClick(this, 0)">Botão 1</button>
+    <button id="button2" onclick="handleClick(this, 1)">Botão 2</button>
+    <button id="button3" onclick="handleClick(this, 2)">Botão 3</button>
+    <button id="button4" onclick="handleClick(this, 3)">Botão 4</button>
+    <button id="button5" onclick="handleClick(this, 4)">Botão 5</button>
+    
+    <br><br>
+    
+    Qual é botão associado ao maior número: <select id="button-list" onchange="checkLargest()">
+        <option value="1">Botão 1</option>
+        <option value="2">Botão 2</option>
+        <option value="3">Botão 3</option>
+        <option value="4">Botão 4</option>
+        <option value="5">Botão 5</option>
+        
+    </select>
+    <br><br>
+    
+    <textarea id="myTextarea" rows="10" cols="100"></textarea>
+    
+</body>
+</html>
+
