@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Problema da Fofoca</title>
+    <script>
+                
+
+        let segredos = [];
+        let clickedButtons = [];
+        let ligacoes = 0
+
+        function generateSecretNumbers() {
+            for (let i = 0; i < 5; i++) {
+                segredos.push(new Set([i+1]));
+            }
+
+            let textarea = document.getElementById('myTextarea')
+    
+            textarea.value = "Numero de ligacoes " + ligacoes + "\n"
+            for (let i = 0; i < 5; i++) {
+                textarea.value += "Pessoa " + (i+1)  + " sabe { ";
+                segredos[i].forEach(element => {
+                    textarea.value += element + " "
+                });
+                textarea.value += "} numero de segredos :" + segredos[i].size + "\n"
+                
+            }
+
+        }
+
+        
+        function handleClick(button, index) {
+            button.disabled = true;
+            clickedButtons.push(index);
+
+            if (clickedButtons.length === 2) {
+                
+                botao1 = clickedButtons[0];
+                botao2 = clickedButtons[1];
+                
+                // Creating a new set for the union
+                const unionSet = new Set();
+
+                // Adding elements from set1 to the union set
+                segredos[botao1].forEach(element => {
+                    segredos[botao2].add(element);
+                });
+
+                // Adding elements from set2 to the union set
+                segredos[botao2].forEach(element => {
+                    segredos[botao1].add(element);
+                });
+                
+                
+                let button1 = document.getElementById('button1');
+                let button2 = document.getElementById('button2');
+                let button3 = document.getElementById('button3');
+                let button4 = document.getElementById('button4');
+                let button5 = document.getElementById('button5');
+                
+
+                button1.disabled = false
+                button2.disabled = false
+                button3.disabled = false
+                button4.disabled = false
+                button5.disabled = false
+                
+
+                let textarea = document.getElementById('myTextarea')
+
+                ligacoes += 1
+                
+                textarea.value = "Numero de ligacoes " + ligacoes + "\n"
+                for (let i = 0; i < 5; i++) {
+                    textarea.value += "Pessoa " + (i+1)  + " sabe { ";
+                    segredos[i].forEach(element => {
+                        textarea.value += element + " "
+                    });
+                    textarea.value += "} numero de segredos :" + segredos[i].size + "\n"
+                    
+                }
+
+                
+
+                let acabou = true
+
+                for (let i = 0; i < 5; i++) {
+                    if (segredos[i].size != 5){
+                        acabou = false
+                        
+                    }
+                }
+
+                if(acabou){
+                    alert("Acabou!!!")
+                    textarea.value = ""
+                    for (let i = 0; i < 5; i++) {
+                        segredos[i].clear();
+                        segredos[i].add(i+1);
+                    }
+                    
+                    if(ligacoes > 6){
+                        alert("Tente novamente")
+                        let textarea = document.getElementById('myTextarea')
+                        ligacoes = 0
+                        textarea.value = "Numero de ligacoes " + ligacoes + "\n"
+                        for (let i = 0; i < 5; i++) {
+                            textarea.value += "Pessoa " + (i+1)  + " sabe { ";
+                            segredos[i].forEach(element => {
+                                textarea.value += element + " "
+                            });
+                            textarea.value += "} numero de segredos :" + segredos[i].size + "\n"
+                        }
+                    }else{
+                        alert("Parabéns, você é um fofoqueiro");
+                        let textarea = document.getElementById('myTextarea')
+                        ligacoes = 0
+                        textarea.value = "Numero de ligacoes " + ligacoes + "\n"
+                        for (let i = 0; i < 5; i++) {
+                            textarea.value += "Pessoa " + (i+1)  + " sabe { ";
+                            segredos[i].forEach(element => {
+                                textarea.value += element + " "
+                            });
+                            textarea.value += "} numero de segredos :" + segredos[i].size + "\n"
+                        }
+                    }
+
+                    
+                    
+                    
+
+                }   
+
+                clickedButtons = [] 
+                
+                
+                
+            }
+        }
+
+        function checkLargest() {
+            let textarea = document.getElementById('myTextarea')
+
+            let selectList = document.getElementById('button-list');
+            let selectedValue = selectList.value;
+
+            textarea.value += `Você selecionou  o botão ${selectedValue}.\n`
+        
+            
+            
+            let maxValue = Math.max(...secretNumbers);
+            let selectedIndex = secretNumbers.indexOf(maxValue) + 1;
+
+            if (selectedValue == selectedIndex.toString()) {
+                textarea.value += `Parabéns! Você acertou o botão ${selectedValue} associado ao maior valor.\n`
+                for (let i = 0; i < secretNumbers.length; i++) {
+                    textarea.value += `O número secreto ${i+1} é ${secretNumbers[i]}.\n`                
+                }
+                generateSecretNumbers();  
+
+            } else {
+                textarea.value += `Tente novamente!\n`
+            }
+        }
+    </script>
+</head>
+<body onload="generateSecretNumbers()">
+    <h1>Problema da Fofoca</h1>
+
+    Regras:
+    <ul>
+    <li> Cada botão está associado a uma pessoa.</li>
+    <li> Inicialmente, cada pessoa i sabe uma fofoca i.</li>
+    <li> Essas pessoas se comunicam por telefone  </li>
+    <li> Quando duas pessoas conversam, elas compartilham entre si todas as fofocas que cada uma sabe </li>    
+    <li> Encontre uma sequência de 6 ligações para que todas as pessoas sobre todas as fofocas. </li>
+    </ul>
+    
+    Pessoas: <br>
+
+    <button id="button1" onclick="handleClick(this, 0)">Pessoa 1</button>
+    <button id="button2" onclick="handleClick(this, 1)">Pessoa 2</button>
+    <button id="button3" onclick="handleClick(this, 2)">Pessoa 3</button>
+    <button id="button4" onclick="handleClick(this, 3)">Pessoa 4</button>
+    <button id="button5" onclick="handleClick(this, 4)">Pessoa 5</button>
+    
+    <br><br>
+    
+    
+    <textarea id="myTextarea" rows="10" cols="100"></textarea>
+    
+</body>
+</html>
+
