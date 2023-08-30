@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Botões e Números Secretos</title>
+    <script>
+                
+        let selectList = document.getElementById('button-list');
+        
+        var grafo = new Map();
+
+        function generateSecretNumbers() {
+            let p = Math.random() 
+                
+            for (let i = 1; i <= 5; i++) {
+                for(int j = 1; j <= 5; j++){
+                    let e = Math.random() 
+                    grafo
+                }
+            }
+        }
+
+        
+        function handleClick(button, index) {
+            button.disabled = true;
+            clickedButtons.push(index);
+
+            if (clickedButtons.length === 2) {
+                let largerButtonIndex = secretNumbers[clickedButtons[0]] > secretNumbers[clickedButtons[1]] ? clickedButtons[0] : clickedButtons[1];
+                let smallerButtonIndex = secretNumbers[clickedButtons[0]] > secretNumbers[clickedButtons[1]] ? clickedButtons[1] : clickedButtons[0];
+                
+                let largerButtonNumber = largerButtonIndex + 1;
+                let smallerButtonNumber = smallerButtonIndex + 1;
+                
+                
+                
+                
+                let button1 = document.getElementById('button1');
+                let button2 = document.getElementById('button2');
+                let button3 = document.getElementById('button3');
+                let button4 = document.getElementById('button4');
+                let button5 = document.getElementById('button5');
+                
+
+                button1.disabled = false
+                button2.disabled = false
+                button3.disabled = false
+                button4.disabled = false
+                button5.disabled = false
+                
+
+                let textarea = document.getElementById('myTextarea')
+
+                textarea.value += `O botão ${largerButtonNumber} é maior que o botão ${smallerButtonNumber}.\n`
+
+
+                clickedButtons = [] 
+                
+                
+                
+            }
+        }
+
+        function checkLargest() {
+            let textarea = document.getElementById('myTextarea')
+
+            let selectList = document.getElementById('button-list');
+            let selectedValue = selectList.value;
+
+            textarea.value += `Você selecionou  o botão ${selectedValue}.\n`
+        
+            
+            
+            let maxValue = Math.max(...secretNumbers);
+            let selectedIndex = secretNumbers.indexOf(maxValue) + 1;
+
+            if (selectedValue == selectedIndex.toString()) {
+                textarea.value += `Parabéns! Você acertou o botão ${selectedValue} associado ao maior valor.\n`
+                for (let i = 0; i < secretNumbers.length; i++) {
+                    textarea.value += `O número secreto ${i+1} é ${secretNumbers[i]}.\n`                
+                }
+                generateSecretNumbers();  
+
+            } else {
+                textarea.value += `Tente novamente!\n`
+            }
+        }
+    </script>
+</head>
+<body onload="generateSecretNumbers()">
+    <h1>Grafo Conexo</h1>
+
+    <ul>
+        <li> Um grafo é estrutura matemática formada por um conjunto de vértices que pode ser representado por círculos e um 
+            conjunto de arestas. 
+        <li> Cada aresta é definida por um conjunto com dois vértices {u,v} que pode ser representando por uma linha ligando o vértice u e v.s 
+        <center> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Tree_graph.svg/1200px-Tree_graph.svg.png" height="200" > </center>
+        <li> Um grafo é dito conexo quando a partir de um vértice todos os outros podem ser alcançados.
+        <li> Escolha dois vértices u e v e você receberá uma informação
+            "o vertice u (não) está ligado ao vértice v"
+    <ul>
+
+
+    Vértices: <br>
+
+    <button id="button1" onclick="handleClick(this, 0)">1</button>
+    <button id="button2" onclick="handleClick(this, 1)">2</button>
+    <button id="button3" onclick="handleClick(this, 2)">3</button>
+    <button id="button4" onclick="handleClick(this, 3)">4</button>
+    <button id="button5" onclick="handleClick(this, 4)">5</button>
+    
+    <br><br>
+
+    <textarea id="myTextarea" rows="10" cols="100"></textarea>
+    
+    <br><br>
+    
+    O grafo é conexo <select id="button-list" onchange="checkLargest()">
+        <option value="1">Sim</option>
+        <option value="2">Não</option>
+    </select>
+    <br><br>
+    
+   
+    
+</body>
+</html>
+

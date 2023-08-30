@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Botões e Números Secretos</title>
+    <script>
+                
+        
+        let secretNumber = 0;
+        
+        function generateSecretNumbers() {
+            secretNumber = Math.floor(Math.random() * 100) + 1; // Generate a random number between 1 and 100
+        }
+
+        
+        function processa() {
+            let valor =   document.getElementById("numero").value
+            let textarea = document.getElementById('myTextarea')
+
+           
+            
+            if (secretNumber%valor == 0){
+               
+                textarea.value += `${valor} divide o número secreto.\n`
+            }else{
+                textarea.value += `${valor} não divide o número secreto.\n`
+            }
+            
+        }
+
+        function checa() {
+            let textarea = document.getElementById('myTextarea')
+            let palpite =   document.getElementById("palpite").value
+            
+            if(palpite == secretNumber){
+                textarea.value += `Parabéns você acertou. Descubra o próximo\n`;
+                secretNumber = Math.floor(Math.random() * 100) + 1;
+            }else{
+                textarea.value += `O número secreto é ${secretNumber}\nDescubra o próximo`;
+                secretNumber = Math.floor(Math.random() * 100) + 1;
+                
+            }
+            
+            
+        }
+    </script>
+</head>
+<body onload="generateSecretNumbers()">
+    <h1>Jogo da Fatoração</h1>
+
+    <ul>
+
+    <li>Você deve descobrir um número secreto entre 1 e 100.</li>
+    <li>Você pode perguntar se X divide o número secreto </li>
+    <li>Tente encontrar o número secreto com o mínimo de perguntas</li>
+    </ul>
+
+
+    Pergunta: <input type="text" id="numero"> <button id="button1" onclick="processa()">Pergunte</button> <br> <br>
+    
+    <textarea id="myTextarea" rows="10" cols="100"></textarea> <br> <br>
+
+    Resposta: <input type="text" id="palpite"> <button id="button2" onclick="checa()">Cheque</button> <br> <br>
+
+
+    Os números primos entre 1 e 100 são 2 , 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
+
+</body>
+</html>
+
