@@ -4,17 +4,29 @@
     <title>Botões e Números Secretos</title>
     <script>
                 
-        let selectList = document.getElementById('button-list');
         
-        var grafo = new Map();
+        let grafo = [];
+        let clickedButtons = [];
 
-        function generateSecretNumbers() {
-            let p = Math.random() 
-                
-            for (let i = 1; i <= 5; i++) {
-                for(int j = 1; j <= 5; j++){
-                    let e = Math.random() 
-                    grafo
+
+        function generateGrafo() {
+            let p = Math.random(); 
+           
+
+            for(let i = 0; i < 5; i++)
+                grafo[i] = [];
+            for (let i = 0; i < 5; i++) {
+                for(let j = i+1; j < 5; j++){
+                    let e = Math.random();
+                    
+                    if (e <= p){
+                        grafo[i][j] = 1;
+                        grafo[j][i] = 1;
+                    }
+                    else{
+                        grafo[i][j] = 0;
+                        grafo[j][i] = 0;
+                    }
                 }
             }
         }
@@ -22,15 +34,25 @@
         
         function handleClick(button, index) {
             button.disabled = true;
+
             clickedButtons.push(index);
+            
+
+            
 
             if (clickedButtons.length === 2) {
-                let largerButtonIndex = secretNumbers[clickedButtons[0]] > secretNumbers[clickedButtons[1]] ? clickedButtons[0] : clickedButtons[1];
-                let smallerButtonIndex = secretNumbers[clickedButtons[0]] > secretNumbers[clickedButtons[1]] ? clickedButtons[1] : clickedButtons[0];
+                let u = clickedButtons[0]
+                let v = clickedButtons[1]
+
                 
-                let largerButtonNumber = largerButtonIndex + 1;
-                let smallerButtonNumber = smallerButtonIndex + 1;
                 
+                let textarea = document.getElementById('myTextarea');
+
+                if (grafo[u][v] == 1){
+                    textarea.value += `existe uma arestra entre ${u+1} e ${v+1}.\n`
+                }else{
+                    textarea.value += `não existe uma arestra entre ${u+1} e ${v+1}.\n`
+                }
                 
                 
                 
@@ -48,10 +70,6 @@
                 button5.disabled = false
                 
 
-                let textarea = document.getElementById('myTextarea')
-
-                textarea.value += `O botão ${largerButtonNumber} é maior que o botão ${smallerButtonNumber}.\n`
-
 
                 clickedButtons = [] 
                 
@@ -60,33 +78,56 @@
             }
         }
 
-        function checkLargest() {
-            let textarea = document.getElementById('myTextarea')
+        let mark = []
 
+        function dfs(u) {
+            for(let v = 0; v < 5; v++){
+                if(grafo[u][v] == 1 && mark[v] == false){
+                    mark[v] = true
+                    dfs(v)
+                }
+            }
+        }
+
+        function conexo() {
+            for(let i = 0; i < 5; i++){
+                mark[i] = false;
+            }
+            
+            dfs(0);
+            
             let selectList = document.getElementById('button-list');
             let selectedValue = selectList.value;
+            let textarea = document.getElementById('myTextarea');
 
-            textarea.value += `Você selecionou  o botão ${selectedValue}.\n`
-        
-            
-            
-            let maxValue = Math.max(...secretNumbers);
-            let selectedIndex = secretNumbers.indexOf(maxValue) + 1;
-
-            if (selectedValue == selectedIndex.toString()) {
-                textarea.value += `Parabéns! Você acertou o botão ${selectedValue} associado ao maior valor.\n`
-                for (let i = 0; i < secretNumbers.length; i++) {
-                    textarea.value += `O número secreto ${i+1} é ${secretNumbers[i]}.\n`                
+            for(let i = 0; i < 5; i++){
+                if( mark[i] == false){
+                    if( selectedValue == 2){
+                        textarea.value += "Você acertou o grafo não é conexo.\n"
+                    }else{
+                        textarea.value += "Você errou o grafo não é conexo.\n"
+                    }
+                    textarea.value += "gerando um novo grafo.\n"
+                    generateGrafo()
+                    return 
                 }
-                generateSecretNumbers();  
-
-            } else {
-                textarea.value += `Tente novamente!\n`
             }
+
+            if( selectedValue == 1){
+                textarea.value += "Você acertou o grafo é conexo.\n"
+            }else{
+                textarea.value += "Você errou o grafo não é conexo.\n"
+            }
+            textarea.value += "gerando um novo grafo.\n"
+            generateGrafo()
+            
+
+
+
         }
     </script>
 </head>
-<body onload="generateSecretNumbers()">
+<body onload="generateGrafo()">
     <h1>Grafo Conexo</h1>
 
     <ul>
@@ -95,11 +136,12 @@
         <li> Cada aresta é definida por um conjunto com dois vértices {u,v} que pode ser representando por uma linha ligando o vértice u e v.s 
         <center> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Tree_graph.svg/1200px-Tree_graph.svg.png" height="200" > </center>
         <li> Um grafo é dito conexo quando a partir de um vértice todos os outros podem ser alcançados.
-        <li> Escolha dois vértices u e v e você receberá uma informação
+        <li> Você deve descobrir se um grafo secreto é conexo.
+        <li> Você pode perguntar se dois vértices u e v estão conectados por uma aresta. Você vai receber a seguinte informação:
             "o vertice u (não) está ligado ao vértice v"
     <ul>
 
-
+    <br><br>
     Vértices: <br>
 
     <button id="button1" onclick="handleClick(this, 0)">1</button>
@@ -114,10 +156,12 @@
     
     <br><br>
     
-    O grafo é conexo <select id="button-list" onchange="checkLargest()">
+    O grafo é conexo <select id="button-list" onchange="conexo(0)">
         <option value="1">Sim</option>
         <option value="2">Não</option>
     </select>
+
+
     <br><br>
     
    
