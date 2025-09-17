@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gerador de senha a partir da matrícula</title>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>Gerador de senha a partir da matrícula</h1>
+    <p>Insira a matrícula (apenas dígitos). A senha exibida terá o mesmo número de caracteres.</p>
+
+    <div class="row" style="margin-bottom:8px;">
+      <input id="matricula" type="text" inputmode="numeric" placeholder="Ex: 555555" aria-label="Matrícula (apenas dígitos)" />
+      <button id="gerar">Gerar</button>
+      <button id="limpar" class="secondary" title="Limpar">Limpar</button>
+    </div>
+
+    <div id="mensagem" class="error" aria-live="polite"></div>
+
+    <div class="result" id="saida" style="display:none;">
+      <div style="display:flex;flex-direction:column;">
+        <div style="font-size:0.85rem; color:#64748b;">Senha gerada</div>
+        <div class="chip" id="senha">000000</div>
+      </div>
+      
+    </div>
+  </main>
+
+  <script>
+    // Converte o algoritmo Python para JS usando BigInt
+    function gerarSenhaJS(numeroStr) {
+      // numeroStr: string apenas dígitos
+      const n = BigInt(numeroStr.length);
+      const numeroInt = BigInt(numeroStr);
+
+      // constantes em BigInt
+      const multiplicador = 73n;
+      const soma = 97n;
+      const constanteHex = 0xABCDEn; // igual a 703710 em decimal
+
+      // operação equivalente: (numero_int * 73 + 97) ^ 0xABCDE
+      let valor = (numeroInt * multiplicador + soma) ^ constanteHex;
+
+      // abs (BigInt)
+      if (valor < 0n) valor = -valor;
+
+      // modulo 10**n
+      const dez = 10n;
+      // 10n ** n where n is BigInt -> but exponent must be Number for ** in some engines;
+      // convert n to Number safely (n is length of string; small)
+      const pow = 10n ** BigInt(Number(n));
+      const senhaNum = valor % pow;
+
+      // preencher com zeros à esquerda até length n
+      const senhaStr = senhaNum.toString();
+      const targetLen = Number(n);
+      return senhaStr.padStart(targetLen, "0");
+    }
+
+    // DOM
+    const inp = document.getElementById("matricula");
+    const btn = document.getElementById("gerar");
+    const limparBtn = document.getElementById("limpar");
+    const msg = document.getElementById("mensagem");
+    const saida = document.getElementById("saida");
+    const senhaEl = document.getElementById("senha");
+    const copiarBtn = document.getElementById("copiar");
+
+    function validarEGerar() {
+      msg.textContent = "";
+      const valor = inp.value.trim();
+
+      if (!valor) {
+        msg.textContent = "Informe a matrícula (campo vazio).";
+        saida.style.display = "none";
+        return;
+      }
+      if (!/^\d+$/.test(valor)) {
+        msg.textContent = "A matrícula deve conter apenas dígitos (0-9).";
+        saida.style.display = "none";
+        return;
+      }
+      if (valor.length > 30) {
+        msg.textContent = "Matrícula muito longa. Use no máximo 30 dígitos.";
+        saida.style.display = "none";
+        return;
+      }
+
+      try {
+        const senha = gerarSenhaJS(valor);
+        senhaEl.textContent = senha;
+        saida.style.display = "flex";
+      } catch (e) {
+        msg.textContent = "Erro ao gerar a senha: " + (e.message || e);
+        saida.style.display = "none";
+      }
+    }
+
+    btn.addEventListener("click", validarEGerar);
+    inp.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") validarEGerar();
+    });
+    limparBtn.addEventListener("click", () => {
+      inp.value = "";
+      msg.textContent = "";
+      saida.style.display = "none";
+      inp.focus();
+    });
+
+    copiarBtn.addEventListener("click", async () => {
+      const texto = senhaEl.textContent;
+      try {
+        await navigator.clipboard.writeText(texto);
+        copiarBtn.textContent = "Copiado!";
+        setTimeout(() => copiarBtn.textContent = "Copiar", 1200);
+      } catch {
+        // fallback
+        const tmp = document.createElement("textarea");
+        tmp.value = texto;
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand("copy");
+        tmp.remove();
+        copiarBtn.textContent = "Copiado!";
+        setTimeout(() => copiarBtn.textContent = "Copiar", 1200);
+      }
+    });
+  </script>
+</body>
+</html>
