@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repositório de Iniciativas Digitais em Saúde · v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde:        #1b6b47;
+  --verde-md:     #2a8f60;
+  --verde-lt:     #eaf5ef;
+  --verde-brd:    #b8deca;
+  --azul:         #17416a;
+  --azul-lt:      #e8f0f8;
+  --laranja:      #d97706;
+  --laranja-lt:   #fef3e2;
+  --vermelho:     #c0392b;
+  --vermelho-lt:  #fdecea;
+  --roxo:         #6d4cb4;
+  --roxo-lt:      #f0ebfb;
+  --teal:         #147a7a;
+  --teal-lt:      #e4f4f4;
+  --cinza-f:      #f6f5f2;
+  --cinza-brd:    #e2dfd8;
+  --texto:        #1a1a1a;
+  --texto-md:     #4a4a4a;
+  --texto-lt:     #7a7a7a;
+  --branco:       #fdfcfa;
+  --shadow-sm:    0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.1);
+  --shadow-lg:    0 12px 36px rgba(0,0,0,.13);
+  --radius:       10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--branco);
+  color: var(--texto);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════ */
+.topbar {
+  background: var(--verde);
+  color: white;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.75rem;
+  position: sticky;
+  top: 0;
+  z-index: 300;
+  box-shadow: 0 2px 10px rgba(0,0,0,.2);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  cursor: pointer;
+}
+
+.brand-mark {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,.2);
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  font-size: .95rem;
+}
+
+.brand-text { font-family: 'Lora', serif; font-size: 1rem; font-weight: 700; }
+.brand-sub  { font-size: .65rem; font-weight: 300; opacity: .7; display: block; font-family: 'DM Sans', sans-serif; }
+
+.topnav { display: flex; align-items: center; gap: .25rem; }
+
+.topnav-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,.8);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem;
+  font-weight: 500;
+  padding: .4rem .85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.topnav-btn:hover, .topnav-btn.active { background: rgba(255,255,255,.15); color: white; }
+
+.topnav-sep { width: 1px; height: 18px; background: rgba(255,255,255,.2); margin: 0 .25rem; }
+
+.btn-login {
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  padding: .38rem .9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.btn-login:hover { background: rgba(255,255,255,.25); }
+
+.btn-nova {
+  background: var(--laranja);
+  border: none;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  padding: .38rem .9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin-left: .4rem;
+}
+.btn-nova:hover { background: #b86005; }
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero {
+  background: linear-gradient(160deg, #134d34 0%, #17416a 100%);
+  padding: 3rem 1.75rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,.04) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(255,255,255,.03) 0%, transparent 40%);
+}
+
+.hero-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.9);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: .3rem .8rem;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-family: 'Lora', serif;
+  font-size: 2.2rem;
+  color: white;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: .75rem;
+}
+
+.hero p {
+  color: rgba(255,255,255,.78);
+  font-size: .95rem;
+  font-weight: 300;
+  margin-bottom: 1.75rem;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.search-wrap {
+  display: flex;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.2);
+}
+
+.search-wrap input {
+  flex: 1;
+  border: none;
+  padding: .85rem 1.1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  color: var(--texto);
+  outline: none;
+}
+
+.search-wrap button {
+  background: var(--verde-md);
+  border: none;
+  color: white;
+  padding: .85rem 1.4rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: .88rem;
+  cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.search-wrap button:hover { background: var(--verde); }
+
+.hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.chip {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.85);
+  font-size: .75rem;
+  padding: .22rem .65rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.chip:hover { background: rgba(255,255,255,.22); }
+
+/* ═══════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════ */
+.statsbar {
+  background: white;
+  border-bottom: 1px solid var(--cinza-brd);
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+
+.stat-item {
+  padding: 1rem 2.5rem;
+  text-align: center;
+  border-right: 1px solid var(--cinza-brd);
+}
+.stat-item:last-child { border-right: none; }
+
+.stat-n {
+  font-family: 'Lora', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--verde);
+  line-height: 1;
+}
+
+.stat-l {
+  font-size: .7rem;
+  color: var(--texto-lt);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-top: .2rem;
+}
+
+/* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+.page-body {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 1.75rem;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.75rem;
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════ */
+.sidebar {
+  position: sticky;
+  top: 74px;
+  align-self: start;
+}
+
+.filter-block { margin-bottom: 1.5rem; }
+
+.filter-head {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-weight: 700;
+  color: var(--texto-lt);
+  margin-bottom: .6rem;
+  padding-bottom: .4rem;
+  border-bottom: 1px solid var(--cinza-brd);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter-clear {
+  font-size: .68rem;
+  color: var(--verde-md);
+  cursor: pointer;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.f-opt {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .38rem .45rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: .84rem;
+  color: var(--texto-md);
+  transition: background .12s;
+  user-select: none;
+}
+.f-opt:hover { background: var(--cinza-f); }
+.f-opt.sel { background: var(--verde-lt); color: var(--verde); font-weight: 600; }
+
+.f-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.f-count {
+  margin-left: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  color: var(--texto-lt);
+  background: var(--cinza-f);
+  padding: .1rem .4rem;
+  border-radius: 8px;
+}
+
+.f-opt.sel .f-count { background: rgba(27,107,71,.15); color: var(--verde); }
+
+.status-dot { width: 8px; height: 8px; border-radius: 50%; }
+.s-ativo    { background: #22c55e; }
+.s-parcial  { background: var(--laranja); }
+.s-inativo  { background: #94a3b8; }
+
+/* ═══════════════════════════════════════
+   CONTENT AREA
+═══════════════════════════════════════ */
+.content-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.content-title {
+  font-family: 'Lora', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.content-title span {
+  font-size: .85rem;
+  font-weight: 400;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--texto-lt);
+  margin-left: .4rem;
+}
+
+.top-right { display: flex; align-items: center; gap: .6rem; }
+
+.view-tog {
+  display: flex;
+  background: var(--cinza-f);
+  border-radius: 7px;
+  padding: .2rem;
+  gap: .15rem;
+}
+
+.vtbtn {
+  background: transparent;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  font-weight: 500;
+  color: var(--texto-lt);
+  padding: .3rem .65rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all .12s;
+}
+.vtbtn.on { background: white; color: var(--texto); box-shadow: var(--shadow-sm); }
+
+.sort-sel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .8rem;
+  border: 1px solid var(--cinza-brd);
+  border-radius: 7px;
+  padding: .35rem .75rem;
+  color: var(--texto-md);
+  background: white;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Active filters strip */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-bottom: 1rem;
+}
+
+.af-tag {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  background: var(--verde-lt);
+  border: 1px solid var(--verde-brd);
+  color: var(--verde);
+  font-size: .75rem;
+  font-weight: 600;
+  padding: .22rem .6rem;
+  border-radius: 20px;
+}
+.af-tag button {
+  background: none; border: none; cursor: pointer;
+  color: var(--verde); font-size: .8rem; line-height: 1;
+  padding: 0; margin-left: .1rem;
+}
+
+/* ═══════════════════════════════════════
+   CARDS
+═══════════════════════════════════════ */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.1rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--cinza-brd);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: box-shadow .18s, transform .18s;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp .3s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--cat-color, var(--verde));
+}
+
+.card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.card-row1 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: .75rem;
+  gap: .5rem;
+}
+
+.cat-pill {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .22rem .6rem;
+  border-radius: 20px;
+  background: var(--cat-bg, var(--verde-lt));
+  color: var(--cat-color, var(--verde));
+  white-space: nowrap;
+}
+
+.right-badges { display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; }
+
+.ambito-pill {
+  font-size: .67rem;
+  font-family: 'DM Mono', monospace;
+  background: var(--cinza-f);
+  color: var(--texto-lt);
+  padding: .15rem .45rem;
+  border-radius: 4px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .28rem;
+  font-size: .67rem;
+  font-weight: 600;
+}
+
+.card h3 {
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: .3rem;
+  color: var(--texto);
+}
+
+.card-tipo-label {
+  font-size: .72rem;
+  color: var(--texto-lt);
+  margin-bottom: .6rem;
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+
+.card p {
+  font-size: .83rem;
+  color: var(--texto-md);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: .85rem;
+}
+
+.card-tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .85rem; }
+.tag {
+  font-size: .7rem;
+  padding: .18rem .55rem;
+  border-radius: 4px;
+  background: var(--azul-lt);
+  color: var(--azul);
+  font-weight: 500;
+}
+
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: .75rem;
+  border-top: 1px solid var(--cinza-f);
+  gap: .5rem;
+}
+
+.card-inst { font-size: .75rem; color: var(--texto-lt); font-weight: 500; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-date { font-size: .7rem; font-family: 'DM Mono', monospace; color: var(--texto-lt); flex-shrink: 0; }
+.card-ndocs { font-size: .72rem; color: var(--verde-md); font-weight: 600; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════
+   TABLE VIEW
+═══════════════════════════════════════ */
+.tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--cinza-brd); }
+
+table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+thead tr { background: #f0ede7; }
+thead th { padding: .7rem 1rem; text-align: left; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-lt); font-weight: 700; white-space: nowrap; border-bottom: 1px solid var(--cinza-brd); }
+tbody tr { border-bottom: 1px solid var(--cinza-f); cursor: pointer; transition: background .1s; }
+tbody tr:hover { background: var(--verde-lt); }
+tbody td { padding: .65rem 1rem; vertical-align: middle; }
+.td-nome { font-weight: 600; color: var(--verde); }
+.td-mono { font-family: 'DM Mono', monospace; font-size: .75rem; color: var(--texto-lt); }
+
+/* ═══════════════════════════════════════
+   PENDING BADGE (revisor)
+═══════════════════════════════════════ */
+.pending-bar {
+  display: none;
+  background: var(--laranja-lt);
+  border: 1px solid #f5d28a;
+  border-radius: var(--radius);
+  padding: .85rem 1.1rem;
+  margin-bottom: 1.1rem;
+  align-items: center;
+  gap: .75rem;
+  font-size: .85rem;
+  color: #7a4a00;
+}
+.pending-bar.show { display: flex; }
+.pending-bar strong { font-weight: 700; }
+.pending-bar button {
+  margin-left: auto;
+  background: var(--laranja);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: .38rem .85rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════
+   MODAL BASE
+═══════════════════════════════════════ */
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(10,20,15,.55);
+  backdrop-filter: blur(3px);
+  z-index: 400;
+  padding: 1.5rem;
+  overflow-y: auto;
+  align-items: flex-start;
+  justify-content: center;
+}
+.overlay.open { display: flex; }
+
+/* ═══════════════════════════════════════
+   MODAL DETALHE
+═══════════════════════════════════════ */
+.modal-detail {
+  background: white;
+  border-radius: 14px;
+  max-width: 820px;
+  width: 100%;
+  margin: auto;
+  overflow: hidden;
+  animation: popIn .22s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+@keyframes popIn {
+  from { transform: scale(.96) translateY(10px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.mdh {
+  padding: 1.6rem 1.75rem 1.2rem;
+  border-bottom: 1px solid var(--cinza-brd);
+  position: relative;
+}
+
+.mdh-badges { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .7rem; }
+
+.mdh h2 {
+  font-family: 'Lora', serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-bottom: .3rem;
+}
+
+.mdh-sub { font-size: .85rem; color: var(--texto-lt); }
+
+.close-btn {
+  position: absolute; top: 1.2rem; right: 1.2rem;
+  background: var(--cinza-f); border: none;
+  width: 30px; height: 30px; border-radius: 50%;
+  font-size: .9rem; cursor: pointer; color: var(--texto-md);
+  display: grid; place-items: center;
+  transition: background .12s;
+}
+.close-btn:hover { background: var(--cinza-brd); }
+
+.mdb { padding: 1.5rem 1.75rem; }
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .9rem 1.5rem;
+  background: var(--cinza-f);
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.4rem;
+}
+
+.mi label {
+  display: block;
+  font-size: .67rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--texto-lt);
+  font-weight: 700;
+  margin-bottom: .2rem;
+}
+.mi span { font-size: .88rem; font-weight: 500; color: var(--texto); }
+
+.sec-label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  font-weight: 700;
+  color: var(--texto-lt);
+  margin-bottom: .65rem;
+  padding-bottom: .4rem;
+  border-bottom: 1px solid var(--cinza-brd);
+}
+
+.detail-text { font-size: .88rem; color: var(--texto-md); line-height: 1.7; margin-bottom: 1.4rem; }
+
+.doc-list { list-style: none; display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1.4rem; }
+
+.doc-row {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .6rem .85rem;
+  background: var(--azul-lt);
+  border-radius: 7px;
+  font-size: .83rem;
+  transition: background .12s;
+}
+.doc-row:hover { background: #d5e3f0; }
+
+.doc-ico { color: var(--azul); font-size: .95rem; flex-shrink: 0; }
+.doc-name { flex: 1; font-weight: 500; color: var(--azul); }
+.doc-src {
+  font-size: .7rem;
+  font-family: 'DM Mono', monospace;
+  background: rgba(23,65,106,.12);
+  color: var(--azul);
+  padding: .12rem .4rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.doc-link { font-size: .75rem; color: var(--verde-md); font-weight: 700; text-decoration: none; flex-shrink: 0; }
+.doc-link:hover { text-decoration: underline; }
+
+.bvs-note {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  background: var(--verde-lt);
+  border: 1px solid var(--verde-brd);
+  border-radius: 7px;
+  padding: .65rem .9rem;
+  font-size: .8rem;
+  color: var(--verde);
+  margin-bottom: 1.4rem;
+}
+
+.mdf {
+  padding: 1.1rem 1.75rem;
+  background: var(--cinza-f);
+  display: flex;
+  gap: .6rem;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn { padding: .55rem 1.15rem; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: .83rem; font-weight: 600; cursor: pointer; border: none; transition: all .15s; }
+.btn-ghost { background: white; color: var(--texto); border: 1px solid var(--cinza-brd); }
+.btn-ghost:hover { background: var(--cinza-f); }
+.btn-primary { background: var(--verde); color: white; }
+.btn-primary:hover { background: var(--verde-md); }
+.btn-warn { background: var(--laranja); color: white; }
+.btn-warn:hover { background: #b86005; }
+.btn-danger { background: var(--vermelho); color: white; }
+.btn-danger:hover { background: #a93224; }
+
+/* ═══════════════════════════════════════
+   MODAL FORMULÁRIO
+═══════════════════════════════════════ */
+.modal-form {
+  background: white;
+  border-radius: 14px;
+  max-width: 720px;
+  width: 100%;
+  margin: auto;
+  overflow: hidden;
+  animation: popIn .22s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.form-header {
+  padding: 1.4rem 1.75rem 1.1rem;
+  border-bottom: 1px solid var(--cinza-brd);
+  background: linear-gradient(135deg, var(--verde) 0%, var(--azul) 100%);
+  color: white;
+  position: relative;
+}
+
+.form-header h2 { font-family: 'Lora', serif; font-size: 1.3rem; margin-bottom: .2rem; }
+.form-header p  { font-size: .82rem; opacity: .8; font-weight: 300; }
+
+/* Steps */
+.steps-bar {
+  display: flex;
+  padding: 1.1rem 1.75rem .5rem;
+  gap: 0;
+  background: var(--cinza-f);
+  border-bottom: 1px solid var(--cinza-brd);
+  overflow-x: auto;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.step-dot {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--cinza-brd);
+  background: white;
+  display: grid;
+  place-items: center;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--texto-lt);
+  flex-shrink: 0;
+  transition: all .2s;
+}
+
+.step.done .step-dot  { background: var(--verde); border-color: var(--verde); color: white; }
+.step.curr .step-dot  { background: white; border-color: var(--verde); color: var(--verde); box-shadow: 0 0 0 3px rgba(27,107,71,.15); }
+
+.step-label {
+  font-size: .72rem;
+  color: var(--texto-lt);
+  margin-left: .45rem;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.step.curr .step-label { color: var(--verde); font-weight: 700; }
+.step.done .step-label { color: var(--verde-md); }
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--cinza-brd);
+  margin: 0 .4rem;
+  min-width: 12px;
+}
+.step.done + .step .step-line,
+.step.done .step-line { background: var(--verde-md); }
+
+.form-body {
+  padding: 1.5rem 1.75rem;
+  max-height: 62vh;
+  overflow-y: auto;
+}
+
+.form-section { display: none; }
+.form-section.active { display: block; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.form-row.full { grid-template-columns: 1fr; }
+.form-row.tri  { grid-template-columns: 1fr 1fr 1fr; }
+
+.fld { display: flex; flex-direction: column; gap: .35rem; }
+
+.fld label {
+  font-size: .74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--texto-md);
+}
+
+.fld label .req { color: var(--vermelho); margin-left: .15rem; }
+
+.fld input, .fld select, .fld textarea {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  border: 1.5px solid var(--cinza-brd);
+  border-radius: 7px;
+  padding: .6rem .85rem;
+  color: var(--texto);
+  background: white;
+  transition: border-color .15s;
+  outline: none;
+  width: 100%;
+}
+
+.fld input:focus, .fld select:focus, .fld textarea:focus {
+  border-color: var(--verde-md);
+  box-shadow: 0 0 0 3px rgba(42,143,96,.1);
+}
+
+.fld textarea { resize: vertical; min-height: 90px; }
+
+.fld-hint { font-size: .72rem; color: var(--texto-lt); margin-top: .1rem; }
+
+/* Doc repeater */
+.doc-repeater { display: flex; flex-direction: column; gap: .6rem; margin-bottom: .65rem; }
+
+.doc-entry {
+  border: 1px solid var(--cinza-brd);
+  border-radius: 8px;
+  padding: .85rem;
+  background: var(--cinza-f);
+  position: relative;
+}
+
+.doc-entry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 80px;
+  gap: .65rem;
+}
+
+.doc-entry-remove {
+  position: absolute;
+  top: .6rem; right: .6rem;
+  background: none; border: none;
+  color: var(--texto-lt); cursor: pointer; font-size: .85rem;
+  transition: color .12s;
+}
+.doc-entry-remove:hover { color: var(--vermelho); }
+
+.add-doc-btn {
+  background: none;
+  border: 1.5px dashed var(--cinza-brd);
+  color: var(--verde-md);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem;
+  font-weight: 600;
+  width: 100%;
+  padding: .6rem;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.add-doc-btn:hover { border-color: var(--verde-md); background: var(--verde-lt); }
+
+/* Cobertura geo */
+.geo-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.geo-check {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  background: var(--cinza-f);
+  border: 1px solid var(--cinza-brd);
+  border-radius: 6px;
+  padding: .4rem .75rem;
+  font-size: .82rem;
+  cursor: pointer;
+  transition: all .12s;
+  user-select: none;
+}
+.geo-check input { accent-color: var(--verde); }
+.geo-check:has(input:checked) { background: var(--verde-lt); border-color: var(--verde-brd); color: var(--verde); font-weight: 600; }
+
+/* Progress note */
+.form-note {
+  background: var(--azul-lt);
+  border-radius: 7px;
+  padding: .75rem 1rem;
+  font-size: .82rem;
+  color: var(--azul);
+  margin-bottom: 1.1rem;
+  display: flex;
+  gap: .5rem;
+}
+
+.form-footer {
+  padding: 1rem 1.75rem;
+  border-top: 1px solid var(--cinza-brd);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--cinza-f);
+}
+
+.step-counter { font-size: .78rem; color: var(--texto-lt); font-family: 'DM Mono', monospace; }
+
+/* ═══════════════════════════════════════
+   MODAL REVISOR
+═══════════════════════════════════════ */
+.modal-review {
+  background: white;
+  border-radius: 14px;
+  max-width: 860px;
+  width: 100%;
+  margin: auto;
+  overflow: hidden;
+  animation: popIn .22s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.review-header {
+  padding: 1.2rem 1.75rem;
+  background: var(--laranja-lt);
+  border-bottom: 1px solid #f5d28a;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.review-header h2 {
+  font-family: 'Lora', serif;
+  font-size: 1.2rem;
+  color: #7a4a00;
+}
+
+.review-header p { font-size: .82rem; color: #9a6300; margin-top: .1rem; }
+
+.review-list { padding: 1.25rem 1.75rem; max-height: 55vh; overflow-y: auto; display: flex; flex-direction: column; gap: .75rem; }
+
+.review-item {
+  border: 1px solid var(--cinza-brd);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.review-item-info { flex: 1; }
+.review-item-info h4 { font-family: 'Lora', serif; font-size: .95rem; margin-bottom: .2rem; }
+.review-item-info p  { font-size: .8rem; color: var(--texto-lt); }
+
+.review-actions { display: flex; gap: .45rem; flex-shrink: 0; align-self: center; }
+
+/* ═══════════════════════════════════════
+   LOGIN MODAL
+═══════════════════════════════════════ */
+.modal-login {
+  background: white;
+  border-radius: 14px;
+  max-width: 400px;
+  width: 100%;
+  margin: auto;
+  overflow: hidden;
+  animation: popIn .22s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.login-header {
+  background: linear-gradient(135deg, var(--verde) 0%, var(--azul) 100%);
+  color: white;
+  padding: 1.6rem 1.75rem 1.3rem;
+  text-align: center;
+}
+
+.login-header .lh-icon { font-size: 2rem; margin-bottom: .5rem; }
+.login-header h2 { font-family: 'Lora', serif; font-size: 1.25rem; }
+.login-header p  { font-size: .8rem; opacity: .75; margin-top: .2rem; }
+
+.login-body { padding: 1.6rem 1.75rem; }
+
+.login-profiles { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1rem; }
+
+.profile-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: .85rem 1rem;
+  border: 1.5px solid var(--cinza-brd);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: left;
+}
+.profile-btn:hover { border-color: var(--verde-md); background: var(--verde-lt); }
+
+.profile-ico { font-size: 1.5rem; flex-shrink: 0; }
+.profile-info strong { display: block; font-size: .88rem; font-weight: 700; color: var(--texto); }
+.profile-info span   { font-size: .75rem; color: var(--texto-lt); }
+
+.login-guest {
+  text-align: center;
+  font-size: .78rem;
+  color: var(--texto-lt);
+}
+.login-guest a { color: var(--verde-md); text-decoration: none; font-weight: 600; cursor: pointer; }
+
+/* ═══════════════════════════════════════
+   USER INFO (topbar)
+═══════════════════════════════════════ */
+.user-info {
+  display: none;
+  align-items: center;
+  gap: .5rem;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 20px;
+  padding: .3rem .7rem .3rem .5rem;
+  font-size: .78rem;
+  color: rgba(255,255,255,.9);
+  cursor: pointer;
+}
+.user-info.show { display: flex; }
+.user-avatar { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.25); display: grid; place-items: center; font-size: .75rem; }
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: #1a2a1e;
+  color: white;
+  padding: .75rem 1.25rem;
+  border-radius: 8px;
+  font-size: .85rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all .3s ease;
+  z-index: 999;
+  max-width: 320px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-left: 4px solid #22c55e; }
+.toast.warning { border-left: 4px solid var(--laranja); }
+
+/* ═══════════════════════════════════════
+   MISC
+═══════════════════════════════════════ */
+.empty { grid-column: 1/-1; text-align: center; padding: 3rem 1rem; color: var(--texto-lt); }
+.empty-ico { font-size: 2.5rem; margin-bottom: .5rem; }
+
+@media (max-width: 780px) {
+  .page-body { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+  .meta-grid { grid-template-columns: 1fr 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .form-row.tri { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <div class="brand" onclick="goHome()">
+    <div class="brand-mark">🏥</div>
+    <div class="brand-text">
+      Repositório de Iniciativas Digitais em Saúde
+      <span class="brand-sub">Ministério da Saúde · Brasil</span>
+    </div>
+  </div>
+
+  <nav class="topnav">
+    <button class="topnav-btn active">Explorar</button>
+    <button class="topnav-btn">Categorias</button>
+    <button class="topnav-btn">Sobre</button>
+    <button class="topnav-btn">BVS</button>
+    <div class="topnav-sep"></div>
+
+    <!-- Logged out -->
+    <button class="btn-login" id="btnLogin" onclick="openLogin()">
+      <span>👤</span> Entrar
+    </button>
+
+    <!-- Logged in -->
+    <div class="user-info" id="userInfo" onclick="logout()">
+      <div class="user-avatar" id="userAvatar"></div>
+      <span id="userName"></span>
+      <span style="opacity:.5">·</span>
+      <span style="opacity:.6;font-size:.72rem">Sair</span>
+    </div>
+
+    <button class="btn-nova" id="btnNova" style="display:none" onclick="openForm()">
+      <span>＋</span> Nova Iniciativa
+    </button>
+  </nav>
+</header>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🇧🇷 Repositório Nacional · v2.0</div>
+    <h1>Iniciativas Digitais<br>em Saúde Pública</h1>
+    <p>Sistemas, plataformas, programas e campanhas digitais organizados por categoria temática para gestores, clínicos e pesquisadores.</p>
+    <div class="search-wrap">
+      <input id="searchInput" type="text" placeholder="Buscar por nome, área, tipo ou instituição…" oninput="renderAll()">
+      <button>Buscar</button>
+    </div>
+    <div class="hero-chips">
+      <span class="chip" onclick="qs('e-SUS')">e-SUS</span>
+      <span class="chip" onclick="qs('SINAN')">SINAN</span>
+      <span class="chip" onclick="qs('RNDS')">RNDS</span>
+      <span class="chip" onclick="qs('vigilância')">Vigilância</span>
+      <span class="chip" onclick="qs('atenção primária')">Atenção Primária</span>
+      <span class="chip" onclick="qs('vacinação')">Vacinação</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="statsbar">
+  <div class="stat-item"><div class="stat-n" id="stTotal">12</div><div class="stat-l">Iniciativas</div></div>
+  <div class="stat-item"><div class="stat-n">5</div><div class="stat-l">Categorias</div></div>
+  <div class="stat-item"><div class="stat-n">3</div><div class="stat-l">Âmbitos</div></div>
+  <div class="stat-item"><div class="stat-n">28</div><div class="stat-l">Documentos</div></div>
+  <div class="stat-item"><div class="stat-n" id="stPending" style="color:var(--laranja)">2</div><div class="stat-l">Aguardando revisão</div></div>
+</div>
+
+<!-- ── PAGE BODY ── -->
+<div class="page-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="filter-block">
+      <div class="filter-head">
+        Categoria Temática
+        <span class="filter-clear" onclick="clearFilter('cat')">limpar</span>
+      </div>
+      <div class="f-opt sel" data-filter="cat" data-val="todas" onclick="setFilter('cat','todas',this)">
+        <span>Todas</span><span class="f-count">12</span>
+      </div>
+      <div class="f-opt" data-filter="cat" data-val="financiamento" onclick="setFilter('cat','financiamento',this)">
+        <span class="f-dot" style="background:#2a8f60"></span>Financiamento da APS<span class="f-count">3</span>
+      </div>
+      <div class="f-opt" data-filter="cat" data-val="vigilancia" onclick="setFilter('cat','vigilancia',this)">
+        <span class="f-dot" style="background:#17416a"></span>Vigilância à Saúde<span class="f-count">4</span>
+      </div>
+      <div class="f-opt" data-filter="cat" data-val="planejamento" onclick="setFilter('cat','planejamento',this)">
+        <span class="f-dot" style="background:#6d4cb4"></span>Planejamento<span class="f-count">2</span>
+      </div>
+      <div class="f-opt" data-filter="cat" data-val="atencao" onclick="setFilter('cat','atencao',this)">
+        <span class="f-dot" style="background:#c0622b"></span>Atenção Primária<span class="f-count">2</span>
+      </div>
+      <div class="f-opt" data-filter="cat" data-val="gestao" onclick="setFilter('cat','gestao',this)">
+        <span class="f-dot" style="background:#147a7a"></span>Gestão em Saúde<span class="f-count">1</span>
+      </div>
+    </div>
+
+    <div class="filter-block">
+      <div class="filter-head">Âmbito <span class="filter-clear" onclick="clearFilter('ambito')">limpar</span></div>
+      <div class="f-opt sel" data-filter="ambito" data-val="todos" onclick="setFilter('ambito','todos',this)">Todos<span class="f-count">12</span></div>
+      <div class="f-opt" data-filter="ambito" data-val="Nacional" onclick="setFilter('ambito','Nacional',this)">🇧🇷 Nacional<span class="f-count">11</span></div>
+      <div class="f-opt" data-filter="ambito" data-val="Estadual" onclick="setFilter('ambito','Estadual',this)">🗺️ Estadual<span class="f-count">1</span></div>
+      <div class="f-opt" data-filter="ambito" data-val="Municipal" onclick="setFilter('ambito','Municipal',this)">🏙️ Municipal<span class="f-count">0</span></div>
+    </div>
+
+    <div class="filter-block">
+      <div class="filter-head">Status <span class="filter-clear" onclick="clearFilter('status')">limpar</span></div>
+      <div class="f-opt sel" data-filter="status" data-val="todos" onclick="setFilter('status','todos',this)">Todos</div>
+      <div class="f-opt" data-filter="status" data-val="Ativo" onclick="setFilter('status','Ativo',this)"><span class="status-dot s-ativo"></span>Ativo</div>
+      <div class="f-opt" data-filter="status" data-val="Parcial" onclick="setFilter('status','Parcial',this)"><span class="status-dot s-parcial"></span>Parcial</div>
+      <div class="f-opt" data-filter="status" data-val="Descontinuado" onclick="setFilter('status','Descontinuado',this)"><span class="status-dot s-inativo"></span>Descontinuado</div>
+    </div>
+
+    <div class="filter-block">
+      <div class="filter-head">Tipo</div>
+      <div class="f-opt sel" data-filter="tipo" data-val="todos" onclick="setFilter('tipo','todos',this)">Todos os tipos</div>
+      <div class="f-opt" data-filter="tipo" data-val="Sistema de Informação" onclick="setFilter('tipo','Sistema de Informação',this)">Sistema de Informação</div>
+      <div class="f-opt" data-filter="tipo" data-val="Plataforma Digital" onclick="setFilter('tipo','Plataforma Digital',this)">Plataforma Digital</div>
+      <div class="f-opt" data-filter="tipo" data-val="Programa" onclick="setFilter('tipo','Programa',this)">Programa</div>
+      <div class="f-opt" data-filter="tipo" data-val="Campanha" onclick="setFilter('tipo','Campanha',this)">Campanha</div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- Pending bar (revisor) -->
+    <div class="pending-bar" id="pendingBar">
+      <span>⚠️</span>
+      <div><strong>2 iniciativas aguardando revisão.</strong> Como revisor, você pode aprovar ou devolver para correção.</div>
+      <button onclick="openReview()">Revisar agora</button>
+    </div>
+
+    <!-- Active filters -->
+    <div class="active-filters" id="activeFilters"></div>
+
+    <div class="content-top">
+      <div class="content-title">
+        Resultados <span id="resultLabel">(12 iniciativas)</span>
+      </div>
+      <div class="top-right">
+        <div class="view-tog">
+          <button class="vtbtn on" onclick="setView('cards',this)">⊞ Cards</button>
+          <button class="vtbtn" onclick="setView('table',this)">≡ Tabela</button>
+        </div>
+        <select class="sort-sel" onchange="renderAll()">
+          <option value="rel">Relevância</option>
+          <option value="az">Nome A–Z</option>
+          <option value="cat">Categoria</option>
+          <option value="new">Mais recentes</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div id="cardsWrap">
+      <div class="cards-grid" id="cardsGrid"></div>
+    </div>
+
+    <!-- Table -->
+    <div id="tableWrap" style="display:none">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Categoria</th><th>Nome</th><th>Tipo</th><th>Âmbito</th>
+            <th>Cobertura</th><th>Status</th><th>Atualização</th><th>Docs</th>
+          </tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ════════════════════════════════════
+     MODAL: DETALHE
+════════════════════════════════════ -->
+<div class="overlay" id="ovDetail" onclick="closeOv('ovDetail',event)">
+  <div class="modal-detail">
+    <div class="mdh">
+      <button class="close-btn" onclick="closeOvDirect('ovDetail')">✕</button>
+      <div class="mdh-badges" id="detBadges"></div>
+      <h2 id="detTitle"></h2>
+      <div class="mdh-sub" id="detSub"></div>
+    </div>
+    <div class="mdb">
+      <div class="meta-grid" id="detMeta"></div>
+      <div class="bvs-note" id="bvsNote">
+        📚 <span>Esta iniciativa possui documentos referenciados na <strong>Biblioteca Virtual em Saúde (BVS)</strong>. Acesse para consulta complementar.</span>
+      </div>
+      <div class="sec-label">Descrição</div>
+      <p class="detail-text" id="detDesc"></p>
+      <div class="sec-label">Como utilizar</div>
+      <p class="detail-text" id="detUtil"></p>
+      <div class="sec-label">Documentos Relacionados</div>
+      <ul class="doc-list" id="detDocs"></ul>
+    </div>
+    <div class="mdf">
+      <div style="font-size:.75rem;color:var(--texto-lt)" id="detDates"></div>
+      <button class="btn btn-ghost" onclick="closeOvDirect('ovDetail')">Fechar</button>
+      <button class="btn btn-primary">🔗 Acessar Iniciativa</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     MODAL: FORMULÁRIO MULTI-ETAPAS
+════════════════════════════════════ -->
+<div class="overlay" id="ovForm" onclick="closeOv('ovForm',event)">
+  <div class="modal-form">
+    <div class="form-header">
+      <button class="close-btn" style="background:rgba(255,255,255,.2);color:white;top:1rem;right:1.1rem;position:absolute" onclick="closeOvDirect('ovForm')">✕</button>
+      <h2>Cadastrar Nova Iniciativa</h2>
+      <p>Preencha todos os campos. A iniciativa ficará aguardando revisão antes de ser publicada.</p>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps-bar" id="stepsBar">
+      <div class="step curr" id="step0">
+        <div class="step-dot">1</div>
+        <span class="step-label">Identificação</span>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" id="step1">
+        <div class="step-dot">2</div>
+        <span class="step-label">Detalhes</span>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-dot">3</div>
+        <span class="step-label">Cobertura</span>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-dot">4</div>
+        <span class="step-label">Documentos</span>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" id="step4">
+        <div class="step-dot">5</div>
+        <span class="step-label">Revisão</span>
+      </div>
+    </div>
+
+    <div class="form-body">
+
+      <!-- STEP 1: Identificação -->
+      <div class="form-section active" id="fs0">
+        <div class="form-note">📋 Informe os dados básicos de identificação da iniciativa.</div>
+        <div class="form-row full">
+          <div class="fld">
+            <label>Nome da Iniciativa <span class="req">*</span></label>
+            <input id="fNome" type="text" placeholder="Ex.: SINAN – Sistema de Informação de Agravos de Notificação">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fld">
+            <label>Categoria Temática <span class="req">*</span></label>
+            <select id="fCat">
+              <option value="">Selecione…</option>
+              <option>Financiamento da APS</option>
+              <option>Vigilância à Saúde</option>
+              <option>Planejamento</option>
+              <option>Atenção Primária à Saúde</option>
+              <option>Gestão em Saúde</option>
+              <option>Assistência Farmacêutica</option>
+              <option>Saúde Digital / Interoperabilidade</option>
+              <option>Outra (especificar)</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Tipo de Iniciativa <span class="req">*</span></label>
+            <select id="fTipo">
+              <option value="">Selecione…</option>
+              <option>Sistema de Informação</option>
+              <option>Plataforma Digital</option>
+              <option>Programa</option>
+              <option>Campanha</option>
+              <option>Manual / Protocolo</option>
+              <option>Aplicativo Móvel</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fld">
+            <label>Instituição Responsável <span class="req">*</span></label>
+            <input id="fInst" type="text" placeholder="Ex.: SVS / Ministério da Saúde">
+          </div>
+          <div class="fld">
+            <label>Área de Saúde <span class="req">*</span></label>
+            <input id="fArea" type="text" placeholder="Ex.: Vigilância Epidemiológica">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fld">
+            <label>Público-Alvo <span class="req">*</span></label>
+            <input id="fPublico" type="text" placeholder="Ex.: Profissionais de vigilância, secretarias">
+          </div>
+          <div class="fld">
+            <label>Status da Iniciativa</label>
+            <select id="fStatus">
+              <option>Ativo</option>
+              <option>Parcial</option>
+              <option>Descontinuado</option>
+              <option>Em implantação</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Detalhes -->
+      <div class="form-section" id="fs1">
+        <div class="form-note">✏️ Descreva a iniciativa com clareza para facilitar a busca por outros profissionais.</div>
+        <div class="form-row full">
+          <div class="fld">
+            <label>Descrição Resumida <span class="req">*</span></label>
+            <textarea id="fDesc" placeholder="Descreva o propósito, funcionamento e principais características da iniciativa…"></textarea>
+            <span class="fld-hint">Recomendado: 3–5 frases. Evite jargões técnicos desnecessários.</span>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="fld">
+            <label>Como Utilizar <span class="req">*</span></label>
+            <textarea id="fUtil" placeholder="Como profissionais podem acessar ou utilizar esta iniciativa? Ex.: acesso via portal, instalação, credenciais…"></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fld">
+            <label>Disponibilidade de Acesso</label>
+            <select id="fDisp">
+              <option>Online / Acesso aberto</option>
+              <option>Acesso restrito (institucional)</option>
+              <option>Parcial</option>
+              <option>Offline / Instalação local</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>URL da Iniciativa</label>
+            <input id="fUrl" type="url" placeholder="https://…">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Cobertura -->
+      <div class="form-section" id="fs2">
+        <div class="form-note">🗺️ Informe o alcance geográfico e temporal da iniciativa.</div>
+        <div class="form-row">
+          <div class="fld">
+            <label>Âmbito Principal <span class="req">*</span></label>
+            <select id="fAmbito">
+              <option>Nacional</option>
+              <option>Estadual</option>
+              <option>Municipal</option>
+              <option>Regional</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Estado(s) / Região (se aplicável)</label>
+            <input id="fEstado" type="text" placeholder="Ex.: Amazônia Legal, SP, RJ…">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="fld">
+            <label>Cobertura Geográfica Detalhada</label>
+            <div class="geo-checks">
+              <label class="geo-check"><input type="checkbox" value="Norte"> Norte</label>
+              <label class="geo-check"><input type="checkbox" value="Nordeste"> Nordeste</label>
+              <label class="geo-check"><input type="checkbox" value="Centro-Oeste"> Centro-Oeste</label>
+              <label class="geo-check"><input type="checkbox" value="Sudeste"> Sudeste</label>
+              <label class="geo-check"><input type="checkbox" value="Sul"> Sul</label>
+              <label class="geo-check"><input type="checkbox" value="Todo o território nacional" checked> Todo o território nacional</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-row tri">
+          <div class="fld">
+            <label>Ano de Criação</label>
+            <input id="fAnoCriacao" type="number" placeholder="Ex.: 2010" min="1990" max="2025">
+          </div>
+          <div class="fld">
+            <label>Última Atualização</label>
+            <input id="fUltAtt" type="month">
+          </div>
+          <div class="fld">
+            <label>Data de Cadastro</label>
+            <input type="text" value="" id="fDataCad" readonly style="background:var(--cinza-f);color:var(--texto-lt)">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Documentos -->
+      <div class="form-section" id="fs3">
+        <div class="form-note">📄 Adicione documentos relacionados. Indique se cada documento está disponível na BVS.</div>
+        <div class="doc-repeater" id="docRepeater">
+          <div class="doc-entry">
+            <button class="doc-entry-remove" onclick="removeDoc(this)" title="Remover">✕</button>
+            <div class="doc-entry-grid">
+              <div class="fld"><label>Descrição do Documento</label><input type="text" placeholder="Ex.: Manual de Implantação"></div>
+              <div class="fld"><label>Link / URL</label><input type="url" placeholder="https://…"></div>
+              <div class="fld"><label>Fonte</label><select><option>Portal MS</option><option>BVS</option><option>Portal Institucional</option><option>Outro</option></select></div>
+            </div>
+          </div>
+        </div>
+        <button class="add-doc-btn" onclick="addDoc()">＋ Adicionar documento</button>
+      </div>
+
+      <!-- STEP 5: Revisão/Confirmação -->
+      <div class="form-section" id="fs4">
+        <div class="form-note">✅ Confira os dados abaixo. Ao enviar, a iniciativa ficará <strong>aguardando aprovação de um revisor</strong> antes de ser publicada.</div>
+        <div id="summaryBox" style="background:var(--cinza-f);border-radius:8px;padding:1.1rem 1.25rem;font-size:.85rem;line-height:1.8;color:var(--texto-md)">
+          <!-- filled by JS -->
+        </div>
+        <div style="margin-top:1rem;padding:1rem;border:1.5px solid var(--laranja);border-radius:8px;background:var(--laranja-lt);font-size:.82rem;color:#7a4a00;display:flex;gap:.65rem;align-items:flex-start">
+          <span style="font-size:1.1rem;flex-shrink:0">⏳</span>
+          <div><strong>Fluxo de publicação:</strong> Após o envio, um revisor habilitado receberá notificação para analisar e aprovar esta iniciativa. O prazo estimado é de <strong>2 dias úteis</strong>.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <span class="step-counter" id="stepCounter">Etapa 1 de 5</span>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-ghost" id="btnBack" onclick="stepBack()" style="display:none">← Voltar</button>
+        <button class="btn btn-primary" id="btnNext" onclick="stepNext()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     MODAL: REVISÃO
+════════════════════════════════════ -->
+<div class="overlay" id="ovReview" onclick="closeOv('ovReview',event)">
+  <div class="modal-review">
+    <div class="review-header">
+      <div>
+        <h2>⚠️ Fila de Revisão</h2>
+        <p>Iniciativas enviadas por bolsistas aguardando sua aprovação para publicação.</p>
+      </div>
+      <button class="close-btn" style="margin-left:auto" onclick="closeOvDirect('ovReview')">✕</button>
+    </div>
+    <div class="review-list">
+      <div class="review-item" id="ri1">
+        <div class="review-item-info">
+          <h4>PNI Digital – Plataforma Nacional de Imunização</h4>
+          <p>Enviado por: Ana Paula Silva · <span style="font-family:'DM Mono',monospace;font-size:.75rem">07/03/2026</span> · Categoria: Vigilância à Saúde</p>
+        </div>
+        <div class="review-actions">
+          <button class="btn btn-primary" style="font-size:.78rem;padding:.45rem .85rem" onclick="approveItem('ri1','PNI Digital')">✓ Aprovar</button>
+          <button class="btn btn-ghost" style="font-size:.78rem;padding:.45rem .85rem" onclick="returnItem('ri1')">↩ Devolver</button>
+        </div>
+      </div>
+      <div class="review-item" id="ri2">
+        <div class="review-item-info">
+          <h4>SISAB – Sistema de Informação em Saúde para a Atenção Básica</h4>
+          <p>Enviado por: Carlos Eduardo Lima · <span style="font-family:'DM Mono',monospace;font-size:.75rem">06/03/2026</span> · Categoria: Atenção Primária</p>
+        </div>
+        <div class="review-actions">
+          <button class="btn btn-primary" style="font-size:.78rem;padding:.45rem .85rem" onclick="approveItem('ri2','SISAB')">✓ Aprovar</button>
+          <button class="btn btn-ghost" style="font-size:.78rem;padding:.45rem .85rem" onclick="returnItem('ri2')">↩ Devolver</button>
+        </div>
+      </div>
+    </div>
+    <div style="padding:1rem 1.75rem;border-top:1px solid var(--cinza-brd);text-align:right">
+      <button class="btn btn-ghost" onclick="closeOvDirect('ovReview')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     MODAL: LOGIN
+════════════════════════════════════ -->
+<div class="overlay" id="ovLogin" onclick="closeOv('ovLogin',event)">
+  <div class="modal-login">
+    <div class="login-header">
+      <div class="lh-icon">🏥</div>
+      <h2>Acesso ao Repositório</h2>
+      <p>Escolha seu perfil para continuar</p>
+    </div>
+    <div class="login-body">
+      <div class="login-profiles">
+        <button class="profile-btn" onclick="doLogin('bolsista','Ana Paula Silva','✏️')">
+          <span class="profile-ico">✏️</span>
+          <div class="profile-info">
+            <strong>Bolsista / Editor</strong>
+            <span>Pode cadastrar novas iniciativas</span>
+          </div>
+        </button>
+        <button class="profile-btn" onclick="doLogin('revisor','Dr. Marcos Oliveira','🔍')">
+          <span class="profile-ico">🔍</span>
+          <div class="profile-info">
+            <strong>Revisor</strong>
+            <span>Aprova ou devolve iniciativas para correção</span>
+          </div>
+        </button>
+        <button class="profile-btn" onclick="doLogin('admin','Admin Sistema','⚙️')">
+          <span class="profile-ico">⚙️</span>
+          <div class="profile-info">
+            <strong>Administrador</strong>
+            <span>Acesso completo ao repositório</span>
+          </div>
+        </button>
+      </div>
+      <div class="login-guest">
+        <a onclick="closeOvDirect('ovLogin')">Continuar como visitante →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════
+     DATA + JS
+══════════════════════ -->
+<script>
+/* ── DATA ── */
+const CATS = {
+  financiamento: { label:'Financiamento da APS',      color:'#2a8f60', bg:'#eaf5ef' },
+  vigilancia:    { label:'Vigilância à Saúde',         color:'#17416a', bg:'#e8f0f8' },
+  planejamento:  { label:'Planejamento',               color:'#6d4cb4', bg:'#f0ebfb' },
+  atencao:       { label:'Atenção Primária',           color:'#c0622b', bg:'#fef0e8' },
+  gestao:        { label:'Gestão em Saúde',            color:'#147a7a', bg:'#e4f4f4' },
+};
+
+const DADOS = [
+  { id:1, cat:'financiamento', nome:'PMAQ-AB – Programa de Melhoria do Acesso e da Qualidade',
+    tipo:'Programa', ambito:'Nacional', area:'Atenção Primária à Saúde',
+    publico:'Equipes de saúde da família, gestores municipais', inst:'Ministério da Saúde / DAB',
+    desc:'Programa que induz a ampliação do acesso e a melhoria da qualidade da atenção básica, com garantia de um padrão de qualidade comparável nacional e regional.',
+    util:'Acessar o portal do DAB, realizar cadastro da equipe e submeter avaliações conforme ciclos do programa.',
+    disp:'Online', status:'Ativo', cobertura:'Todo o território nacional', criado:'2011', atualizado:'2019-03',
+    bvs:true,
+    docs:[{n:'Portaria nº 1.645/2015',l:'#',src:'BVS'},{n:'Manual Instrutivo PMAQ',l:'#',src:'Portal MS'},{n:'Relatório 3º Ciclo',l:'#',src:'Portal MS'}]
+  },
+  { id:2, cat:'vigilancia', nome:'SINAN – Sistema de Informação de Agravos de Notificação',
+    tipo:'Sistema de Informação', ambito:'Nacional', area:'Vigilância Epidemiológica',
+    publico:'Profissionais de vigilância, secretarias de saúde', inst:'SVS / Ministério da Saúde',
+    desc:'Sistema nacional para coleta, transmissão e disseminação de dados sobre agravos de notificação compulsória. Principal instrumento para acompanhamento do perfil de morbidade.',
+    util:'Instalação do sistema cliente, configuração de acesso via DATASUS, notificação de casos pelas unidades de saúde.',
+    disp:'Online', status:'Ativo', cobertura:'Todo o território nacional', criado:'1993', atualizado:'2023-06',
+    bvs:true,
+    docs:[{n:'Guia de Usuário SINAN',l:'#',src:'DATASUS'},{n:'Ficha de Notificação Individual',l:'#',src:'BVS'}]
+  },
+  { id:3, cat:'atencao', nome:'e-SUS Atenção Primária',
+    tipo:'Sistema de Informação', ambito:'Nacional', area:'Atenção Primária à Saúde',
+    publico:'Profissionais das equipes de saúde da família', inst:'Ministério da Saúde / SAPS',
+    desc:'Estratégia para reestruturar as informações da atenção básica, com dois sistemas: CDS (Coleta de Dados Simplificada) e PEC (Prontuário Eletrônico do Cidadão).',
+    util:'Download e instalação do sistema PEC ou CDS. Após configuração local, dados são transmitidos ao RNDS e ao SISAB.',
+    disp:'Online', status:'Ativo', cobertura:'Todo o território nacional', criado:'2013', atualizado:'2024-01',
+    bvs:false,
+    docs:[{n:'Manual de Implantação e-SUS PEC',l:'#',src:'Portal MS'},{n:'Nota Técnica e-SUS',l:'#',src:'Portal MS'},{n:'Treinamentos em vídeo',l:'#',src:'Portal MS'}]
+  },
+  { id:4, cat:'planejamento', nome:'SARGSUS – Sistema de Apoio ao Relatório de Gestão',
+    tipo:'Sistema de Informação', ambito:'Nacional', area:'Gestão / Planejamento em Saúde',
+    publico:'Gestores municipais, estaduais e federais do SUS', inst:'Ministério da Saúde / SE',
+    desc:'Sistema que apoia a elaboração e consolidação dos Relatórios de Gestão do SUS nos três entes federados, conforme exigência legal do controle social.',
+    util:'Acesso via login no portal SAGE do Ministério da Saúde. Disponível para secretarias cadastradas.',
+    disp:'Parcial', status:'Ativo', cobertura:'Todo o território nacional', criado:'2010', atualizado:'2022-11',
+    bvs:true,
+    docs:[{n:'Manual de Orientação SARGSUS',l:'#',src:'BVS'}]
+  },
+  { id:5, cat:'vigilancia', nome:'SIVEP-Gripe – Vigilância Epidemiológica da Influenza',
+    tipo:'Sistema de Informação', ambito:'Nacional', area:'Vigilância Epidemiológica / Respiratória',
+    publico:'Profissionais de saúde, laboratórios, secretarias', inst:'SVS / Ministério da Saúde',
+    desc:'Sistema de vigilância da influenza e vírus respiratórios, integrando sentinelas ambulatoriais, hospitalares e dados laboratoriais para monitoramento em tempo oportuno.',
+    util:'Acesso por login institucional. Notificação de SRAG hospitalizado e síndrome gripal pelas unidades sentinela.',
+    disp:'Online', status:'Ativo', cobertura:'Todo o território nacional', criado:'2000', atualizado:'2023-12',
+    bvs:true,
+    docs:[{n:'Protocolo de Vigilância da Influenza',l:'#',src:'BVS'},{n:'Boletim Epidemiológico Semanal',l:'#',src:'SVS'}]
+  },
+  { id:6, cat:'financiamento', nome:'Previne Brasil – Financiamento da APS',
+    tipo:'Programa', ambito:'Nacional', area:'Financiamento / Atenção Primária',
+    publico:'Gestores municipais, coordenadores de atenção básica', inst:'Ministério da Saúde / SAPS',
+    desc:'Modelo de financiamento federal da APS baseado em três componentes: capitação ponderada, pagamento por desempenho e incentivo para ações estratégicas.',
+    util:'Acompanhamento via plataforma e-Gestor AB. Municípios mantêm cadastros no CNES e registros no e-SUS.',
+    disp:'Online', status:'Ativo', cobertura:'Todo o território nacional', criado:'2019', atualizado:'2024-02',
+    bvs:false,
+    docs:[{n:'Portaria nº 2.979/2019',l:'#',src:'BVS'},{n:'Manual de Operacionalização',l:'#',src:'Portal MS'},{n:'Painel Previne Brasil',l:'#',src:'e-Gestor'}]
+  },
+  { id:7, cat:'vigilancia', nome:'RNDS – Rede Nacional de Dados em Saúde',
+    tipo:'Plataforma Digital', ambito:'Nacional', area:'Saúde Digital / Interoperabilidade',
+    publico:'Profissionais de saúde, estabelecimentos, sistemas de informação', inst:'DATASUS / Ministério da Saúde',
+    desc:'Plataforma nacional de interoperabilidade que permite compartilhamento de dados de saúde do cidadão entre diferentes pontos da RAS, usando padrão HL7 FHIR.',
+    util:'Integração via API FHIR. Sistemas devem solicitar credenciais ao DATASUS e seguir o guia de integração.',
+    disp:'Online', status:'Ativo', cobertura:'Todo o território nacional', criado:'2020', atualizado:'2024-03',
+    bvs:false,
+    docs:[{n:'Guia de Integração RNDS',l:'#',src:'Portal MS'},{n:'Portaria nº 1.434/2020',l:'#',src:'BVS'},{n:'Especificações FHIR Brasil',l:'#',src:'Simplifier.net'}]
+  },
+  { id:8, cat:'atencao', nome:'Conecte SUS Cidadão',
+    tipo:'Plataforma Digital', ambito:'Nacional', area:'Saúde Digital / Cidadania',
+    publico:'Cidadãos brasileiros com acesso digital', inst:'DATASUS / Ministério da Saúde',
+    desc:'Aplicativo que permite ao cidadão acompanhar histórico de vacinação, exames, medicamentos dispensados e atendimentos registrados no SUS.',
+    util:'Disponível para download nas lojas App Store e Google Play. Autenticação via gov.br.',
+    disp:'Online', status:'Ativo', cobertura:'Todo o território nacional', criado:'2020', atualizado:'2024-01',
+    bvs:false,
+    docs:[{n:'Guia do Usuário Conecte SUS',l:'#',src:'Portal MS'},{n:'Nota Informativa SCTIE',l:'#',src:'BVS'}]
+  },
+  { id:9, cat:'planejamento', nome:'RAAS – Registro das Ações Ambulatoriais de Saúde',
+    tipo:'Sistema de Informação', ambito:'Nacional', area:'Atenção Especializada / Psicossocial',
+    publico:'Equipes de saúde mental, NASF, CAPS, reabilitação', inst:'Ministério da Saúde / SAPS',
+    desc:'Instrumento de registro de procedimentos ambulatoriais especializados, permitindo acompanhamento longitudinal de usuários em saúde mental e reabilitação.',
+    util:'Integrado ao e-SUS PEC ou SISREG. Registro pelos profissionais após cada atendimento ambulatorial.',
+    disp:'Online', status:'Ativo', cobertura:'Todo o território nacional', criado:'2013', atualizado:'2022-08',
+    bvs:true,
+    docs:[{n:'Manual de Orientação RAAS',l:'#',src:'BVS'}]
+  },
+  { id:10, cat:'vigilancia', nome:'SIVEP-Malária',
+    tipo:'Sistema de Informação', ambito:'Nacional', area:'Vigilância Epidemiológica / Doenças Tropicais',
+    publico:'Profissionais de saúde da Amazônia Legal e áreas de risco', inst:'SVS / Ministério da Saúde',
+    desc:'Sistema de informações epidemiológicas para vigilância da malária no Brasil, monitorando casos, tratamentos e ações de controle vetorial.',
+    util:'Acesso via web com login institucional. Registro de lâminas positivas e notificação de casos.',
+    disp:'Online', status:'Ativo', cobertura:'Amazônia Legal', criado:'1993', atualizado:'2023-05',
+    bvs:true,
+    docs:[{n:'Manual de Diagnóstico e Tratamento da Malária',l:'#',src:'BVS'}]
+  },
+  { id:11, cat:'gestao', nome:'HORUS – Gestão da Assistência Farmacêutica',
+    tipo:'Sistema de Informação', ambito:'Nacional', area:'Assistência Farmacêutica',
+    publico:'Farmacêuticos, gestores de assistência farmacêutica', inst:'DAF / Ministério da Saúde',
+    desc:'Sistema para qualificar a gestão da assistência farmacêutica no SUS, possibilitando monitoramento da disponibilidade de medicamentos nos serviços.',
+    util:'Acesso via portal DAF. Gestores registram estoque, dispensação e abastecimento de medicamentos.',
+    disp:'Online', status:'Ativo', cobertura:'Todo o território nacional', criado:'2009', atualizado:'2023-10',
+    bvs:true,
+    docs:[{n:'Manual Operacional HORUS',l:'#',src:'Portal MS'},{n:'Nota Técnica RENAME',l:'#',src:'BVS'}]
+  },
+  { id:12, cat:'financiamento', nome:'FPO – Fundo de Participação – Bloco APS',
+    tipo:'Plataforma Digital', ambito:'Nacional', area:'Financiamento da Atenção Primária',
+    publico:'Gestores financeiros e coordenadores de atenção básica', inst:'Ministério da Saúde / FNS',
+    desc:'Plataforma de acompanhamento e prestação de contas dos recursos federais transferidos fundo a fundo para o financiamento da APS nos municípios.',
+    util:'Acesso pelo SIOPS ou plataforma Fundo a Fundo. Credenciamento junto ao Fundo Nacional de Saúde.',
+    disp:'Parcial', status:'Parcial', cobertura:'Todo o território nacional', criado:'2015', atualizado:'2022-06',
+    bvs:false,
+    docs:[{n:'Portaria de Consolidação nº 6',l:'#',src:'BVS'}]
+  },
+];
+
+/* ── STATE ── */
+let filters = { cat:'todas', ambito:'todos', status:'todos', tipo:'todos' };
+let currentView = 'cards';
+let currentUser = null;
+let currentStep = 0;
+const TOTAL_STEPS = 5;
+
+/* ── RENDER ── */
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  return DADOS.filter(d => {
+    if (filters.cat !== 'todas' && d.cat !== filters.cat) return false;
+    if (filters.ambito !== 'todos' && d.ambito !== filters.ambito) return false;
+    if (filters.status !== 'todos' && d.status !== filters.status) return false;
+    if (filters.tipo !== 'todos' && d.tipo !== filters.tipo) return false;
+    if (q && ![d.nome, d.desc, d.area, d.tipo, d.inst].some(s => s.toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function statusDot(s) {
+  const m = { Ativo:'#22c55e', Parcial:'#d97706', Descontinuado:'#94a3b8', 'Em implantação':'#3b82f6' };
+  return `<span class="status-dot" style="background:${m[s]||'#94a3b8'};display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px"></span>`;
+}
+
+function renderAll() {
+  const list = getFiltered();
+  document.getElementById('resultLabel').textContent = `(${list.length} iniciativa${list.length!==1?'s':''})`;
+  renderCards(list);
+  renderTable(list);
+  renderActiveFilters();
+}
+
+function renderCards(list) {
+  const grid = document.getElementById('cardsGrid');
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-ico">🔍</div><p>Nenhuma iniciativa encontrada com os filtros selecionados.</p></div>';
+    return;
+  }
+  grid.innerHTML = list.map((d,i) => {
+    const c = CATS[d.cat];
+    return `<div class="card" data-id="${d.id}" style="--cat-color:${c.color};animation-delay:${i*0.04}s" onclick="openDetail(${d.id})">
+      <div class="card-row1">
+        <span class="cat-pill" style="background:${c.bg};color:${c.color}">${c.label}</span>
+        <div class="right-badges">
+          <span class="ambito-pill">${d.ambito}</span>
+          <span class="status-pill">${statusDot(d.status)}${d.status}</span>
+        </div>
+      </div>
+      <h3>${d.nome}</h3>
+      <div class="card-tipo-label">⬡ ${d.tipo}</div>
+      <p>${d.desc}</p>
+      <div class="card-tags">
+        <span class="tag">${d.area}</span>
+        <span class="tag" style="background:var(--verde-lt);color:var(--verde)">${d.cobertura}</span>
+      </div>
+      <div class="card-foot">
+        <span class="card-inst">🏛 ${d.inst}</span>
+        <span class="card-date">${d.atualizado}</span>
+        <span class="card-ndocs">📄 ${d.docs.length}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTable(list) {
+  document.getElementById('tableBody').innerHTML = list.map(d => {
+    const c = CATS[d.cat];
+    return `<tr onclick="openDetail(${d.id})">
+      <td><span style="background:${c.bg};color:${c.color};font-size:.68rem;font-weight:700;padding:.18rem .5rem;border-radius:12px;white-space:nowrap">${c.label}</span></td>
+      <td class="td-nome">${d.nome}</td>
+      <td class="td-mono">${d.tipo}</td>
+      <td>${d.ambito}</td>
+      <td style="font-size:.8rem;color:var(--texto-lt)">${d.cobertura}</td>
+      <td>${statusDot(d.status)}<span style="font-size:.8rem">${d.status}</span></td>
+      <td class="td-mono">${d.atualizado}</td>
+      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--verde)">${d.docs.length}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderActiveFilters() {
+  const af = document.getElementById('activeFilters');
+  const parts = [];
+  const labels = { financiamento:'Financiamento da APS', vigilancia:'Vigilância à Saúde', planejamento:'Planejamento', atencao:'Atenção Primária', gestao:'Gestão em Saúde' };
+  if (filters.cat !== 'todas')    parts.push({ k:'cat',    v: labels[filters.cat]||filters.cat });
+  if (filters.ambito !== 'todos') parts.push({ k:'ambito', v: filters.ambito });
+  if (filters.status !== 'todos') parts.push({ k:'status', v: filters.status });
+  if (filters.tipo !== 'todos')   parts.push({ k:'tipo',   v: filters.tipo });
+  af.innerHTML = parts.map(p =>
+    `<span class="af-tag">${p.v}<button onclick="clearFilter('${p.k}')">✕</button></span>`
+  ).join('');
+}
+
+/* ── FILTERS ── */
+function setFilter(key, val, el) {
+  filters[key] = val;
+  el.closest('.filter-block').querySelectorAll('.f-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  renderAll();
+}
+
+function clearFilter(key) {
+  const defaults = { cat:'todas', ambito:'todos', status:'todos', tipo:'todos' };
+  filters[key] = defaults[key];
+  document.querySelectorAll(`[data-filter="${key}"]`).forEach(o => o.classList.remove('sel'));
+  const defEl = document.querySelector(`[data-filter="${key}"][data-val="${defaults[key]}"]`);
+  if (defEl) defEl.classList.add('sel');
+  renderAll();
+}
+
+function setView(v, btn) {
+  currentView = v;
+  document.querySelectorAll('.vtbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('cardsWrap').style.display = v === 'cards' ? '' : 'none';
+  document.getElementById('tableWrap').style.display = v === 'table' ? '' : 'none';
+}
+
+function qs(q) {
+  document.getElementById('searchInput').value = q;
+  renderAll();
+}
+
+/* ── DETAIL MODAL ── */
+function openDetail(id) {
+  const d = DADOS.find(x => x.id === id);
+  if (!d) return;
+  const c = CATS[d.cat];
+
+  document.getElementById('detBadges').innerHTML = `
+    <span style="background:${c.bg};color:${c.color};font-size:.72rem;font-weight:700;padding:.22rem .6rem;border-radius:20px">${c.label}</span>
+    <span style="background:var(--cinza-f);color:var(--texto-lt);font-size:.72rem;padding:.22rem .55rem;border-radius:4px;font-family:'DM Mono',monospace">${d.tipo}</span>
+    <span style="background:var(--cinza-f);color:var(--texto-lt);font-size:.72rem;padding:.22rem .55rem;border-radius:4px">${d.ambito}</span>
+    <span style="font-size:.72rem;font-weight:600">${statusDot(d.status)}${d.status}</span>`;
+
+  document.getElementById('detTitle').textContent = d.nome;
+  document.getElementById('detSub').textContent = '🏛 ' + d.inst;
+
+  document.getElementById('detMeta').innerHTML = `
+    <div class="mi"><label>Área de Saúde</label><span>${d.area}</span></div>
+    <div class="mi"><label>Público-Alvo</label><span>${d.publico}</span></div>
+    <div class="mi"><label>Disponibilidade</label><span>${d.disp}</span></div>
+    <div class="mi"><label>Âmbito</label><span>${d.ambito}</span></div>
+    <div class="mi"><label>Cobertura Geográfica</label><span>${d.cobertura}</span></div>
+    <div class="mi"><label>Ano de Criação</label><span>${d.criado}</span></div>`;
+
+  document.getElementById('bvsNote').style.display = d.bvs ? 'flex' : 'none';
+  document.getElementById('detDesc').textContent = d.desc;
+  document.getElementById('detUtil').textContent = d.util;
+  document.getElementById('detDocs').innerHTML = d.docs.map(doc =>
+    `<li class="doc-row">
+      <span class="doc-ico">📄</span>
+      <span class="doc-name">${doc.n}</span>
+      <span class="doc-src">${doc.src}</span>
+      <a class="doc-link" href="${doc.l}" target="_blank" onclick="event.stopPropagation()">Ver →</a>
+    </li>`).join('');
+  document.getElementById('detDates').textContent = `Última atualização: ${d.atualizado}`;
+
+  openOv('ovDetail');
+}
+
+/* ── FORM STEPS ── */
+function openForm() {
+  if (!currentUser) { openLogin(); return; }
+  currentStep = 0;
+  document.getElementById('fDataCad').value = new Date().toLocaleDateString('pt-BR');
+  updateStepUI();
+  openOv('ovForm');
+}
+
+function updateStepUI() {
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    document.getElementById('fs'+i).classList.toggle('active', i === currentStep);
+    const s = document.getElementById('step'+i);
+    s.classList.remove('done','curr');
+    if (i < currentStep) s.classList.add('done');
+    if (i === currentStep) s.classList.add('curr');
+    const dot = s.querySelector('.step-dot');
+    dot.textContent = i < currentStep ? '✓' : i+1;
+  }
+  document.getElementById('stepCounter').textContent = `Etapa ${currentStep+1} de ${TOTAL_STEPS}`;
+  document.getElementById('btnBack').style.display = currentStep > 0 ? '' : 'none';
+  document.getElementById('btnNext').textContent = currentStep === TOTAL_STEPS-1 ? '✓ Enviar para Revisão' : 'Próximo →';
+
+  if (currentStep === TOTAL_STEPS-1) buildSummary();
+}
+
+function stepNext() {
+  if (currentStep === TOTAL_STEPS-1) { submitForm(); return; }
+  currentStep++;
+  updateStepUI();
+}
+
+function stepBack() {
+  if (currentStep > 0) { currentStep--; updateStepUI(); }
+}
+
+function buildSummary() {
+  const v = id => document.getElementById(id)?.value || '—';
+  document.getElementById('summaryBox').innerHTML = `
+    <strong>Nome:</strong> ${v('fNome')}<br>
+    <strong>Categoria:</strong> ${v('fCat')}<br>
+    <strong>Tipo:</strong> ${v('fTipo')}<br>
+    <strong>Instituição:</strong> ${v('fInst')}<br>
+    <strong>Área de Saúde:</strong> ${v('fArea')}<br>
+    <strong>Âmbito:</strong> ${v('fAmbito')}<br>
+    <strong>Status:</strong> ${v('fStatus')}<br>
+    <strong>Disponibilidade:</strong> ${v('fDisp')}<br>
+    <strong>Ano de criação:</strong> ${v('fAnoCriacao')}<br>
+    <strong>Última atualização:</strong> ${v('fUltAtt')}<br>`;
+}
+
+function submitForm() {
+  closeOvDirect('ovForm');
+  showToast('✅ Iniciativa enviada para revisão! Um revisor será notificado.','success');
+}
+
+function addDoc() {
+  const rep = document.getElementById('docRepeater');
+  const div = document.createElement('div');
+  div.className = 'doc-entry';
+  div.innerHTML = `
+    <button class="doc-entry-remove" onclick="removeDoc(this)" title="Remover">✕</button>
+    <div class="doc-entry-grid">
+      <div class="fld"><label>Descrição</label><input type="text" placeholder="Ex.: Portaria de regulamentação"></div>
+      <div class="fld"><label>Link / URL</label><input type="url" placeholder="https://…"></div>
+      <div class="fld"><label>Fonte</label><select><option>Portal MS</option><option>BVS</option><option>Portal Institucional</option><option>Outro</option></select></div>
+    </div>`;
+  rep.appendChild(div);
+}
+
+function removeDoc(btn) {
+  const entries = document.getElementById('docRepeater').querySelectorAll('.doc-entry');
+  if (entries.length > 1) btn.closest('.doc-entry').remove();
+}
+
+/* ── REVIEW ── */
+function openReview() {
+  openOv('ovReview');
+}
+
+let pendingCount = 2;
+function approveItem(id, nome) {
+  document.getElementById(id).style.opacity = '.4';
+  document.getElementById(id).style.pointerEvents = 'none';
+  pendingCount--;
+  document.getElementById('stPending').textContent = pendingCount;
+  if (pendingCount <= 0) document.getElementById('pendingBar').classList.remove('show');
+  showToast(`✅ "${nome}" aprovada e publicada!`, 'success');
+  if (pendingCount === 0) setTimeout(() => closeOvDirect('ovReview'), 1200);
+}
+
+function returnItem(id) {
+  document.getElementById(id).style.opacity = '.4';
+  document.getElementById(id).style.pointerEvents = 'none';
+  pendingCount--;
+  document.getElementById('stPending').textContent = pendingCount;
+  if (pendingCount <= 0) document.getElementById('pendingBar').classList.remove('show');
+  showToast('↩ Iniciativa devolvida para correção.', 'warning');
+}
+
+/* ── LOGIN ── */
+function openLogin() { openOv('ovLogin'); }
+
+function doLogin(role, name, icon) {
+  currentUser = { role, name, icon };
+  closeOvDirect('ovLogin');
+
+  document.getElementById('btnLogin').style.display = 'none';
+  document.getElementById('userInfo').classList.add('show');
+  document.getElementById('userAvatar').textContent = icon;
+  document.getElementById('userName').textContent = name;
+
+  const canEdit = role === 'bolsista' || role === 'admin';
+  const canReview = role === 'revisor' || role === 'admin';
+  document.getElementById('btnNova').style.display = canEdit ? 'flex' : 'none';
+  if (canReview) document.getElementById('pendingBar').classList.add('show');
+
+  showToast(`👋 Bem-vindo(a), ${name}!`, 'success');
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('btnLogin').style.display = 'flex';
+  document.getElementById('userInfo').classList.remove('show');
+  document.getElementById('btnNova').style.display = 'none';
+  document.getElementById('pendingBar').classList.remove('show');
+  showToast('Sessão encerrada.', '');
+}
+
+/* ── OVERLAYS ── */
+function openOv(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeOv(id, e) {
+  if (e.target === document.getElementById(id)) closeOvDirect(id);
+}
+function closeOvDirect(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ── TOAST ── */
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type||'');
+  setTimeout(() => t.className = 'toast', 3200);
+}
+
+function goHome() {
+  document.getElementById('searchInput').value = '';
+  filters = { cat:'todas', ambito:'todos', status:'todos', tipo:'todos' };
+  document.querySelectorAll('.f-opt').forEach(o => {
+    const isDefault = ['todas','todos'].includes(o.dataset.val);
+    o.classList.toggle('sel', isDefault);
+  });
+  renderAll();
+}
+
+/* ── INIT ── */
+renderAll();
+</script>
+</body>
+</html>
