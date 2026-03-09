@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repositório de Iniciativas Digitais em Saúde</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1a6b4a;
+    --verde-claro: #2d9b6e;
+    --verde-menta: #e8f5ef;
+    --azul: #1c4a6e;
+    --azul-claro: #e8f0f7;
+    --amarelo: #e8a020;
+    --cinza: #f5f4f1;
+    --cinza-medio: #c8c4bc;
+    --texto: #1e1e1e;
+    --texto-suave: #5a5a5a;
+    --branco: #fdfcfa;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--branco);
+    color: var(--texto);
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--verde);
+    color: white;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,.18);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,.18);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  .logo span { font-size: .72rem; font-family: 'IBM Plex Sans', sans-serif; font-weight: 300; opacity: .75; display: block; }
+
+  nav { display: flex; gap: 1.5rem; align-items: center; }
+  nav a { color: rgba(255,255,255,.85); text-decoration: none; font-size: .85rem; font-weight: 500; transition: color .2s; }
+  nav a:hover { color: white; }
+  nav a.active { color: white; border-bottom: 2px solid var(--amarelo); padding-bottom: 2px; }
+
+  .btn-contribuir {
+    background: var(--amarelo);
+    color: #1a1a1a !important;
+    padding: .45rem 1rem;
+    border-radius: 6px;
+    font-weight: 600 !important;
+    font-size: .82rem !important;
+    transition: background .2s !important;
+  }
+  .btn-contribuir:hover { background: #d4911a !important; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--verde) 0%, var(--azul) 100%);
+    color: white;
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: .75rem;
+    position: relative;
+  }
+
+  .hero p {
+    font-size: 1rem;
+    opacity: .85;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    font-weight: 300;
+    position: relative;
+  }
+
+  .hero-search {
+    display: flex;
+    max-width: 580px;
+    margin: 0 auto;
+    position: relative;
+    gap: 0;
+  }
+
+  .hero-search input {
+    flex: 1;
+    padding: .85rem 1.2rem;
+    border: none;
+    border-radius: 8px 0 0 8px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .95rem;
+    outline: none;
+    background: white;
+    color: var(--texto);
+  }
+
+  .hero-search button {
+    background: var(--amarelo);
+    border: none;
+    padding: .85rem 1.4rem;
+    border-radius: 0 8px 8px 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: .9rem;
+    cursor: pointer;
+    color: #1a1a1a;
+    transition: background .2s;
+  }
+  .hero-search button:hover { background: #d4911a; }
+
+  .hero-tags {
+    margin-top: 1.2rem;
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+  }
+
+  .hero-tags span {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.25);
+    color: white;
+    padding: .25rem .75rem;
+    border-radius: 20px;
+    font-size: .78rem;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .hero-tags span:hover { background: rgba(255,255,255,.25); }
+
+  /* ── STATS ── */
+  .stats {
+    background: white;
+    border-bottom: 1px solid #e8e6e1;
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+  }
+
+  .stat { text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--verde); }
+  .stat-label { font-size: .75rem; color: var(--texto-suave); text-transform: uppercase; letter-spacing: .05em; }
+
+  /* ── LAYOUT PRINCIPAL ── */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    gap: 2rem;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar { position: sticky; top: 80px; align-self: start; }
+
+  .filter-section { margin-bottom: 1.75rem; }
+
+  .filter-title {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--texto-suave);
+    font-weight: 600;
+    margin-bottom: .75rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid #e8e6e1;
+  }
+
+  .filter-option {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .4rem .5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: .875rem;
+    transition: background .15s;
+    color: var(--texto);
+  }
+  .filter-option:hover { background: var(--verde-menta); }
+  .filter-option.active { background: var(--verde-menta); color: var(--verde); font-weight: 600; }
+
+  .filter-option input[type="checkbox"] { accent-color: var(--verde); width: 14px; height: 14px; }
+
+  .filter-badge {
+    margin-left: auto;
+    background: var(--cinza);
+    color: var(--texto-suave);
+    font-size: .7rem;
+    padding: .1rem .45rem;
+    border-radius: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .categoria-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── CONTENT ── */
+  .content-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  .content-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .sort-select {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .82rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: .35rem .75rem;
+    color: var(--texto);
+    background: white;
+    cursor: pointer;
+  }
+
+  /* ── CARDS ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid #e8e6e1;
+    border-radius: 12px;
+    padding: 1.35rem;
+    transition: box-shadow .2s, transform .2s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); transform: translateY(-2px); }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: .85rem;
+  }
+
+  .card-categoria {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: .25rem .65rem;
+    border-radius: 20px;
+  }
+
+  .card-ambito {
+    font-size: .7rem;
+    color: var(--texto-suave);
+    background: var(--cinza);
+    padding: .2rem .55rem;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: .5rem;
+    line-height: 1.35;
+    color: var(--texto);
+  }
+
+  .card-tipo {
+    display: inline-block;
+    font-size: .72rem;
+    color: var(--texto-suave);
+    margin-bottom: .65rem;
+  }
+
+  .card p {
+    font-size: .85rem;
+    color: var(--texto-suave);
+    line-height: 1.55;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .tag {
+    font-size: .72rem;
+    padding: .2rem .6rem;
+    border-radius: 4px;
+    background: var(--azul-claro);
+    color: var(--azul);
+    font-weight: 500;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: .85rem;
+    border-top: 1px solid #f0ede8;
+  }
+
+  .card-instituicao {
+    font-size: .78rem;
+    color: var(--texto-suave);
+    font-weight: 500;
+  }
+
+  .card-docs {
+    font-size: .75rem;
+    color: var(--verde);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 200;
+    padding: 2rem;
+    overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+
+  .modal {
+    background: white;
+    border-radius: 16px;
+    max-width: 780px;
+    width: 100%;
+    overflow: hidden;
+    animation: slideUp .25s ease;
+    margin: auto;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-header {
+    padding: 1.75rem 2rem 1.25rem;
+    border-bottom: 1px solid #e8e6e1;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.25rem; right: 1.25rem;
+    background: var(--cinza);
+    border: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--texto-suave);
+    transition: background .2s;
+  }
+  .modal-close:hover { background: #ddd; }
+
+  .modal-header-badges { display: flex; gap: .5rem; margin-bottom: .75rem; flex-wrap: wrap; }
+
+  .modal-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: .4rem;
+  }
+
+  .modal-header .subtitulo {
+    font-size: .88rem;
+    color: var(--texto-suave);
+  }
+
+  .modal-body { padding: 1.75rem 2rem; }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 2rem;
+    margin-bottom: 1.75rem;
+    background: var(--cinza);
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+
+  .meta-item label {
+    display: block;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--texto-suave);
+    font-weight: 600;
+    margin-bottom: .25rem;
+  }
+
+  .meta-item span {
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--texto);
+  }
+
+  .section-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--texto-suave);
+    font-weight: 600;
+    margin-bottom: .75rem;
+    padding-bottom: .4rem;
+    border-bottom: 1px solid #e8e6e1;
+  }
+
+  .modal-descricao {
+    font-size: .9rem;
+    color: var(--texto-suave);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .doc-list { list-style: none; display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1.5rem; }
+
+  .doc-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .65rem .9rem;
+    background: var(--azul-claro);
+    border-radius: 8px;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .doc-item:hover { background: #d5e3f0; }
+
+  .doc-icon { color: var(--azul); font-size: 1rem; flex-shrink: 0; }
+  .doc-nome { flex: 1; font-weight: 500; color: var(--azul); }
+  .doc-link { font-size: .75rem; color: var(--verde); font-weight: 600; text-decoration: none; }
+
+  .modal-footer {
+    padding: 1.25rem 2rem;
+    background: var(--cinza);
+    display: flex;
+    gap: .75rem;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: .6rem 1.25rem;
+    border-radius: 8px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+  }
+
+  .btn-primary { background: var(--verde); color: white; }
+  .btn-primary:hover { background: var(--verde-claro); }
+  .btn-secondary { background: white; color: var(--texto); border: 1px solid #ddd; }
+  .btn-secondary:hover { background: var(--cinza); }
+
+  /* ── PLANILHA VIEW ── */
+  .view-toggle {
+    display: flex;
+    gap: .3rem;
+    background: var(--cinza);
+    border-radius: 8px;
+    padding: .25rem;
+  }
+
+  .view-btn {
+    padding: .35rem .75rem;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .8rem;
+    cursor: pointer;
+    color: var(--texto-suave);
+    font-weight: 500;
+    transition: all .15s;
+  }
+  .view-btn.active { background: white; color: var(--texto); box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+
+  .table-view { display: none; overflow-x: auto; }
+  .table-view.active { display: block; }
+  .cards-view { display: none; }
+  .cards-view.active { display: block; }
+
+  table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+
+  thead tr { background: var(--verde); color: white; }
+  thead th { padding: .75rem 1rem; text-align: left; font-weight: 600; font-size: .78rem; white-space: nowrap; }
+
+  tbody tr { border-bottom: 1px solid #f0ede8; transition: background .1s; cursor: pointer; }
+  tbody tr:hover { background: var(--verde-menta); }
+  tbody td { padding: .7rem 1rem; vertical-align: top; }
+
+  .td-nome { font-weight: 600; color: var(--verde); font-size: .88rem; }
+  .td-tipo { font-family: 'IBM Plex Mono', monospace; font-size: .75rem; color: var(--texto-suave); }
+
+  /* Cores por categoria */
+  .cat-financiamento { --cat-color: #2d9b6e; --cat-bg: #e8f5ef; }
+  .cat-vigilancia    { --cat-color: #1c4a6e; --cat-bg: #e8f0f7; }
+  .cat-planejamento  { --cat-color: #7b5ea7; --cat-bg: #f0ebf9; }
+  .cat-atencao       { --cat-color: #c0622b; --cat-bg: #fdf0e8; }
+  .cat-gestao        { --cat-color: #1a7a7a; --cat-bg: #e8f5f5; }
+
+  .badge-cat {
+    background: var(--cat-bg);
+    color: var(--cat-color);
+    font-size: .7rem;
+    font-weight: 700;
+    padding: .25rem .65rem;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .card[data-cat]::before { background: var(--cat-color); }
+  .card[data-cat] .card-categoria { background: var(--cat-bg); color: var(--cat-color); }
+
+  /* Disponibilidade */
+  .disp-badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .72rem; font-weight: 600;
+  }
+  .disp-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .disp-online .disp-dot { background: #22c55e; }
+  .disp-parcial .disp-dot { background: var(--amarelo); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .main-layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .stats { gap: 1.5rem; }
+    .hero h1 { font-size: 1.7rem; }
+    .meta-grid { grid-template-columns: 1fr; }
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: var(--texto-suave);
+  }
+
+  .tooltip { position: relative; }
+  .tooltip:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+    background: #333; color: white; padding: .3rem .6rem; border-radius: 4px; font-size: .72rem; white-space: nowrap; z-index: 10;
+  }
+
+  /* PLANILHA CONTRIBUIÇÃO */
+  .contribuir-section {
+    background: linear-gradient(135deg, var(--verde-menta), var(--azul-claro));
+    border: 1px solid #c8dfd0;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  .contribuir-section h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: .4rem; color: var(--verde); }
+  .contribuir-section p { font-size: .85rem; color: var(--texto-suave); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🏥</div>
+    <div>
+      Repositório de Iniciativas Digitais
+      <span>em Saúde · Brasil</span>
+    </div>
+  </div>
+  <nav>
+    <a href="#" class="active">Explorar</a>
+    <a href="#">Categorias</a>
+    <a href="#">Sobre</a>
+    <a href="#" class="btn-contribuir">+ Contribuir</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Iniciativas Digitais em Saúde</h1>
+  <p>Repositório organizado de sistemas, plataformas, programas e campanhas digitais para profissionais e gestores da saúde pública brasileira.</p>
+  <div class="hero-search">
+    <input type="text" id="searchInput" placeholder="Buscar iniciativas, sistemas, programas…" oninput="filterCards()">
+    <button onclick="filterCards()">Buscar</button>
+  </div>
+  <div class="hero-tags">
+    <span onclick="setSearch('e-SUS')">e-SUS</span>
+    <span onclick="setSearch('RNDS')">RNDS</span>
+    <span onclick="setSearch('vigilância')">Vigilância</span>
+    <span onclick="setSearch('atenção primária')">Atenção Primária</span>
+    <span onclick="setSearch('SINAN')">SINAN</span>
+    <span onclick="setSearch('vacinação')">Vacinação</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-num" id="totalCount">12</div><div class="stat-label">Iniciativas</div></div>
+  <div class="stat"><div class="stat-num">5</div><div class="stat-label">Categorias</div></div>
+  <div class="stat"><div class="stat-num">3</div><div class="stat-label">Âmbitos</div></div>
+  <div class="stat"><div class="stat-num">28</div><div class="stat-label">Documentos Vinculados</div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="filter-section">
+      <div class="filter-title">Categoria Temática</div>
+      <label class="filter-option active" onclick="toggleFilter(this, 'cat', 'todas')">
+        <input type="checkbox" checked> Todas as categorias
+        <span class="filter-badge">12</span>
+      </label>
+      <label class="filter-option" onclick="toggleFilter(this, 'cat', 'financiamento')">
+        <span class="categoria-dot" style="background:#2d9b6e"></span>
+        Financiamento da APS
+        <span class="filter-badge">3</span>
+      </label>
+      <label class="filter-option" onclick="toggleFilter(this, 'cat', 'vigilancia')">
+        <span class="categoria-dot" style="background:#1c4a6e"></span>
+        Vigilância à Saúde
+        <span class="filter-badge">4</span>
+      </label>
+      <label class="filter-option" onclick="toggleFilter(this, 'cat', 'planejamento')">
+        <span class="categoria-dot" style="background:#7b5ea7"></span>
+        Planejamento
+        <span class="filter-badge">2</span>
+      </label>
+      <label class="filter-option" onclick="toggleFilter(this, 'cat', 'atencao')">
+        <span class="categoria-dot" style="background:#c0622b"></span>
+        Atenção Primária
+        <span class="filter-badge">2</span>
+      </label>
+      <label class="filter-option" onclick="toggleFilter(this, 'cat', 'gestao')">
+        <span class="categoria-dot" style="background:#1a7a7a"></span>
+        Gestão em Saúde
+        <span class="filter-badge">1</span>
+      </label>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-title">Âmbito</div>
+      <label class="filter-option active" onclick="toggleFilter(this, 'ambito', 'todos')">
+        <input type="checkbox" checked> Todos
+      </label>
+      <label class="filter-option" onclick="toggleFilter(this, 'ambito', 'Nacional')">
+        <input type="checkbox"> 🇧🇷 Nacional
+      </label>
+      <label class="filter-option" onclick="toggleFilter(this, 'ambito', 'Estadual')">
+        <input type="checkbox"> 🗺️ Estadual
+      </label>
+      <label class="filter-option" onclick="toggleFilter(this, 'ambito', 'Municipal')">
+        <input type="checkbox"> 🏙️ Municipal
+      </label>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-title">Tipo de Iniciativa</div>
+      <label class="filter-option"><input type="checkbox"> Sistema de Informação</label>
+      <label class="filter-option"><input type="checkbox"> Plataforma Digital</label>
+      <label class="filter-option"><input type="checkbox"> Programa</label>
+      <label class="filter-option"><input type="checkbox"> Campanha</label>
+      <label class="filter-option"><input type="checkbox"> Manual / Protocolo</label>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-title">Disponibilidade</div>
+      <label class="filter-option"><input type="checkbox"> Online / Acesso aberto</label>
+      <label class="filter-option"><input type="checkbox"> Acesso restrito</label>
+      <label class="filter-option"><input type="checkbox"> Parcial</label>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main>
+    <div class="content-header">
+      <h2>Resultados <span id="resultCount" style="font-size:.9rem;color:var(--texto-suave);font-family:'IBM Plex Sans',sans-serif;font-weight:400">(12 iniciativas)</span></h2>
+      <div style="display:flex;gap:.75rem;align-items:center">
+        <div class="view-toggle">
+          <button class="view-btn active" onclick="setView('cards', this)">⊞ Cards</button>
+          <button class="view-btn" onclick="setView('table', this)">≡ Tabela</button>
+        </div>
+        <select class="sort-select">
+          <option>Ordenar: Relevância</option>
+          <option>Nome A–Z</option>
+          <option>Categoria</option>
+          <option>Mais recentes</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- CARDS VIEW -->
+    <div class="cards-view active" id="cardsView">
+      <div class="cards-grid" id="cardsGrid"></div>
+    </div>
+
+    <!-- TABLE VIEW -->
+    <div class="table-view" id="tableView">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Âmbito</th>
+            <th>Área de Saúde</th>
+            <th>Instituição</th>
+            <th>Disponibilidade</th>
+            <th>Docs</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- CTA CONTRIBUIÇÃO -->
+    <div class="contribuir-section">
+      <div style="font-size:2.5rem">📋</div>
+      <div>
+        <h3>Contribua com novas iniciativas</h3>
+        <p>Profissionais de saúde podem preencher a planilha padronizada para incluir novas iniciativas digitais no repositório. Seu conhecimento técnico é fundamental para enriquecer este acervo.</p>
+      </div>
+      <button class="btn btn-primary" style="flex-shrink:0" onclick="openContribuir()">Baixar Planilha</button>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL DETALHE -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      <div class="modal-header-badges" id="modalBadges"></div>
+      <h2 id="modalTitle"></h2>
+      <div class="subtitulo" id="modalSubtitulo"></div>
+    </div>
+    <div class="modal-body">
+      <div class="meta-grid" id="modalMeta"></div>
+      <div class="section-label">Descrição</div>
+      <p class="modal-descricao" id="modalDescricao"></p>
+      <div class="section-label">Como utilizar</div>
+      <p class="modal-descricao" id="modalUtilizar"></p>
+      <div class="section-label">Documentos Relacionados</div>
+      <ul class="doc-list" id="modalDocs"></ul>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModalDirect()">Fechar</button>
+      <button class="btn btn-primary">🔗 Acessar Iniciativa</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const categorias = {
+  financiamento: { label: 'Financiamento da APS', color: '#2d9b6e', bg: '#e8f5ef' },
+  vigilancia:    { label: 'Vigilância à Saúde',   color: '#1c4a6e', bg: '#e8f0f7' },
+  planejamento:  { label: 'Planejamento',          color: '#7b5ea7', bg: '#f0ebf9' },
+  atencao:       { label: 'Atenção Primária',      color: '#c0622b', bg: '#fdf0e8' },
+  gestao:        { label: 'Gestão em Saúde',       color: '#1a7a7a', bg: '#e8f5f5' },
+};
+
+const dados = [
+  {
+    id: 1, cat: 'financiamento',
+    nome: 'PMAQ-AB – Programa de Melhoria do Acesso e da Qualidade',
+    tipo: 'Programa', ambito: 'Nacional',
+    area: 'Atenção Primária à Saúde',
+    publico: 'Equipes de saúde da família, gestores municipais',
+    instituicao: 'Ministério da Saúde / DAB',
+    descricao: 'Programa que induz a ampliação do acesso e a melhoria da qualidade da atenção básica, com garantia de um padrão de qualidade comparável nacional e regional, de maneira a permitir maior transparência e efetividade das ações governamentais.',
+    utilizar: 'Acessar o portal do DAB, realizar cadastro da equipe e submeter avaliações conforme ciclos do programa. Disponível para secretarias municipais de saúde.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Portaria nº 1.645/2015', link: 'https://bvsms.saude.gov.br' },
+      { nome: 'Manual Instrutivo PMAQ', link: 'https://aps.saude.gov.br' },
+      { nome: 'Relatório de Resultados 3º Ciclo', link: 'https://aps.saude.gov.br' },
+    ]
+  },
+  {
+    id: 2, cat: 'vigilancia',
+    nome: 'SINAN – Sistema de Informação de Agravos de Notificação',
+    tipo: 'Sistema de Informação', ambito: 'Nacional',
+    area: 'Vigilância Epidemiológica',
+    publico: 'Profissionais de vigilância, secretarias de saúde',
+    instituicao: 'SVS / Ministério da Saúde',
+    descricao: 'Sistema nacional para coleta, transmissão e disseminação de dados sobre agravos de notificação compulsória em todo o território brasileiro. Principal instrumento para o acompanhamento do perfil de morbidade e contribui para tomadas de decisão.',
+    utilizar: 'Instalação do sistema cliente, configuração de acesso via DATASUS, notificação de casos pelas unidades de saúde e envio periódico às esferas estadual e federal.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Guia de Usuário SINAN', link: 'https://datasus.saude.gov.br' },
+      { nome: 'Ficha de Notificação Individual', link: 'https://sinan.saude.gov.br' },
+    ]
+  },
+  {
+    id: 3, cat: 'atencao',
+    nome: 'e-SUS Atenção Primária',
+    tipo: 'Sistema de Informação', ambito: 'Nacional',
+    area: 'Atenção Primária à Saúde',
+    publico: 'Profissionais das equipes de saúde da família e atenção básica',
+    instituicao: 'Ministério da Saúde / SAPS',
+    descricao: 'Estratégia do Ministério da Saúde para reestruturar as informações da atenção básica em nível nacional, por meio de dois sistemas: CDS (Coleta de Dados Simplificada) e PEC (Prontuário Eletrônico do Cidadão).',
+    utilizar: 'Download e instalação do sistema PEC ou CDS no computador da UBS. Após configuração local, os dados são transmitidos ao RNDS e ao SISAB.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Manual de Implantação e-SUS PEC', link: 'https://aps.saude.gov.br' },
+      { nome: 'Nota Técnica e-SUS', link: 'https://aps.saude.gov.br' },
+      { nome: 'Treinamentos em vídeo', link: 'https://www.youtube.com' },
+    ]
+  },
+  {
+    id: 4, cat: 'planejamento',
+    nome: 'SARGSUS – Sistema de Apoio ao Relatório de Gestão',
+    tipo: 'Sistema de Informação', ambito: 'Nacional',
+    area: 'Gestão / Planejamento em Saúde',
+    publico: 'Gestores municipais, estaduais e federais do SUS',
+    instituicao: 'Ministério da Saúde / SE',
+    descricao: 'Sistema que apoia a elaboração e consolidação dos Relatórios de Gestão do SUS nos três entes federados, conforme exigência legal do controle social e do Pacto pela Saúde.',
+    utilizar: 'Acesso via login no portal SAGE do Ministério da Saúde. Disponível para secretarias municipais e estaduais de saúde cadastradas.',
+    disponibilidade: 'Parcial',
+    docs: [
+      { nome: 'Manual de Orientação SARGSUS', link: 'https://sage.saude.gov.br' },
+    ]
+  },
+  {
+    id: 5, cat: 'vigilancia',
+    nome: 'SIVEP-Gripe – Vigilância Epidemiológica da Influenza',
+    tipo: 'Sistema de Informação', ambito: 'Nacional',
+    area: 'Vigilância Epidemiológica / Doenças Respiratórias',
+    publico: 'Profissionais de saúde, laboratórios, secretarias de saúde',
+    instituicao: 'SVS / Ministério da Saúde',
+    descricao: 'Sistema de vigilância epidemiológica da influenza e outros vírus respiratórios, que integra sentinelas ambulatoriais, hospitalares e dados laboratoriais para monitoramento em tempo oportuno.',
+    utilizar: 'Acesso por meio de login institucional. Notificação de casos de SRAG hospitalizado e síndrome gripal pelas unidades sentinela.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Protocolo de Vigilância da Influenza', link: 'https://svs.aids.gov.br' },
+      { nome: 'Boletim Epidemiológico Semanal', link: 'https://svs.aids.gov.br' },
+    ]
+  },
+  {
+    id: 6, cat: 'financiamento',
+    nome: 'FPO – Fundo de Participação dos Municípios – Bloco APS',
+    tipo: 'Plataforma Digital', ambito: 'Nacional',
+    area: 'Financiamento da Atenção Primária',
+    publico: 'Gestores financeiros e coordenadores de atenção básica',
+    instituicao: 'Ministério da Saúde / FNS',
+    descricao: 'Plataforma de acompanhamento e prestação de contas dos recursos federais transferidos fundo a fundo para o financiamento da atenção primária à saúde nos municípios brasileiros.',
+    utilizar: 'Acesso pelo SIOPS ou plataforma Fundo a Fundo. Necessário credenciamento junto ao Fundo Nacional de Saúde.',
+    disponibilidade: 'Parcial',
+    docs: [
+      { nome: 'Portaria de Consolidação nº 6', link: 'https://bvsms.saude.gov.br' },
+    ]
+  },
+  {
+    id: 7, cat: 'vigilancia',
+    nome: 'RNDS – Rede Nacional de Dados em Saúde',
+    tipo: 'Plataforma Digital', ambito: 'Nacional',
+    area: 'Saúde Digital / Interoperabilidade',
+    publico: 'Profissionais de saúde, estabelecimentos, sistemas de informação',
+    instituicao: 'DATASUS / Ministério da Saúde',
+    descricao: 'Plataforma nacional de interoperabilidade que permite o compartilhamento de dados de saúde do cidadão entre os diferentes pontos de atenção da RAS, usando padrão HL7 FHIR.',
+    utilizar: 'Integração via API FHIR. Sistemas habilitadores devem solicitar credenciais de acesso ao DATASUS e seguir o guia de integração disponível no portal.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Guia de Integração RNDS', link: 'https://rnds-guia.saude.gov.br' },
+      { nome: 'Portaria nº 1.434/2020', link: 'https://bvsms.saude.gov.br' },
+      { nome: 'Especificações FHIR Brasil', link: 'https://simplifier.net' },
+    ]
+  },
+  {
+    id: 8, cat: 'planejamento',
+    nome: 'RAAS – Registro das Ações Ambulatoriais de Saúde',
+    tipo: 'Sistema de Informação', ambito: 'Nacional',
+    area: 'Atenção Especializada / Psicossocial',
+    publico: 'Equipes de saúde mental, NASF, CAPS, equipes de reabilitação',
+    instituicao: 'Ministério da Saúde / SAPS',
+    descricao: 'Instrumento de registro de informações sobre procedimentos ambulatoriais especializados, permitindo o acompanhamento longitudinal de usuários em serviços de saúde mental e reabilitação.',
+    utilizar: 'Integrado ao e-SUS PEC ou por meio do sistema SISREG. Registro realizado pelos profissionais após cada atendimento ambulatorial.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Manual de Orientação RAAS', link: 'https://aps.saude.gov.br' },
+    ]
+  },
+  {
+    id: 9, cat: 'atencao',
+    nome: 'Conecte SUS Cidadão',
+    tipo: 'Plataforma Digital', ambito: 'Nacional',
+    area: 'Saúde Digital / Cidadania',
+    publico: 'Cidadãos brasileiros com acesso digital',
+    instituicao: 'DATASUS / Ministério da Saúde',
+    descricao: 'Aplicativo oficial do Governo Federal que permite ao cidadão acompanhar sua histórico de vacinação, exames, medicamentos dispensados, atendimentos e demais informações de saúde registradas no SUS.',
+    utilizar: 'Disponível para download nas lojas App Store e Google Play. Autenticação via gov.br. Dados alimentados pelas notificações feitas pelos serviços de saúde na RNDS.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Guia do Usuário Conecte SUS', link: 'https://conectesus.saude.gov.br' },
+      { nome: 'Nota Informativa SCTIE', link: 'https://bvsms.saude.gov.br' },
+    ]
+  },
+  {
+    id: 10, cat: 'vigilancia',
+    nome: 'SIVEP-Malária',
+    tipo: 'Sistema de Informação', ambito: 'Nacional',
+    area: 'Vigilância Epidemiológica / Doenças Tropicais',
+    publico: 'Profissionais de saúde da Amazônia Legal e áreas de risco',
+    instituicao: 'SVS / Ministério da Saúde',
+    descricao: 'Sistema de informações epidemiológicas para a vigilância da malária no Brasil, permitindo o monitoramento de casos, tratamentos e ações de controle vetorial nas áreas endêmicas.',
+    utilizar: 'Acesso via web com login institucional. Registro de lâminas positivas, notificação de casos e acompanhamento de tratamento pelos serviços de saúde das áreas endêmicas.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Manual de Diagnóstico e Tratamento da Malária', link: 'https://bvsms.saude.gov.br' },
+    ]
+  },
+  {
+    id: 11, cat: 'gestao',
+    nome: 'HORUS – Sistema Nacional de Gestão da Assistência Farmacêutica',
+    tipo: 'Sistema de Informação', ambito: 'Nacional',
+    area: 'Assistência Farmacêutica',
+    publico: 'Farmacêuticos, gestores de assistência farmacêutica',
+    instituicao: 'DAF / Ministério da Saúde',
+    descricao: 'Sistema de informações desenvolvido para qualificar a gestão da assistência farmacêutica no SUS, possibilitando o monitoramento da disponibilidade de medicamentos nos serviços de saúde.',
+    utilizar: 'Acesso via portal DAF. Gestores municipais e estaduais registram estoque, dispensação e abastecimento de medicamentos do componente básico e especializado.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Manual Operacional HORUS', link: 'https://daf.saude.gov.br' },
+      { nome: 'Nota Técnica RENAME', link: 'https://bvsms.saude.gov.br' },
+    ]
+  },
+  {
+    id: 12, cat: 'financiamento',
+    nome: 'Previne Brasil – Financiamento da APS',
+    tipo: 'Programa', ambito: 'Nacional',
+    area: 'Financiamento / Atenção Primária à Saúde',
+    publico: 'Gestores municipais, coordenadores de atenção básica',
+    instituicao: 'Ministério da Saúde / SAPS',
+    descricao: 'Modelo de financiamento federal da atenção primária à saúde baseado em três componentes: capitação ponderada, pagamento por desempenho e incentivo para ações estratégicas. Substituiu o PAB variável e PAB fixo anterior.',
+    utilizar: 'Acompanhamento via plataforma e-Gestor AB. Municípios devem manter cadastros atualizados no CNES e registros no e-SUS para garantir recebimento dos recursos.',
+    disponibilidade: 'Online',
+    docs: [
+      { nome: 'Portaria nº 2.979/2019 – Previne Brasil', link: 'https://bvsms.saude.gov.br' },
+      { nome: 'Manual de Operacionalização', link: 'https://aps.saude.gov.br' },
+      { nome: 'Painel Previne Brasil', link: 'https://egestorab.saude.gov.br' },
+    ]
+  },
+];
+
+let activeFilter = { cat: 'todas', ambito: 'todos' };
+let currentView = 'cards';
+
+function renderCards(list) {
+  const grid = document.getElementById('cardsGrid');
+  if (list.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><p style="font-size:2rem">🔍</p><p>Nenhuma iniciativa encontrada.</p></div>';
+    return;
+  }
+  grid.innerHTML = list.map(d => {
+    const cat = categorias[d.cat];
+    return `
+    <div class="card cat-${d.cat}" data-cat="${d.cat}" onclick="openModal(${d.id})" style="--cat-color:${cat.color};--cat-bg:${cat.bg}">
+      <div class="card-top">
+        <span class="card-categoria badge-cat" style="background:${cat.bg};color:${cat.color}">${cat.label}</span>
+        <span class="card-ambito">${d.ambito}</span>
+      </div>
+      <h3>${d.nome}</h3>
+      <span class="card-tipo">⬡ ${d.tipo}</span>
+      <p>${d.descricao}</p>
+      <div class="card-meta">
+        <span class="tag">${d.area}</span>
+        <span class="tag" style="background:var(--verde-menta);color:var(--verde)">${d.publico.split(',')[0]}</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-instituicao">🏛 ${d.instituicao}</span>
+        <span class="card-docs">📄 ${d.docs.length} doc${d.docs.length > 1 ? 's' : ''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTable(list) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = list.map(d => {
+    const cat = categorias[d.cat];
+    return `<tr onclick="openModal(${d.id})">
+      <td><span class="badge-cat" style="background:${cat.bg};color:${cat.color};font-size:.68rem;padding:.2rem .55rem;border-radius:12px;white-space:nowrap">${cat.label}</span></td>
+      <td class="td-nome">${d.nome}</td>
+      <td class="td-tipo">${d.tipo}</td>
+      <td>${d.ambito}</td>
+      <td style="font-size:.82rem;color:var(--texto-suave)">${d.area}</td>
+      <td style="font-size:.78rem;color:var(--texto-suave)">${d.instituicao}</td>
+      <td><span class="disp-badge disp-${d.disponibilidade === 'Online' ? 'online' : 'parcial'}"><span class="disp-dot"></span>${d.disponibilidade}</span></td>
+      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--verde)">${d.docs.length}</td>
+    </tr>`;
+  }).join('');
+}
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  return dados.filter(d => {
+    const catOk = activeFilter.cat === 'todas' || d.cat === activeFilter.cat;
+    const ambitoOk = activeFilter.ambito === 'todos' || d.ambito === activeFilter.ambito;
+    const search = !q || d.nome.toLowerCase().includes(q) || d.descricao.toLowerCase().includes(q) || d.area.toLowerCase().includes(q) || d.tipo.toLowerCase().includes(q);
+    return catOk && ambitoOk && search;
+  });
+}
+
+function filterCards() {
+  const list = getFiltered();
+  renderCards(list);
+  renderTable(list);
+  document.getElementById('resultCount').textContent = `(${list.length} iniciativa${list.length !== 1 ? 's' : ''})`;
+}
+
+function toggleFilter(el, type, val) {
+  const section = el.closest('.filter-section');
+  section.querySelectorAll('.filter-option').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter[type] = val;
+  filterCards();
+}
+
+function setSearch(q) {
+  document.getElementById('searchInput').value = q;
+  filterCards();
+}
+
+function setView(v, btn) {
+  currentView = v;
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cardsView').classList.toggle('active', v === 'cards');
+  document.getElementById('tableView').classList.toggle('active', v === 'table');
+}
+
+function openModal(id) {
+  const d = dados.find(x => x.id === id);
+  if (!d) return;
+  const cat = categorias[d.cat];
+
+  document.getElementById('modalBadges').innerHTML = `
+    <span class="badge-cat" style="background:${cat.bg};color:${cat.color}">${cat.label}</span>
+    <span style="background:var(--cinza);color:var(--texto-suave);font-size:.72rem;padding:.25rem .6rem;border-radius:4px;font-family:'IBM Plex Mono',monospace">${d.tipo}</span>
+    <span style="background:var(--cinza);color:var(--texto-suave);font-size:.72rem;padding:.25rem .6rem;border-radius:4px">${d.ambito}</span>`;
+
+  document.getElementById('modalTitle').textContent = d.nome;
+  document.getElementById('modalSubtitulo').textContent = d.instituicao;
+
+  document.getElementById('modalMeta').innerHTML = `
+    <div class="meta-item"><label>Área de Saúde</label><span>${d.area}</span></div>
+    <div class="meta-item"><label>Público-Alvo</label><span>${d.publico}</span></div>
+    <div class="meta-item"><label>Disponibilidade</label><span>${d.disponibilidade}</span></div>
+    <div class="meta-item"><label>Âmbito</label><span>${d.ambito}</span></div>`;
+
+  document.getElementById('modalDescricao').textContent = d.descricao;
+  document.getElementById('modalUtilizar').textContent = d.utilizar;
+  document.getElementById('modalDocs').innerHTML = d.docs.map(doc => `
+    <li class="doc-item">
+      <span class="doc-icon">📄</span>
+      <span class="doc-nome">${doc.nome}</span>
+      <a class="doc-link" href="${doc.link}" target="_blank" onclick="event.stopPropagation()">Ver →</a>
+    </li>`).join('');
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function openContribuir() {
+  alert('Em breve: download da planilha padronizada para contribuição!');
+}
+
+// Init
+renderCards(dados);
+renderTable(dados);
+</script>
+</body>
+</html>
