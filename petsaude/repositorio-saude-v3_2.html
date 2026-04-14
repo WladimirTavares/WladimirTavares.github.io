@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RIDS · Repositório de Iniciativas Digitais em Saúde</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080c10;--bg2:#0d1117;--bg3:#131920;--surface:rgba(255,255,255,.04);--surface2:rgba(255,255,255,.07);--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#e8edf2;--text2:#8a97a8;--text3:#4a5568;--green:#00d68f;--green-dim:rgba(0,214,143,.12);--green-glow:rgba(0,214,143,.25);--teal:#00b4d8;--teal-dim:rgba(0,180,216,.1);--amber:#f59e0b;--amber-dim:rgba(245,158,11,.12);--rose:#fb7185;--violet:#a78bfa;--r:12px;--r-lg:18px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;animation:pulse 8s ease-in-out infinite alternate}
+.o1{width:600px;height:600px;background:radial-gradient(circle,rgba(0,214,143,.08),transparent 70%);top:-200px;left:-200px}
+.o2{width:500px;height:500px;background:radial-gradient(circle,rgba(0,180,216,.06),transparent 70%);bottom:-100px;right:-100px;animation-delay:-4s}
+.o3{width:300px;height:300px;background:radial-gradient(circle,rgba(167,139,250,.05),transparent 70%);top:40%;left:50%;animation-delay:-2s}
+@keyframes pulse{from{opacity:.6;transform:scale(1)}to{opacity:1;transform:scale(1.1)}}
+nav{position:sticky;top:0;z-index:200;background:rgba(8,12,16,.82);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;padding:0 1.75rem;gap:1.25rem}
+.nav-logo{display:flex;align-items:center;gap:.65rem;cursor:pointer;flex-shrink:0}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--green),var(--teal));border-radius:9px;display:grid;place-items:center;font-size:.85rem;box-shadow:0 0 20px var(--green-glow)}
+.logo-name{font-size:.95rem;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,#fff 0%,var(--text2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-v{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--green);background:var(--green-dim);border:1px solid rgba(0,214,143,.2);padding:.1rem .4rem;border-radius:4px;letter-spacing:.04em}
+.nav-links{display:flex;gap:.2rem;margin-left:.3rem}
+.nl{font-size:.78rem;font-weight:500;color:var(--text2);padding:.35rem .7rem;border-radius:7px;background:none;border:none;cursor:pointer;transition:all .15s;letter-spacing:.02em}
+.nl:hover,.nl.on{color:var(--text);background:var(--surface2)}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:.5rem}
+.btn-gs{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:8px;padding:.38rem .85rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.4rem}
+.btn-gs:hover{color:var(--text);border-color:rgba(255,255,255,.25);background:var(--surface2)}
+.btn-gr{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;color:#000;background:var(--green);border:none;border-radius:8px;padding:.38rem .9rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.4rem;box-shadow:0 0 16px rgba(0,214,143,.3)}
+.btn-gr:hover{background:#00f0a0;box-shadow:0 0 24px rgba(0,214,143,.5)}
+.u-pill{display:none;align-items:center;gap:.5rem;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:.3rem .75rem .3rem .45rem;font-size:.78rem;cursor:pointer;transition:all .15s}
+.u-pill:hover{background:rgba(255,255,255,.1)}
+.u-pill.show{display:flex}
+.u-dot{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--teal));display:grid;place-items:center;font-size:.72rem}
+.hero{position:relative;z-index:1;padding:5rem 2rem 4rem;text-align:center;overflow:hidden}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:500;letter-spacing:.12em;color:var(--green);text-transform:uppercase;background:var(--green-dim);border:1px solid rgba(0,214,143,.2);padding:.35rem .9rem;border-radius:20px;margin-bottom:1.75rem;animation:fsu .6s ease both}
+.eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hero h1{font-family:'Instrument Serif',serif;font-size:clamp(2.8rem,6vw,4.5rem);font-weight:400;line-height:1.1;letter-spacing:-.02em;color:white;margin-bottom:1.25rem;animation:fsu .6s .1s ease both}
+.hero h1 em{font-style:italic;background:linear-gradient(135deg,var(--green) 0%,var(--teal) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1rem;font-weight:400;color:var(--text2);max-width:520px;margin:0 auto 2.5rem;line-height:1.7;animation:fsu .6s .2s ease both}
+@keyframes fsu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.s-wrap{max-width:600px;margin:0 auto 1.5rem;position:relative;animation:fsu .6s .3s ease both}
+.s-box{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;display:flex;align-items:center;padding:.2rem .2rem .2rem 1.25rem;transition:all .2s}
+.s-box:focus-within{border-color:rgba(0,214,143,.4);box-shadow:0 0 0 4px var(--green-glow);background:rgba(255,255,255,.06)}
+.s-box input{flex:1;background:none;border:none;outline:none;font-family:'Syne',sans-serif;font-size:.9rem;color:var(--text);padding:.7rem 0}
+.s-box input::placeholder{color:var(--text3)}
+.s-btn{background:var(--green);color:#000;border:none;border-radius:10px;padding:.65rem 1.25rem;font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
+.s-btn:hover{background:#00f0a0}
+.htags{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;animation:fsu .6s .4s ease both}
+.htag{font-size:.72rem;font-weight:500;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:.22rem .65rem;cursor:pointer;transition:all .15s}
+.htag:hover{color:var(--text);border-color:var(--border2);background:var(--surface2)}
+.stats-strip{position:relative;z-index:1;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(13,17,23,.6);backdrop-filter:blur(10px)}
+.sc{padding:1.1rem 1.5rem;border-right:1px solid var(--border);text-align:center}
+.sc:last-child{border-right:none}
+.sn{font-family:'Instrument Serif',serif;font-size:1.8rem;color:white;line-height:1}
+.sn span{color:var(--green)}
+.sl{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-top:.3rem}
+.main{position:relative;z-index:1;display:grid;grid-template-columns:220px 1fr;max-width:1400px;margin:0 auto;padding:2rem;gap:1.75rem}
+.sidebar{position:sticky;top:76px;align-self:start}
+.sb-s{margin-bottom:1.75rem}
+.sb-h{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:.65rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sb-cl{color:var(--green);cursor:pointer;font-size:.62rem;letter-spacing:0;text-transform:none;transition:opacity .15s}
+.sb-cl:hover{opacity:.7}
+.fi{display:flex;align-items:center;gap:.55rem;padding:.38rem .5rem;border-radius:7px;cursor:pointer;font-size:.8rem;font-weight:500;color:var(--text2);transition:all .12s;user-select:none}
+.fi:hover{background:var(--surface2);color:var(--text)}
+.fi.on{background:var(--green-dim);color:var(--green)}
+.fi.on .fc{background:rgba(0,214,143,.2);color:var(--green)}
+.fd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.fc{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.62rem;background:var(--surface2);color:var(--text3);padding:.1rem .38rem;border-radius:6px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem}
+.rl{font-size:.82rem;font-weight:600;color:var(--text)}
+.rs{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text3);margin-left:.3rem}
+.ach{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
+.ac{display:flex;align-items:center;gap:.3rem;background:var(--green-dim);border:1px solid rgba(0,214,143,.25);color:var(--green);font-size:.72rem;font-weight:600;padding:.2rem .55rem;border-radius:20px}
+.ac button{background:none;border:none;color:var(--green);cursor:pointer;font-size:.8rem;line-height:1}
+.tr{display:flex;align-items:center;gap:.5rem}
+.vs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.18rem;gap:.15rem}
+.vsb{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:600;color:var(--text2);background:none;border:none;padding:.32rem .65rem;border-radius:6px;cursor:pointer;transition:all .12s;letter-spacing:.03em}
+.vsb.on{background:var(--surface2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sp{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:500;background:var(--surface);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:.38rem .75rem;cursor:pointer;outline:none}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1rem}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.35rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;animation:ci .4s ease both}
+@keyframes ci{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cc,var(--green)),transparent);opacity:0;transition:opacity .2s}
+.card::after{content:'';position:absolute;top:20%;left:0;width:2px;bottom:20%;background:var(--cc,var(--green));border-radius:0 2px 2px 0;opacity:0;transition:opacity .2s}
+.card:hover{border-color:rgba(255,255,255,.14);background:var(--bg3);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.06);transform:translateY(-3px)}
+.card:hover::before,.card:hover::after{opacity:.6}
+.c-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:.5rem}
+.c-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:.22rem .6rem;border-radius:6px;white-space:nowrap}
+.c-right{display:flex;flex-direction:column;align-items:flex-end;gap:.3rem}
+.c-ambito{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);background:var(--surface);padding:.15rem .45rem;border-radius:4px}
+.card h3{font-family:'Instrument Serif',serif;font-size:1.1rem;font-weight:400;line-height:1.35;color:white;margin-bottom:.3rem}
+.c-tipo{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);margin-bottom:.75rem}
+.card p{font-size:.82rem;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:.9rem}
+.c-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.9rem}
+.tag{font-size:.68rem;font-weight:500;padding:.18rem .55rem;border-radius:5px;background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.c-foot{display:flex;align-items:center;justify-content:space-between;padding-top:.85rem;border-top:1px solid var(--border);gap:.5rem}
+.c-inst{font-size:.72rem;color:var(--text3);font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-mr{display:flex;align-items:center;gap:.65rem;flex-shrink:0}
+.c-date{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text3)}
+.c-nd{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--teal);font-weight:500}
+.tbl-outer{border-radius:var(--r);border:1px solid var(--border);overflow:hidden;background:var(--bg2)}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead th{padding:.75rem 1rem;text-align:left;font-family:'JetBrains Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg3);font-weight:500}
+tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+tbody tr:hover{background:var(--surface2)}
+tbody td{padding:.7rem 1rem;vertical-align:middle}
+.td-n{font-family:'Instrument Serif',serif;font-size:.92rem;color:white}
+.td-m{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text3)}
+.pb{display:none;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:var(--r);padding:.85rem 1.1rem;margin-bottom:1.25rem;align-items:center;gap:.75rem;font-size:.82rem;color:var(--amber)}
+.pb.show{display:flex}
+.pb-b{margin-left:auto;background:var(--amber);color:#000;border:none;border-radius:7px;padding:.38rem .85rem;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s}
+.pb-b:hover{background:#fbbf24}
+.ov{display:none;position:fixed;inset:0;background:rgba(4,8,12,.88);backdrop-filter:blur(8px);z-index:400;padding:1.5rem;overflow-y:auto;align-items:flex-start;justify-content:center}
+.ov.open{display:flex}
+@keyframes mi{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.md{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;max-width:840px;width:100%;margin:auto;overflow:hidden;animation:mi .22s ease;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05)}
+.mdh{padding:2rem 2rem 1.5rem;border-bottom:1px solid var(--border);position:relative;background:linear-gradient(180deg,var(--bg3) 0%,var(--bg2) 100%)}
+.mdh-t{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.9rem}
+.mdh h2{font-family:'Instrument Serif',serif;font-size:1.7rem;font-weight:400;color:white;line-height:1.2;margin-bottom:.35rem}
+.mdh-i{font-size:.82rem;color:var(--text3)}
+.cx{position:absolute;top:1.5rem;right:1.5rem;background:var(--surface2);border:1px solid var(--border);width:30px;height:30px;border-radius:50%;color:var(--text2);font-size:.85rem;cursor:pointer;display:grid;place-items:center;transition:all .12s}
+.cx:hover{background:rgba(255,255,255,.12);color:white}
+.mdb{padding:1.75rem 2rem}
+.meta-r{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem 1.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem 1.25rem;margin-bottom:1.5rem}
+.mi label{display:block;font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.25rem}
+.mi span{font-size:.85rem;font-weight:500;color:var(--text)}
+.sl{font-family:'JetBrains Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+.dt{font-size:.87rem;color:var(--text2);line-height:1.75;margin-bottom:1.4rem}
+.bvs-p{display:flex;align-items:center;gap:.55rem;background:var(--teal-dim);border:1px solid rgba(0,180,216,.2);border-radius:8px;padding:.6rem .9rem;font-size:.8rem;color:var(--teal);margin-bottom:1.4rem}
+.dl{list-style:none;display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.5rem}
+.dr{display:flex;align-items:center;gap:.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.6rem .9rem;transition:all .12s}
+.dr:hover{border-color:var(--border2);background:rgba(255,255,255,.04)}
+.di{font-size:.9rem;flex-shrink:0}
+.dn{flex:1;font-size:.82rem;font-weight:600;color:var(--text)}
+.ds{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:var(--surface2);color:var(--text3);padding:.12rem .4rem;border-radius:4px;flex-shrink:0}
+.da{font-size:.72rem;color:var(--green);font-weight:700;text-decoration:none;flex-shrink:0}
+.da:hover{text-decoration:underline}
+.mdf{padding:1.1rem 2rem;background:var(--bg3);border-top:1px solid var(--border);display:flex;gap:.6rem;justify-content:flex-end;align-items:center}
+.mf{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;max-width:700px;width:100%;margin:auto;overflow:hidden;animation:mi .22s ease;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05)}
+.fh{padding:1.6rem 2rem 1.3rem;background:linear-gradient(135deg,rgba(0,214,143,.08),rgba(0,180,216,.05));border-bottom:1px solid var(--border);position:relative}
+.fh h2{font-family:'Instrument Serif',serif;font-size:1.4rem;color:white;margin-bottom:.2rem}
+.fh p{font-size:.8rem;color:var(--text3)}
+.stps{display:flex;align-items:center;padding:1rem 2rem .75rem;background:var(--bg3);border-bottom:1px solid var(--border);overflow-x:auto;gap:0}
+.stp{display:flex;align-items:center;flex:1;min-width:0}
+.sd{width:26px;height:26px;border-radius:50%;flex-shrink:0;border:1.5px solid var(--border2);background:var(--bg);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text3);transition:all .2s}
+.stp.done .sd{background:var(--green);border-color:var(--green);color:#000}
+.stp.curr .sd{border-color:var(--green);color:var(--green);box-shadow:0 0 0 3px var(--green-dim)}
+.sl2{font-size:.7rem;color:var(--text3);margin-left:.4rem;white-space:nowrap}
+.stp.curr .sl2{color:var(--green);font-weight:700}
+.stp.done .sl2{color:var(--text2)}
+.sl3{flex:1;height:1px;background:var(--border);margin:0 .35rem;min-width:10px}
+.fb{padding:1.5rem 2rem;max-height:58vh;overflow-y:auto}
+.fb::-webkit-scrollbar{width:4px}
+.fb::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.fs{display:none}
+.fs.active{display:block}
+.fn{background:var(--teal-dim);border:1px solid rgba(0,180,216,.2);border-radius:8px;padding:.7rem 1rem;font-size:.8rem;color:var(--teal);margin-bottom:1.1rem;display:flex;gap:.5rem;align-items:flex-start}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:.9rem}
+.fr.full{grid-template-columns:1fr}
+.fr.tri{grid-template-columns:1fr 1fr 1fr}
+.fld{display:flex;flex-direction:column;gap:.3rem}
+.fld label{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+.fld label .req{color:var(--rose)}
+.fld input,.fld select,.fld textarea{font-family:'Syne',sans-serif;font-size:.85rem;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:.6rem .85rem;color:var(--text);outline:none;transition:all .15s;width:100%}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:rgba(0,214,143,.4);box-shadow:0 0 0 3px var(--green-dim)}
+.fld input::placeholder{color:var(--text3)}
+.fld textarea{resize:vertical;min-height:85px}
+.fld select option{background:#1a2030}
+.fhint{font-size:.7rem;color:var(--text3)}
+.dr2{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.6rem}
+.de{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.8rem;position:relative}
+.deg{display:grid;grid-template-columns:1fr 1fr 90px;gap:.6rem}
+.drm{position:absolute;top:.6rem;right:.6rem;background:none;border:none;color:var(--text3);cursor:pointer;font-size:.85rem;transition:color .12s}
+.drm:hover{color:var(--rose)}
+.adoc{width:100%;background:none;border:1.5px dashed var(--border2);border-radius:8px;color:var(--green);font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;padding:.6rem;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.adoc:hover{border-color:rgba(0,214,143,.4);background:var(--green-dim)}
+.gg{display:flex;flex-wrap:wrap;gap:.4rem}
+.go{display:flex;align-items:center;gap:.35rem;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.38rem .7rem;font-size:.78rem;cursor:pointer;transition:all .12s;user-select:none}
+.go input{accent-color:var(--green)}
+.go:has(input:checked){background:var(--green-dim);border-color:rgba(0,214,143,.3);color:var(--green)}
+.sb2{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:1.1rem 1.25rem;font-size:.83rem;line-height:1.85;color:var(--text2)}
+.sb2 strong{color:var(--text);font-weight:600}
+.an{margin-top:1rem;padding:1rem;border:1px solid rgba(245,158,11,.25);border-radius:8px;background:var(--amber-dim);font-size:.8rem;color:var(--amber);display:flex;gap:.6rem;align-items:flex-start}
+.ff{padding:1rem 2rem;background:var(--bg3);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.stc{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text3)}
+.bb{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);border-radius:8px;padding:.45rem .9rem;cursor:pointer;transition:all .15s}
+.bb:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+.mr{background:var(--bg2);border:1px solid rgba(245,158,11,.2);border-radius:20px;max-width:860px;width:100%;margin:auto;overflow:hidden;animation:mi .22s ease;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+.rh{padding:1.3rem 1.75rem;background:var(--amber-dim);border-bottom:1px solid rgba(245,158,11,.15);display:flex;align-items:flex-start;gap:.75rem}
+.rh h2{font-family:'Instrument Serif',serif;font-size:1.25rem;color:var(--amber)}
+.rh p{font-size:.78rem;color:rgba(245,158,11,.7);margin-top:.15rem}
+.rl2{padding:1.25rem 1.75rem;max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:.65rem}
+.ri{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.15rem;display:flex;align-items:flex-start;gap:1rem}
+.rii{flex:1}
+.rii h4{font-family:'Instrument Serif',serif;font-size:.98rem;color:white;margin-bottom:.2rem}
+.rii p{font-size:.77rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.ria{display:flex;gap:.45rem;flex-shrink:0;align-self:center}
+.ml{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;max-width:400px;width:100%;margin:auto;overflow:hidden;animation:mi .22s ease;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+.lh{padding:2rem 1.75rem 1.5rem;text-align:center;background:linear-gradient(180deg,var(--bg3),var(--bg2));border-bottom:1px solid var(--border)}
+.lhi{font-size:2.2rem;margin-bottom:.6rem}
+.lh h2{font-family:'Instrument Serif',serif;font-size:1.4rem;color:white}
+.lh p{font-size:.8rem;color:var(--text3);margin-top:.2rem}
+.lb{padding:1.5rem 1.75rem}
+.pcs{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.85rem}
+.pc{display:flex;align-items:center;gap:.85rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+.pc:hover{border-color:rgba(0,214,143,.3);background:var(--green-dim)}
+.pci{font-size:1.5rem;flex-shrink:0}
+.pcn strong{display:block;font-size:.85rem;font-weight:700;color:white}
+.pcn span{font-size:.73rem;color:var(--text3)}
+.gl{text-align:center;font-size:.75rem;color:var(--text3)}
+.gl a{color:var(--green);text-decoration:none;font-weight:700;cursor:pointer}
+.btn{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;border:none;border-radius:8px;padding:.5rem 1.1rem;cursor:pointer;transition:all .15s;letter-spacing:.03em}
+.btn-o{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-o:hover{color:var(--text);border-color:rgba(255,255,255,.2);background:var(--surface2)}
+.btn-pg{background:var(--green);color:#000;box-shadow:0 0 16px rgba(0,214,143,.25)}
+.btn-pg:hover{background:#00f0a0;box-shadow:0 0 24px rgba(0,214,143,.4)}
+.btn-ap{background:rgba(0,214,143,.12);color:var(--green);border:1px solid rgba(0,214,143,.25);font-size:.76rem;padding:.4rem .8rem}
+.btn-ap:hover{background:var(--green-dim)}
+.btn-rt{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);font-size:.76rem;padding:.4rem .8rem}
+.btn-rt:hover{color:var(--text)}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:.75rem 1.2rem;border-radius:10px;font-size:.83rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:999;max-width:320px;display:flex;align-items:center;gap:.6rem}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-left:3px solid var(--green)}
+.toast.warn{border-left:3px solid var(--amber)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.empty{grid-column:1/-1;text-align:center;padding:4rem 1rem;color:var(--text3)}
+@media(max-width:780px){.main{grid-template-columns:1fr}.sidebar{position:static}.meta-r{grid-template-columns:1fr 1fr}.fr{grid-template-columns:1fr}.stats-strip{grid-template-columns:repeat(3,1fr)}.sc:nth-child(4),.sc:nth-child(5){display:none}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+
+<nav>
+  <div class="nav-logo" onclick="goHome()">
+    <div class="logo-mark">🏥</div>
+    <span class="logo-name">RIDS</span>
+    <span class="logo-v">v3.0</span>
+  </div>
+  <div class="nav-links">
+    <button class="nl on">Explorar</button>
+    <button class="nl">Categorias</button>
+    <button class="nl">Sobre</button>
+    <button class="nl">BVS</button>
+  </div>
+  <div class="nav-r">
+    <button class="btn-gs" id="btnLogin" onclick="openLogin()">👤 Entrar</button>
+    <div class="u-pill" id="uPill" onclick="logout()">
+      <div class="u-dot" id="uDot"></div>
+      <span id="uName"></span>
+      <span style="color:var(--text3);font-size:.65rem;margin-left:.2rem">· sair</span>
+    </div>
+    <button class="btn-gr" id="btnNova" style="display:none" onclick="openForm()">＋ Nova Iniciativa</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="eyebrow">● Repositório Nacional · Brasil</div>
+  <h1>Iniciativas <em>Digitais</em><br>em Saúde Pública</h1>
+  <p class="hero-sub">Sistemas, plataformas, programas e campanhas organizados por categoria temática para gestores, clínicos e pesquisadores do SUS.</p>
+  <div class="s-wrap">
+    <div class="s-box">
+      <input id="sInput" type="text" placeholder="Buscar iniciativas, sistemas, programas…" oninput="renderAll()">
+      <button class="s-btn">Buscar</button>
+    </div>
+  </div>
+  <div class="htags">
+    <span class="htag" onclick="qs('e-SUS')">e-SUS</span>
+    <span class="htag" onclick="qs('SINAN')">SINAN</span>
+    <span class="htag" onclick="qs('RNDS')">RNDS</span>
+    <span class="htag" onclick="qs('vigilância')">Vigilância</span>
+    <span class="htag" onclick="qs('atenção primária')">Atenção Primária</span>
+    <span class="htag" onclick="qs('vacinação')">Vacinação</span>
+  </div>
+</section>
+
+<div class="stats-strip">
+  <div class="sc"><div class="sn"><span id="stT">12</span></div><div class="sl">Iniciativas</div></div>
+  <div class="sc"><div class="sn"><span>5</span></div><div class="sl">Categorias</div></div>
+  <div class="sc"><div class="sn"><span>3</span></div><div class="sl">Âmbitos</div></div>
+  <div class="sc"><div class="sn"><span>28</span></div><div class="sl">Documentos</div></div>
+  <div class="sc"><div class="sn"><span id="stP" style="color:var(--amber)">2</span></div><div class="sl">Em revisão</div></div>
+</div>
+
+<div class="main">
+  <aside class="sidebar">
+    <div class="sb-s">
+      <div class="sb-h">Categoria <span class="sb-cl" onclick="clrF('cat')">limpar</span></div>
+      <div class="fi on" data-k="cat" data-v="todas"         onclick="setF('cat','todas',this)">Todas<span class="fc">12</span></div>
+      <div class="fi"    data-k="cat" data-v="financiamento" onclick="setF('cat','financiamento',this)"><span class="fd" style="background:#00d68f"></span>Financiamento APS<span class="fc">3</span></div>
+      <div class="fi"    data-k="cat" data-v="vigilancia"    onclick="setF('cat','vigilancia',this)"><span class="fd" style="background:#00b4d8"></span>Vigilância à Saúde<span class="fc">4</span></div>
+      <div class="fi"    data-k="cat" data-v="planejamento"  onclick="setF('cat','planejamento',this)"><span class="fd" style="background:#a78bfa"></span>Planejamento<span class="fc">2</span></div>
+      <div class="fi"    data-k="cat" data-v="atencao"       onclick="setF('cat','atencao',this)"><span class="fd" style="background:#fb7185"></span>Atenção Primária<span class="fc">2</span></div>
+      <div class="fi"    data-k="cat" data-v="gestao"        onclick="setF('cat','gestao',this)"><span class="fd" style="background:#34d399"></span>Gestão em Saúde<span class="fc">1</span></div>
+    </div>
+    <div class="sb-s">
+      <div class="sb-h">Âmbito <span class="sb-cl" onclick="clrF('ambito')">limpar</span></div>
+      <div class="fi on" data-k="ambito" data-v="todos"     onclick="setF('ambito','todos',this)">Todos<span class="fc">12</span></div>
+      <div class="fi"    data-k="ambito" data-v="Nacional"  onclick="setF('ambito','Nacional',this)">🇧🇷 Nacional<span class="fc">11</span></div>
+      <div class="fi"    data-k="ambito" data-v="Estadual"  onclick="setF('ambito','Estadual',this)">🗺️ Estadual<span class="fc">1</span></div>
+      <div class="fi"    data-k="ambito" data-v="Municipal" onclick="setF('ambito','Municipal',this)">🏙️ Municipal<span class="fc">0</span></div>
+    </div>
+    <div class="sb-s">
+      <div class="sb-h">Status <span class="sb-cl" onclick="clrF('status')">limpar</span></div>
+      <div class="fi on" data-k="status" data-v="todos"          onclick="setF('status','todos',this)">Todos</div>
+      <div class="fi"    data-k="status" data-v="Ativo"          onclick="setF('status','Ativo',this)"><span class="fd" style="background:#22c55e"></span>Ativo</div>
+      <div class="fi"    data-k="status" data-v="Parcial"        onclick="setF('status','Parcial',this)"><span class="fd" style="background:var(--amber)"></span>Parcial</div>
+      <div class="fi"    data-k="status" data-v="Descontinuado"  onclick="setF('status','Descontinuado',this)"><span class="fd" style="background:var(--text3)"></span>Descontinuado</div>
+    </div>
+    <div class="sb-s">
+      <div class="sb-h">Tipo</div>
+      <div class="fi on" data-k="tipo" data-v="todos"                 onclick="setF('tipo','todos',this)">Todos</div>
+      <div class="fi"    data-k="tipo" data-v="Sistema de Informação" onclick="setF('tipo','Sistema de Informação',this)">Sistema de Informação</div>
+      <div class="fi"    data-k="tipo" data-v="Plataforma Digital"    onclick="setF('tipo','Plataforma Digital',this)">Plataforma Digital</div>
+      <div class="fi"    data-k="tipo" data-v="Programa"              onclick="setF('tipo','Programa',this)">Programa</div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="pb" id="pBar">
+      <span>⚠</span>
+      <span><strong>2 iniciativas</strong> aguardando sua revisão para publicação.</span>
+      <button class="pb-b" onclick="openReview()">Revisar agora →</button>
+    </div>
+    <div class="ach" id="achips"></div>
+    <div class="toolbar">
+      <span class="rl">Resultados <span class="rs" id="rSub">(12)</span></span>
+      <div class="tr">
+        <div class="vs">
+          <button class="vsb on" onclick="setView('cards',this)">⊞ Cards</button>
+          <button class="vsb"    onclick="setView('table',this)">≡ Tabela</button>
+        </div>
+        <select class="sp" onchange="renderAll()">
+          <option>Relevância</option><option>A → Z</option><option>Categoria</option><option>Recentes</option>
+        </select>
+      </div>
+    </div>
+    <div id="cWrap"><div class="cards-grid" id="cGrid"></div></div>
+    <div id="tWrap" style="display:none">
+      <div class="tbl-outer"><table>
+        <thead><tr><th>Categoria</th><th>Nome</th><th>Tipo</th><th>Âmbito</th><th>Cobertura</th><th>Status</th><th>Atualiz.</th><th>Docs</th></tr></thead>
+        <tbody id="tBody"></tbody>
+      </table></div>
+    </div>
+  </main>
+</div>
+
+<!-- DETAIL -->
+<div class="ov" id="ovD" onclick="cov('ovD',event)">
+  <div class="md">
+    <div class="mdh">
+      <button class="cx" onclick="covD('ovD')">✕</button>
+      <div class="mdh-t" id="dTop"></div>
+      <h2 id="dTitle"></h2>
+      <div class="mdh-i" id="dInst"></div>
+    </div>
+    <div class="mdb">
+      <div class="meta-r" id="dMeta"></div>
+      <div class="bvs-p" id="bvsP">📚 <span>Documentos referenciados na <strong>Biblioteca Virtual em Saúde (BVS)</strong> — consulte para informação complementar.</span></div>
+      <div class="sl">Descrição</div>
+      <p class="dt" id="dDesc"></p>
+      <div class="sl">Como utilizar</div>
+      <p class="dt" id="dUtil"></p>
+      <div class="sl">Documentos Relacionados</div>
+      <ul class="dl" id="dDocs"></ul>
+    </div>
+    <div class="mdf">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3)" id="dDate"></span>
+      <button class="btn btn-o" onclick="covD('ovD')">Fechar</button>
+      <button class="btn btn-pg">🔗 Acessar Iniciativa</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="ov" id="ovF" onclick="cov('ovF',event)">
+  <div class="mf">
+    <div class="fh">
+      <button class="cx" style="background:rgba(255,255,255,.08);top:1.2rem;right:1.2rem;position:absolute" onclick="covD('ovF')">✕</button>
+      <h2>Cadastrar Nova Iniciativa</h2>
+      <p>A iniciativa ficará aguardando aprovação de um revisor antes de ser publicada.</p>
+    </div>
+    <div class="stps" id="stps">
+      <div class="stp curr" id="s0"><div class="sd">1</div><span class="sl2">Identificação</span><div class="sl3"></div></div>
+      <div class="stp"      id="s1"><div class="sd">2</div><span class="sl2">Detalhes</span><div class="sl3"></div></div>
+      <div class="stp"      id="s2"><div class="sd">3</div><span class="sl2">Cobertura</span><div class="sl3"></div></div>
+      <div class="stp"      id="s3"><div class="sd">4</div><span class="sl2">Documentos</span><div class="sl3"></div></div>
+      <div class="stp"      id="s4"><div class="sd">5</div><span class="sl2">Confirmar</span></div>
+    </div>
+    <div class="fb">
+      <div class="fs active" id="f0">
+        <div class="fn">ℹ️ Dados básicos de identificação da iniciativa.</div>
+        <div class="fr full"><div class="fld"><label>Nome da Iniciativa <span class="req">*</span></label><input id="fN" type="text" placeholder="Ex.: SINAN – Sistema de Informação de Agravos de Notificação"></div></div>
+        <div class="fr">
+          <div class="fld"><label>Categoria <span class="req">*</span></label><select id="fC"><option value="">Selecione…</option><option>Financiamento da APS</option><option>Vigilância à Saúde</option><option>Planejamento</option><option>Atenção Primária à Saúde</option><option>Gestão em Saúde</option><option>Saúde Digital</option><option>Outra</option></select></div>
+          <div class="fld"><label>Tipo <span class="req">*</span></label><select id="fTp"><option value="">Selecione…</option><option>Sistema de Informação</option><option>Plataforma Digital</option><option>Programa</option><option>Campanha</option><option>Manual / Protocolo</option><option>Aplicativo Móvel</option></select></div>
+        </div>
+        <div class="fr">
+          <div class="fld"><label>Instituição <span class="req">*</span></label><input id="fI" type="text" placeholder="Ex.: SVS / Ministério da Saúde"></div>
+          <div class="fld"><label>Área de Saúde <span class="req">*</span></label><input id="fA" type="text" placeholder="Ex.: Vigilância Epidemiológica"></div>
+        </div>
+        <div class="fr">
+          <div class="fld"><label>Público-Alvo <span class="req">*</span></label><input id="fPb" type="text" placeholder="Ex.: Profissionais de vigilância"></div>
+          <div class="fld"><label>Status</label><select id="fSt"><option>Ativo</option><option>Parcial</option><option>Descontinuado</option><option>Em implantação</option></select></div>
+        </div>
+      </div>
+      <div class="fs" id="f1">
+        <div class="fn">✏️ Descreva a iniciativa para facilitar a busca por outros profissionais.</div>
+        <div class="fr full"><div class="fld"><label>Descrição Resumida <span class="req">*</span></label><textarea id="fD" placeholder="Descreva o propósito, funcionamento e principais características…"></textarea><span class="fhint">Recomendado: 3–5 frases objetivas.</span></div></div>
+        <div class="fr full"><div class="fld"><label>Como Utilizar <span class="req">*</span></label><textarea id="fU" placeholder="Como acessar ou usar esta iniciativa?"></textarea></div></div>
+        <div class="fr">
+          <div class="fld"><label>Disponibilidade</label><select id="fDp"><option>Online / Acesso aberto</option><option>Acesso restrito</option><option>Parcial</option><option>Offline / Local</option></select></div>
+          <div class="fld"><label>URL da Iniciativa</label><input id="fUrl" type="url" placeholder="https://…"></div>
+        </div>
+      </div>
+      <div class="fs" id="f2">
+        <div class="fn">🗺️ Alcance geográfico e temporal da iniciativa.</div>
+        <div class="fr">
+          <div class="fld"><label>Âmbito <span class="req">*</span></label><select id="fAm"><option>Nacional</option><option>Estadual</option><option>Municipal</option><option>Regional</option></select></div>
+          <div class="fld"><label>Estado(s) / Região</label><input id="fEs" type="text" placeholder="Ex.: Amazônia Legal, SP…"></div>
+        </div>
+        <div class="fr full"><div class="fld"><label>Cobertura Geográfica</label>
+          <div class="gg">
+            <label class="go"><input type="checkbox" value="Norte"> Norte</label>
+            <label class="go"><input type="checkbox" value="Nordeste"> Nordeste</label>
+            <label class="go"><input type="checkbox" value="Centro-Oeste"> Centro-Oeste</label>
+            <label class="go"><input type="checkbox" value="Sudeste"> Sudeste</label>
+            <label class="go"><input type="checkbox" value="Sul"> Sul</label>
+            <label class="go"><input type="checkbox" value="Nacional" checked> Todo o território</label>
+          </div>
+        </div></div>
+        <div class="fr tri">
+          <div class="fld"><label>Ano de Criação</label><input id="fAno" type="number" placeholder="2010" min="1990" max="2025"></div>
+          <div class="fld"><label>Última Atualização</label><input id="fAt" type="month"></div>
+          <div class="fld"><label>Data de Cadastro</label><input id="fCd" type="text" readonly style="opacity:.5"></div>
+        </div>
+      </div>
+      <div class="fs" id="f3">
+        <div class="fn">📄 Adicione documentos. Indique se estão na BVS.</div>
+        <div class="dr2" id="dRep">
+          <div class="de">
+            <button class="drm" onclick="rmDoc(this)">✕</button>
+            <div class="deg">
+              <div class="fld"><label>Descrição</label><input type="text" placeholder="Ex.: Manual de Implantação"></div>
+              <div class="fld"><label>Link / URL</label><input type="url" placeholder="https://…"></div>
+              <div class="fld"><label>Fonte</label><select><option>Portal MS</option><option>BVS</option><option>Portal Institucional</option><option>Outro</option></select></div>
+            </div>
+          </div>
+        </div>
+        <button class="adoc" onclick="addDoc()">＋ Adicionar documento</button>
+      </div>
+      <div class="fs" id="f4">
+        <div class="fn">✅ Revise os dados antes de enviar.</div>
+        <div class="sb2" id="sumBox"></div>
+        <div class="an"><span style="font-size:1rem;flex-shrink:0">⏳</span><div><strong>Fluxo de publicação:</strong> Um revisor analisará e aprovará esta iniciativa. Prazo estimado: <strong>2 dias úteis</strong>.</div></div>
+      </div>
+    </div>
+    <div class="ff">
+      <span class="stc" id="stCt">01 / 05</span>
+      <div style="display:flex;gap:.5rem">
+        <button class="bb" id="btnBk" style="display:none" onclick="sBk()">← Voltar</button>
+        <button class="btn btn-pg" id="btnNx" onclick="sNx()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div class="ov" id="ovR" onclick="cov('ovR',event)">
+  <div class="mr">
+    <div class="rh">
+      <div><h2>⚠ Fila de Revisão</h2><p>Iniciativas enviadas aguardando sua aprovação.</p></div>
+      <button class="cx" style="margin-left:auto;background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2)" onclick="covD('ovR')">✕</button>
+    </div>
+    <div class="rl2">
+      <div class="ri" id="ri1">
+        <div class="rii"><h4>PNI Digital – Plataforma Nacional de Imunização</h4><p>Ana Paula Silva · 07/03/2026 · Vigilância à Saúde</p></div>
+        <div class="ria"><button class="btn btn-ap" onclick="apv('ri1','PNI Digital')">✓ Aprovar</button><button class="btn btn-rt" onclick="rtn('ri1')">↩ Devolver</button></div>
+      </div>
+      <div class="ri" id="ri2">
+        <div class="rii"><h4>SISAB – Sistema de Informação em Saúde para a Atenção Básica</h4><p>Carlos Eduardo Lima · 06/03/2026 · Atenção Primária</p></div>
+        <div class="ria"><button class="btn btn-ap" onclick="apv('ri2','SISAB')">✓ Aprovar</button><button class="btn btn-rt" onclick="rtn('ri2')">↩ Devolver</button></div>
+      </div>
+    </div>
+    <div style="padding:1rem 1.75rem;border-top:1px solid var(--border);text-align:right">
+      <button class="btn btn-o" onclick="covD('ovR')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="ov" id="ovL" onclick="cov('ovL',event)">
+  <div class="ml">
+    <div class="lh"><div class="lhi">🏥</div><h2>Acesso ao RIDS</h2><p>Escolha seu perfil para continuar</p></div>
+    <div class="lb">
+      <div class="pcs">
+        <button class="pc" onclick="doLogin('bolsista','Ana Paula Silva','✏️')"><span class="pci">✏️</span><div class="pcn"><strong>Bolsista / Editor</strong><span>Pode cadastrar novas iniciativas</span></div></button>
+        <button class="pc" onclick="doLogin('revisor','Dr. Marcos Oliveira','🔍')"><span class="pci">🔍</span><div class="pcn"><strong>Revisor</strong><span>Aprova ou devolve iniciativas</span></div></button>
+        <button class="pc" onclick="doLogin('admin','Admin Sistema','⚙️')"><span class="pci">⚙️</span><div class="pcn"><strong>Administrador</strong><span>Acesso completo</span></div></button>
+      </div>
+      <div class="gl"><a onclick="covD('ovL')">Continuar como visitante →</a></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS={financiamento:{label:'Financiamento APS',color:'#00d68f',bg:'rgba(0,214,143,.1)',bd:'rgba(0,214,143,.2)'},vigilancia:{label:'Vigilância à Saúde',color:'#00b4d8',bg:'rgba(0,180,216,.1)',bd:'rgba(0,180,216,.2)'},planejamento:{label:'Planejamento',color:'#a78bfa',bg:'rgba(167,139,250,.1)',bd:'rgba(167,139,250,.2)'},atencao:{label:'Atenção Primária',color:'#fb7185',bg:'rgba(251,113,133,.1)',bd:'rgba(251,113,133,.2)'},gestao:{label:'Gestão em Saúde',color:'#34d399',bg:'rgba(52,211,153,.1)',bd:'rgba(52,211,153,.2)'}};
+const D=[
+{id:1,cat:'financiamento',nome:'PMAQ-AB – Programa de Melhoria do Acesso e da Qualidade',tipo:'Programa',ambito:'Nacional',area:'Atenção Primária à Saúde',publico:'Equipes de saúde da família, gestores municipais',inst:'Ministério da Saúde / DAB',desc:'Programa que induz a ampliação do acesso e melhoria da qualidade da atenção básica, com padrão comparável nacional e regional, permitindo maior transparência das ações governamentais.',util:'Acessar o portal do DAB, cadastrar a equipe e submeter avaliações conforme os ciclos do programa.',disp:'Online',status:'Ativo',cob:'Todo o território nacional',criado:'2011',att:'2019-03',bvs:true,docs:[{n:'Portaria nº 1.645/2015',l:'#',s:'BVS'},{n:'Manual Instrutivo PMAQ',l:'#',s:'Portal MS'},{n:'Relatório 3º Ciclo',l:'#',s:'Portal MS'}]},
+{id:2,cat:'vigilancia',nome:'SINAN – Sistema de Informação de Agravos de Notificação',tipo:'Sistema de Informação',ambito:'Nacional',area:'Vigilância Epidemiológica',publico:'Profissionais de vigilância, secretarias de saúde',inst:'SVS / Ministério da Saúde',desc:'Sistema nacional para coleta, transmissão e disseminação de dados sobre agravos de notificação compulsória. Principal instrumento para acompanhamento do perfil de morbidade no Brasil.',util:'Instalação do sistema cliente, configuração via DATASUS, notificação de casos pelas unidades de saúde.',disp:'Online',status:'Ativo',cob:'Todo o território nacional',criado:'1993',att:'2023-06',bvs:true,docs:[{n:'Guia de Usuário SINAN',l:'#',s:'DATASUS'},{n:'Ficha de Notificação',l:'#',s:'BVS'}]},
+{id:3,cat:'atencao',nome:'e-SUS Atenção Primária',tipo:'Sistema de Informação',ambito:'Nacional',area:'Atenção Primária à Saúde',publico:'Profissionais das equipes de saúde da família',inst:'Ministério da Saúde / SAPS',desc:'Estratégia para reestruturar as informações da atenção básica por meio do CDS (Coleta de Dados Simplificada) e do PEC (Prontuário Eletrônico do Cidadão).',util:'Download e instalação do sistema PEC ou CDS. Dados transmitidos ao RNDS e SISAB.',disp:'Online',status:'Ativo',cob:'Todo o território nacional',criado:'2013',att:'2024-01',bvs:false,docs:[{n:'Manual de Implantação e-SUS PEC',l:'#',s:'Portal MS'},{n:'Nota Técnica e-SUS',l:'#',s:'Portal MS'},{n:'Treinamentos em vídeo',l:'#',s:'YouTube'}]},
+{id:4,cat:'planejamento',nome:'SARGSUS – Sistema de Apoio ao Relatório de Gestão',tipo:'Sistema de Informação',ambito:'Nacional',area:'Gestão / Planejamento em Saúde',publico:'Gestores municipais, estaduais e federais do SUS',inst:'Ministério da Saúde / SE',desc:'Sistema que apoia elaboração e consolidação dos Relatórios de Gestão do SUS nos três entes federados, conforme exigência legal do controle social.',util:'Acesso via login no portal SAGE. Disponível para secretarias cadastradas.',disp:'Parcial',status:'Ativo',cob:'Todo o território nacional',criado:'2010',att:'2022-11',bvs:true,docs:[{n:'Manual de Orientação SARGSUS',l:'#',s:'BVS'}]},
+{id:5,cat:'vigilancia',nome:'SIVEP-Gripe – Vigilância da Influenza',tipo:'Sistema de Informação',ambito:'Nacional',area:'Vigilância / Doenças Respiratórias',publico:'Profissionais de saúde, laboratórios, secretarias',inst:'SVS / Ministério da Saúde',desc:'Sistema de vigilância da influenza e vírus respiratórios, integrando sentinelas ambulatoriais, hospitalares e dados laboratoriais para monitoramento em tempo oportuno.',util:'Acesso por login institucional. Notificação de SRAG hospitalizado e síndrome gripal pelas unidades sentinela.',disp:'Online',status:'Ativo',cob:'Todo o território nacional',criado:'2000',att:'2023-12',bvs:true,docs:[{n:'Protocolo de Vigilância da Influenza',l:'#',s:'BVS'},{n:'Boletim Epidemiológico',l:'#',s:'SVS'}]},
+{id:6,cat:'financiamento',nome:'Previne Brasil – Financiamento da APS',tipo:'Programa',ambito:'Nacional',area:'Financiamento / Atenção Primária',publico:'Gestores municipais, coordenadores de APS',inst:'Ministério da Saúde / SAPS',desc:'Modelo de financiamento federal da APS baseado em capitação ponderada, pagamento por desempenho e incentivo para ações estratégicas.',util:'Acompanhamento via plataforma e-Gestor AB. Municípios mantêm cadastros no CNES e registros no e-SUS.',disp:'Online',status:'Ativo',cob:'Todo o território nacional',criado:'2019',att:'2024-02',bvs:false,docs:[{n:'Portaria nº 2.979/2019',l:'#',s:'BVS'},{n:'Manual de Operacionalização',l:'#',s:'Portal MS'},{n:'Painel Previne Brasil',l:'#',s:'e-Gestor'}]},
+{id:7,cat:'vigilancia',nome:'RNDS – Rede Nacional de Dados em Saúde',tipo:'Plataforma Digital',ambito:'Nacional',area:'Saúde Digital / Interoperabilidade',publico:'Profissionais, estabelecimentos, sistemas de informação',inst:'DATASUS / Ministério da Saúde',desc:'Plataforma nacional de interoperabilidade que permite compartilhamento de dados de saúde do cidadão entre pontos da RAS usando padrão HL7 FHIR.',util:'Integração via API FHIR. Sistemas devem solicitar credenciais ao DATASUS e seguir o guia de integração.',disp:'Online',status:'Ativo',cob:'Todo o território nacional',criado:'2020',att:'2024-03',bvs:false,docs:[{n:'Guia de Integração RNDS',l:'#',s:'Portal MS'},{n:'Portaria nº 1.434/2020',l:'#',s:'BVS'},{n:'Especificações FHIR Brasil',l:'#',s:'Simplifier.net'}]},
+{id:8,cat:'atencao',nome:'Conecte SUS Cidadão',tipo:'Plataforma Digital',ambito:'Nacional',area:'Saúde Digital / Cidadania',publico:'Cidadãos brasileiros com acesso digital',inst:'DATASUS / Ministério da Saúde',desc:'Aplicativo que permite ao cidadão acompanhar histórico de vacinação, exames, medicamentos dispensados e atendimentos registrados no SUS.',util:'Download nas lojas App Store e Google Play. Autenticação via gov.br.',disp:'Online',status:'Ativo',cob:'Todo o território nacional',criado:'2020',att:'2024-01',bvs:false,docs:[{n:'Guia do Usuário Conecte SUS',l:'#',s:'Portal MS'},{n:'Nota Informativa SCTIE',l:'#',s:'BVS'}]},
+{id:9,cat:'planejamento',nome:'RAAS – Registro das Ações Ambulatoriais',tipo:'Sistema de Informação',ambito:'Nacional',area:'Atenção Especializada / Psicossocial',publico:'Equipes de saúde mental, NASF, CAPS, reabilitação',inst:'Ministério da Saúde / SAPS',desc:'Instrumento de registro de procedimentos ambulatoriais especializados para acompanhamento longitudinal em saúde mental e reabilitação.',util:'Integrado ao e-SUS PEC ou SISREG. Registro após cada atendimento.',disp:'Online',status:'Ativo',cob:'Todo o território nacional',criado:'2013',att:'2022-08',bvs:true,docs:[{n:'Manual de Orientação RAAS',l:'#',s:'BVS'}]},
+{id:10,cat:'vigilancia',nome:'SIVEP-Malária',tipo:'Sistema de Informação',ambito:'Estadual',area:'Vigilância / Doenças Tropicais',publico:'Profissionais de saúde da Amazônia Legal',inst:'SVS / Ministério da Saúde',desc:'Sistema de informações epidemiológicas para vigilância da malária, monitorando casos, tratamentos e ações de controle vetorial nas áreas endêmicas.',util:'Acesso via web com login institucional. Registro de lâminas positivas e notificação de casos.',disp:'Online',status:'Ativo',cob:'Amazônia Legal',criado:'1993',att:'2023-05',bvs:true,docs:[{n:'Manual de Diagnóstico e Tratamento da Malária',l:'#',s:'BVS'}]},
+{id:11,cat:'gestao',nome:'HORUS – Gestão da Assistência Farmacêutica',tipo:'Sistema de Informação',ambito:'Nacional',area:'Assistência Farmacêutica',publico:'Farmacêuticos, gestores de assistência farmacêutica',inst:'DAF / Ministério da Saúde',desc:'Sistema para qualificar a gestão da assistência farmacêutica no SUS, monitorando disponibilidade de medicamentos nos serviços de saúde.',util:'Acesso via portal DAF. Gestores registram estoque, dispensação e abastecimento.',disp:'Online',status:'Ativo',cob:'Todo o território nacional',criado:'2009',att:'2023-10',bvs:true,docs:[{n:'Manual Operacional HORUS',l:'#',s:'Portal MS'},{n:'Nota Técnica RENAME',l:'#',s:'BVS'}]},
+{id:12,cat:'financiamento',nome:'FPO – Fundo de Participação – Bloco APS',tipo:'Plataforma Digital',ambito:'Nacional',area:'Financiamento da Atenção Primária',publico:'Gestores financeiros, coordenadores de APS',inst:'Ministério da Saúde / FNS',desc:'Plataforma de acompanhamento e prestação de contas dos recursos federais transferidos fundo a fundo para o financiamento da APS nos municípios.',util:'Acesso pelo SIOPS ou plataforma Fundo a Fundo. Credenciamento junto ao Fundo Nacional de Saúde.',disp:'Parcial',status:'Parcial',cob:'Todo o território nacional',criado:'2015',att:'2022-06',bvs:false,docs:[{n:'Portaria de Consolidação nº 6',l:'#',s:'BVS'}]},
+];
+let F={cat:'todas',ambito:'todos',status:'todos',tipo:'todos'};
+let user=null,cs=0,pc=2;
+const NS=5;
+function flt(){const q=document.getElementById('sInput').value.toLowerCase();return D.filter(d=>{if(F.cat!=='todas'&&d.cat!==F.cat)return false;if(F.ambito!=='todos'&&d.ambito!==F.ambito)return false;if(F.status!=='todos'&&d.status!==F.status)return false;if(F.tipo!=='todos'&&d.tipo!==F.tipo)return false;if(q&&![d.nome,d.desc,d.area,d.tipo,d.inst].some(s=>s.toLowerCase().includes(q)))return false;return true});}
+function sd(s){const c={Ativo:'#22c55e',Parcial:'#f59e0b',Descontinuado:'#4a5568','Em implantação':'#3b82f6'};return`<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${c[s]||'#4a5568'};margin-right:3px;vertical-align:middle"></span>`;}
+function renderAll(){const l=flt();document.getElementById('rSub').textContent=`(${l.length})`;rCards(l);rTable(l);rChips();}
+function rCards(l){const g=document.getElementById('cGrid');if(!l.length){g.innerHTML='<div class="empty"><div style="font-size:2.5rem;opacity:.3;margin-bottom:.75rem">⌕</div><p>Nenhuma iniciativa encontrada.</p></div>';return;}g.innerHTML=l.map((d,i)=>{const c=CATS[d.cat];return`<div class="card" style="--cc:${c.color};animation-delay:${i*.04}s" onclick="openD(${d.id})"><div class="c-hdr"><span class="c-badge" style="background:${c.bg};color:${c.color};border:1px solid ${c.bd}">${c.label}</span><div class="c-right"><span class="c-ambito">${d.ambito}</span><span style="display:flex;align-items:center;gap:.3rem;font-size:.65rem;color:var(--text2);font-weight:600">${sd(d.status)}${d.status}</span></div></div><h3>${d.nome}</h3><div class="c-tipo">⬡ ${d.tipo}</div><p>${d.desc}</p><div class="c-tags"><span class="tag">${d.area}</span><span class="tag">${d.cob}</span></div><div class="c-foot"><span class="c-inst">🏛 ${d.inst}</span><div class="c-mr"><span class="c-date">${d.att}</span><span class="c-nd">📄 ${d.docs.length}</span></div></div></div>`;}).join('');}
+function rTable(l){document.getElementById('tBody').innerHTML=l.map(d=>{const c=CATS[d.cat];return`<tr onclick="openD(${d.id})"><td><span style="background:${c.bg};color:${c.color};border:1px solid ${c.bd};font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;padding:.18rem .5rem;border-radius:5px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">${c.label}</span></td><td class="td-n">${d.nome}</td><td class="td-m">${d.tipo}</td><td class="td-m">${d.ambito}</td><td style="font-size:.77rem;color:var(--text2)">${d.cob}</td><td>${sd(d.status)}<span style="font-size:.78rem;color:var(--text2)">${d.status}</span></td><td class="td-m">${d.att}</td><td style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--teal)">${d.docs.length}</td></tr>`;}).join('');}
+function rChips(){const lb={financiamento:'Financiamento APS',vigilancia:'Vigilância',planejamento:'Planejamento',atencao:'Atenção Primária',gestao:'Gestão'};const df={cat:'todas',ambito:'todos',status:'todos',tipo:'todos'};document.getElementById('achips').innerHTML=Object.entries(F).filter(([k,v])=>v!==df[k]).map(([k,v])=>`<span class="ac">${lb[v]||v}<button onclick="clrF('${k}')">✕</button></span>`).join('');}
+function setF(k,v,el){F[k]=v;el.closest('.sb-s').querySelectorAll('.fi').forEach(i=>i.classList.remove('on'));el.classList.add('on');renderAll();}
+function clrF(k){const d={cat:'todas',ambito:'todos',status:'todos',tipo:'todos'};F[k]=d[k];document.querySelectorAll(`[data-k="${k}"]`).forEach(i=>i.classList.remove('on'));const x=document.querySelector(`[data-k="${k}"][data-v="${d[k]}"]`);if(x)x.classList.add('on');renderAll();}
+function setView(v,btn){document.querySelectorAll('.vsb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('cWrap').style.display=v==='cards'?'':'none';document.getElementById('tWrap').style.display=v==='table'?'':'none';}
+function qs(q){document.getElementById('sInput').value=q;renderAll();}
+function openD(id){const d=D.find(x=>x.id===id);if(!d)return;const c=CATS[d.cat];document.getElementById('dTop').innerHTML=`<span style="background:${c.bg};color:${c.color};border:1px solid ${c.bd};font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;padding:.22rem .6rem;border-radius:6px;text-transform:uppercase;letter-spacing:.06em">${c.label}</span><span style="background:var(--surface2);color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:.22rem .5rem;border-radius:5px">${d.tipo}</span><span style="background:var(--surface2);color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:.22rem .5rem;border-radius:5px">${d.ambito}</span><span>${sd(d.status)}<span style="font-size:.72rem;color:var(--text2);font-weight:600">${d.status}</span></span>`;document.getElementById('dTitle').textContent=d.nome;document.getElementById('dInst').textContent='🏛 '+d.inst;document.getElementById('dMeta').innerHTML=`<div class="mi"><label>Área de Saúde</label><span>${d.area}</span></div><div class="mi"><label>Público-Alvo</label><span>${d.publico}</span></div><div class="mi"><label>Disponibilidade</label><span>${d.disp}</span></div><div class="mi"><label>Âmbito</label><span>${d.ambito}</span></div><div class="mi"><label>Cobertura</label><span>${d.cob}</span></div><div class="mi"><label>Ano de Criação</label><span>${d.criado}</span></div>`;document.getElementById('bvsP').style.display=d.bvs?'flex':'none';document.getElementById('dDesc').textContent=d.desc;document.getElementById('dUtil').textContent=d.util;document.getElementById('dDocs').innerHTML=d.docs.map(x=>`<li class="dr"><span class="di">📄</span><span class="dn">${x.n}</span><span class="ds">${x.s}</span><a class="da" href="${x.l}" target="_blank" onclick="event.stopPropagation()">Ver →</a></li>`).join('');document.getElementById('dDate').textContent='Última atualização: '+d.att;openOv('ovD');}
+function openForm(){if(!user){openLogin();return;}cs=0;document.getElementById('fCd').value=new Date().toLocaleDateString('pt-BR');upStep();openOv('ovF');}
+function upStep(){for(let i=0;i<NS;i++){document.getElementById('f'+i).classList.toggle('active',i===cs);const s=document.getElementById('s'+i);s.classList.remove('done','curr');if(i<cs)s.classList.add('done');if(i===cs)s.classList.add('curr');s.querySelector('.sd').textContent=i<cs?'✓':i+1;}document.getElementById('stCt').textContent=`0${cs+1} / 0${NS}`;document.getElementById('btnBk').style.display=cs>0?'':'none';document.getElementById('btnNx').textContent=cs===NS-1?'✓ Enviar para Revisão':'Próximo →';if(cs===NS-1)bldSum();}
+function sNx(){if(cs===NS-1){submitF();return;}cs++;upStep();}
+function sBk(){if(cs>0){cs--;upStep();}}
+function bldSum(){const v=id=>document.getElementById(id)?.value||'—';document.getElementById('sumBox').innerHTML=`<strong>Nome:</strong> ${v('fN')}<br><strong>Categoria:</strong> ${v('fC')}<br><strong>Tipo:</strong> ${v('fTp')}<br><strong>Instituição:</strong> ${v('fI')}<br><strong>Âmbito:</strong> ${v('fAm')}<br><strong>Status:</strong> ${v('fSt')}<br><strong>Disponibilidade:</strong> ${v('fDp')}<br>`;}
+function submitF(){covD('ovF');toast('✅ Iniciativa enviada! Aguardando revisão.','ok');}
+function addDoc(){const r=document.getElementById('dRep');const d=document.createElement('div');d.className='de';d.innerHTML=`<button class="drm" onclick="rmDoc(this)">✕</button><div class="deg"><div class="fld"><label>Descrição</label><input type="text" placeholder="Ex.: Portaria"></div><div class="fld"><label>Link</label><input type="url" placeholder="https://…"></div><div class="fld"><label>Fonte</label><select><option>Portal MS</option><option>BVS</option><option>Portal Institucional</option><option>Outro</option></select></div></div>`;r.appendChild(d);}
+function rmDoc(btn){const its=document.getElementById('dRep').querySelectorAll('.de');if(its.length>1)btn.closest('.de').remove();}
+function openReview(){openOv('ovR');}
+function apv(id,nome){const el=document.getElementById(id);el.style.opacity='.35';el.style.pointerEvents='none';pc--;document.getElementById('stP').textContent=pc;if(pc<=0)document.getElementById('pBar').classList.remove('show');toast(`✅ "${nome}" aprovada e publicada!`,'ok');if(pc===0)setTimeout(()=>covD('ovR'),1200);}
+function rtn(id){const el=document.getElementById(id);el.style.opacity='.35';el.style.pointerEvents='none';pc--;document.getElementById('stP').textContent=pc;if(pc<=0)document.getElementById('pBar').classList.remove('show');toast('↩ Iniciativa devolvida para correção.','warn');}
+function openLogin(){openOv('ovL');}
+function doLogin(role,name,icon){user={role,name,icon};covD('ovL');document.getElementById('btnLogin').style.display='none';document.getElementById('uPill').classList.add('show');document.getElementById('uDot').textContent=icon;document.getElementById('uName').textContent=name;const ce=role==='bolsista'||role==='admin';const cr=role==='revisor'||role==='admin';document.getElementById('btnNova').style.display=ce?'flex':'none';if(cr)document.getElementById('pBar').classList.add('show');toast(`👋 Bem-vindo(a), ${name}!`,'ok');}
+function logout(){user=null;document.getElementById('btnLogin').style.display='flex';document.getElementById('uPill').classList.remove('show');document.getElementById('btnNova').style.display='none';document.getElementById('pBar').classList.remove('show');toast('Sessão encerrada.','');}
+function openOv(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function cov(id,e){if(e.target===document.getElementById(id))covD(id);}
+function covD(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type||'');setTimeout(()=>t.className='toast',3200);}
+function goHome(){document.getElementById('sInput').value='';F={cat:'todas',ambito:'todos',status:'todos',tipo:'todos'};document.querySelectorAll('.fi').forEach(i=>i.classList.toggle('on',['todas','todos'].includes(i.dataset.v)));renderAll();}
+renderAll();
+</script>
+</body>
+</html>
