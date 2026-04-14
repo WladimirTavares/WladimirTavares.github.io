@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>RIDS v4</title>
+<style>
+body{margin:0;font-family:Arial;background:#0d1117;color:#e6edf3}
+.container{display:flex;height:100vh}
+.list{width:320px;border-right:1px solid #333;overflow:auto}
+.card{padding:12px;border-bottom:1px solid #222;cursor:pointer}
+.card:hover{background:#1c2230}
+.detail{flex:1;padding:20px;overflow:auto}
+.section{margin-bottom:15px;border:1px solid #333;border-radius:6px}
+.section h3{margin:0;padding:10px;background:#161b22;cursor:pointer}
+.section-content{padding:10px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.comment{border:1px solid #333;padding:8px;margin-top:6px;border-radius:6px}
+.sugestão{border-left:4px solid #3fb950}
+.correção{border-left:4px solid #e3b341}
+.experiência{border-left:4px solid #58a6ff}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="list" id="list"></div>
+<div class="detail" id="detail">Selecione uma iniciativa</div>
+</div>
+
+<script>
+const systems = [
+{
+id:"1",
+name:"e-SUS APS",
+categoria:"Assistência digital",
+desc:"Prontuário eletrônico da atenção primária",
+padronizados:{
+instituicao:"Ministério da Saúde",
+status:"Ativo",
+padroes:"HL7"
+},
+custom:{
+versao:"3.2",
+implantacao:"Nacional"
+},
+connections:["2"]
+},
+{
+id:"2",
+name:"RNDS",
+categoria:"Integração e dados",
+desc:"Rede Nacional de Dados em Saúde",
+padronizados:{
+instituicao:"Ministério da Saúde",
+status:"Ativo",
+padroes:"FHIR"
+},
+custom:{
+api:"REST",
+seguranca:"OAuth2"
+},
+connections:["3"]
+},
+{
+id:"3",
+name:"Meu SUS Digital",
+categoria:"Acesso digital",
+desc:"Aplicativo do cidadão",
+padronizados:{
+instituicao:"Ministério da Saúde",
+status:"Ativo",
+padroes:"FHIR"
+},
+custom:{
+plataforma:"Mobile",
+usuarios:"Milhões"
+},
+connections:[]
+}
+];
+
+let selected=null;
+
+const comments={
+"1":[
+{user:"Ana",text:"Funcionou bem no município",type:"experiência",likes:3,date:new Date()},
+{user:"Carlos",text:"Precisa melhorar integração com RNDS",type:"sugestão",likes:2,date:new Date()}
+]
+};
+
+function renderList(){
+const list=document.getElementById("list");
+list.innerHTML="";
+systems.forEach(s=>{
+const div=document.createElement("div");
+div.className="card";
+div.innerHTML=`<strong>${s.name}</strong><br><small>${s.categoria}</small>`;
+div.onclick=()=>selectSystem(s.id);
+list.appendChild(div);
+});
+}
+
+function selectSystem(id){
+selected=id;
+const s=systems.find(x=>x.id===id);
+
+document.getElementById("detail").innerHTML=`
+
+<h2>${s.name}</h2>
+<p>${s.desc}</p>
+
+<div class="section">
+<h3 onclick="toggle(this)">Metadados Padronizados</h3>
+<div class="section-content meta">
+${Object.entries(s.padronizados).map(([k,v])=>`<div><b>${k}</b>: ${v}</div>`).join("")}
+</div>
+</div>
+
+<div class="section">
+<h3 onclick="toggle(this)">Metadados Customizados</h3>
+<div class="section-content meta">
+${Object.entries(s.custom).map(([k,v])=>`<div><b>${k}</b>: ${v}</div>`).join("")}
+</div>
+</div>
+
+<div class="section">
+<h3 onclick="toggle(this)">Interoperabilidade</h3>
+<div class="section-content">
+${s.connections.map(c=>"→ "+systems.find(x=>x.id===c).name).join("<br>")}
+</div>
+</div>
+
+<div class="section">
+<h3 onclick="toggle(this)">Comentários (${(comments[id]||[]).length})</h3>
+<div class="section-content">
+<textarea id="cText"></textarea>
+<select id="cType">
+<option>sugestão</option>
+<option>correção</option>
+<option>experiência</option>
+</select>
+<button onclick="addComment()">Enviar</button>
+<div id="cList"></div>
+</div>
+</div>
+`;
+
+renderComments();
+}
+
+function toggle(el){
+const c=el.nextElementSibling;
+c.style.display=c.style.display==="none"?"block":"none";
+}
+
+function addComment(){
+const text=document.getElementById("cText").value;
+const type=document.getElementById("cType").value;
+if(!text)return;
+
+comments[selected]=comments[selected]||[];
+
+comments[selected].push({
+user:"Usuário",
+text,
+type,
+likes:0,
+date:new Date()
+});
+
+renderComments();
+}
+
+function renderComments(){
+const list=document.getElementById("cList");
+if(!list)return;
+
+list.innerHTML="";
+
+(comments[selected]||[])
+.sort((a,b)=>b.date-a.date)
+.forEach(c=>{
+const div=document.createElement("div");
+div.className="comment "+c.type;
+div.innerHTML=`
+<strong>${c.user}</strong>
+<p>${c.text}</p>
+<small>${c.type} ❤️ ${c.likes}</small>
+`;
+div.onclick=()=>{c.likes++;renderComments()};
+list.appendChild(div);
+});
+}
+
+renderList();
+</script>
+
+</body>
+</html>
