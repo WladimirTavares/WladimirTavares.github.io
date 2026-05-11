@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Grafo Conexo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07090f;
+  --panel: #0d1117;
+  --border: #1c2333;
+  --cyan: #00e5ff;
+  --cyan-dim: rgba(0,229,255,0.08);
+  --cyan-mid: rgba(0,229,255,0.18);
+  --orange: #ff6b35;
+  --orange-dim: rgba(255,107,53,0.12);
+  --text: #c9d1d9;
+  --muted: #4a5568;
+  --highlight: #e6edf3;
+  --node-r: 22px;
+  --edge-yes: #00e5ff;
+  --edge-no: #1c2333;
+  --edge-queried: #ff6b35;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Space Mono',monospace;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:32px 16px 80px;
+  position:relative;
+  overflow-x:hidden;
+}
+/* grid texture */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;
+}
+/* glow top */
+body::after{
+  content:'';
+  position:fixed;
+  top:-120px;left:50%;transform:translateX(-50%);
+  width:600px;height:300px;
+  background:radial-gradient(ellipse, rgba(0,229,255,0.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+/* ── Header ── */
+header{
+  text-align:center;
+  margin-bottom:36px;
+}
+.eyebrow{
+  font-size:0.62rem;
+  letter-spacing:0.4em;
+  text-transform:uppercase;
+  color:var(--cyan);
+  margin-bottom:8px;
+}
+h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2.2rem,6vw,3.6rem);
+  font-weight:900;
+  color:var(--highlight);
+  letter-spacing:-0.03em;
+  line-height:1;
+}
+h1 span{color:var(--cyan);}
+.subtitle{
+  margin-top:10px;
+  font-size:0.7rem;
+  color:var(--muted);
+  letter-spacing:0.08em;
+}
+
+/* ── Layout ── */
+.game-layout{
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:20px;
+  width:100%;
+  max-width:900px;
+}
+@media(max-width:680px){
+  .game-layout{grid-template-columns:1fr;}
+}
+
+/* ── Panel ── */
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:3px;
+  overflow:hidden;
+  position:relative;
+}
+.panel::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+}
+.panel-header{
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  font-size:0.58rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--muted);
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+/* ── SVG Graph ── */
+#graph-canvas{
+  display:block;
+  width:100%;
+  aspect-ratio:1/0.8;
+}
+/* nodes */
+.node-circle{
+  fill:var(--panel);
+  stroke:var(--muted);
+  stroke-width:1.5;
+  transition:all 0.25s;
+  cursor:pointer;
+}
+.node-circle:hover{
+  stroke:var(--cyan);
+  fill:var(--cyan-dim);
+}
+.node-circle.sel1{
+  stroke:var(--cyan);
+  fill:var(--cyan-mid);
+  stroke-width:2.5;
+}
+.node-circle.sel2{
+  stroke:var(--orange);
+  fill:var(--orange-dim);
+  stroke-width:2.5;
+}
+.node-label{
+  fill:var(--highlight);
+  font-family:'Space Mono',monospace;
+  font-size:13px;
+  font-weight:700;
+  text-anchor:middle;
+  dominant-baseline:central;
+  pointer-events:none;
+}
+/* edges */
+.edge{
+  stroke:var(--edge-no);
+  stroke-width:1.5;
+  transition:stroke 0.3s, stroke-width 0.3s, opacity 0.3s;
+}
+.edge.exists{
+  stroke:var(--edge-yes);
+  stroke-width:2;
+  opacity:0.8;
+}
+.edge.queried{
+  stroke:var(--edge-queried);
+  stroke-width:2.5;
+  opacity:1;
+}
+.edge.queried.exists{
+  stroke:var(--edge-yes);
+}
+
+/* ── Right panel ── */
+.right-col{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+/* ── Stats ── */
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:3px;
+  overflow:hidden;
+}
+.stat{
+  background:var(--panel);
+  padding:14px 12px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.stat-label{
+  font-size:0.56rem;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.stat-value{
+  font-family:'Syne',sans-serif;
+  font-size:1.5rem;
+  font-weight:800;
+  color:var(--cyan);
+  line-height:1;
+}
+
+/* ── Buttons ── */
+.section-label{
+  font-size:0.58rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+.vertex-grid{
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.vbtn{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:2px;
+  color:var(--text);
+  font-family:'Space Mono',monospace;
+  font-size:0.72rem;
+  letter-spacing:0.1em;
+  padding:9px 14px;
+  cursor:pointer;
+  transition:all 0.15s;
+  position:relative;
+}
+.vbtn:hover:not(:disabled){
+  border-color:var(--cyan);
+  color:var(--cyan);
+  background:var(--cyan-dim);
+}
+.vbtn.sel1{
+  border-color:var(--cyan);
+  color:var(--cyan);
+  background:var(--cyan-mid);
+}
+.vbtn.sel2{
+  border-color:var(--orange);
+  color:var(--orange);
+  background:var(--orange-dim);
+}
+.vbtn:disabled{opacity:0.3;cursor:not-allowed;}
+
+/* ── Selection indicator ── */
+.sel-indicator{
+  display:flex;align-items:center;gap:8px;
+  font-size:0.65rem;
+  color:var(--muted);
+  min-height:28px;
+  padding:6px 0;
+}
+.slot{
+  border:1px solid var(--border);
+  border-radius:2px;
+  padding:3px 12px;
+  min-width:72px;text-align:center;
+  font-size:0.68rem;
+  transition:all 0.2s;
+}
+.slot.s1{border-color:var(--cyan);color:var(--cyan);}
+.slot.s2{border-color:var(--orange);color:var(--orange);}
+.arr{color:var(--border);}
+
+/* ── Log ── */
+.log-box{
+  flex:1;
+  min-height:0;
+}
+#log{
+  width:100%;
+  height:220px;
+  background:transparent;
+  border:none;
+  resize:none;
+  font-family:'Space Mono',monospace;
+  font-size:0.68rem;
+  line-height:1.85;
+  color:var(--text);
+  outline:none;
+  padding:12px 14px;
+  overflow-y:auto;
+}
+#log::-webkit-scrollbar{width:3px;}
+#log::-webkit-scrollbar-thumb{background:var(--border);}
+
+/* ── Verdict ── */
+.verdict-section{
+  padding:14px;
+}
+.verdict-label{
+  font-size:0.58rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+.verdict-btns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.verd-btn{
+  border:1px solid var(--border);
+  border-radius:2px;
+  background:var(--panel);
+  color:var(--text);
+  font-family:'Space Mono',monospace;
+  font-size:0.68rem;
+  letter-spacing:0.08em;
+  padding:10px;
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.verd-btn:hover{
+  border-color:var(--cyan);
+  color:var(--cyan);
+  background:var(--cyan-dim);
+}
+.verd-btn.no:hover{
+  border-color:var(--orange);
+  color:var(--orange);
+  background:var(--orange-dim);
+}
+
+/* ── Result overlay ── */
+.result-overlay{
+  display:none;
+  position:absolute;inset:0;
+  background:rgba(7,9,15,0.88);
+  backdrop-filter:blur(4px);
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  text-align:center;
+  padding:24px;
+  z-index:10;
+}
+.result-overlay.show{display:flex;}
+.res-icon{font-size:3rem;}
+.res-title{
+  font-family:'Syne',sans-serif;
+  font-size:1.5rem;
+  font-weight:900;
+  color:var(--highlight);
+}
+.res-desc{
+  font-size:0.7rem;
+  color:var(--muted);
+  line-height:1.8;
+  max-width:260px;
+}
+.btn-new{
+  margin-top:8px;
+  background:var(--cyan);
+  color:#07090f;
+  border:none;
+  border-radius:2px;
+  font-family:'Space Mono',monospace;
+  font-size:0.72rem;
+  font-weight:700;
+  letter-spacing:0.15em;
+  padding:10px 24px;
+  cursor:pointer;
+  text-transform:uppercase;
+  transition:opacity 0.15s;
+}
+.btn-new:hover{opacity:0.85;}
+
+/* ── Rules panel ── */
+.rules{
+  font-size:0.68rem;
+  line-height:1.9;
+  color:#5a6880;
+  padding:14px;
+}
+.rules strong{color:var(--cyan);}
+
+/* ── New graph btn ── */
+.btn-ghost{
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:2px;
+  color:var(--muted);
+  font-family:'Space Mono',monospace;
+  font-size:0.62rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  padding:7px 16px;
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Problema de Teoria dos Grafos</div>
+  <h1>Grafo <span>Conexo</span>?</h1>
+  <p class="subtitle">Descubra se o grafo secreto é conexo fazendo o mínimo de perguntas.</p>
+</header>
+
+<div class="game-layout">
+
+  <!-- Left: graph visualization -->
+  <div class="panel" style="position:relative;">
+    <div class="panel-header">
+      <span>Visualização</span>
+      <button class="btn-ghost" onclick="newGame()">↺ Novo Grafo</button>
+    </div>
+    <svg id="graph-canvas" viewBox="0 0 500 400"></svg>
+    <div class="result-overlay" id="result-overlay">
+      <div class="res-icon" id="res-icon"></div>
+      <div class="res-title" id="res-title"></div>
+      <div class="res-desc" id="res-desc"></div>
+      <button class="btn-new" onclick="newGame()">Novo Grafo →</button>
+    </div>
+  </div>
+
+  <!-- Right: controls -->
+  <div class="right-col">
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Perguntas</div>
+        <div class="stat-value" id="stat-q">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Arestas sim</div>
+        <div class="stat-value" id="stat-yes">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Arestas não</div>
+        <div class="stat-value" id="stat-no" style="color:var(--muted)">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Pares rest.</div>
+        <div class="stat-value" id="stat-rem">—</div>
+      </div>
+    </div>
+
+    <!-- Vertex buttons -->
+    <div class="panel">
+      <div class="panel-header"><span>Vértices</span></div>
+      <div style="padding:14px;">
+        <div class="section-label">Selecione dois vértices para perguntar</div>
+        <div class="vertex-grid" id="vertex-grid"></div>
+        <div class="sel-indicator" style="margin-top:10px;">
+          <span class="slot" id="slot-a">u</span>
+          <span class="arr">— aresta? →</span>
+          <span class="slot" id="slot-b">v</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verdict -->
+    <div class="panel">
+      <div class="panel-header"><span>Seu Veredito</span></div>
+      <div class="verdict-section">
+        <div class="verdict-label">O grafo secreto é conexo?</div>
+        <div class="verdict-btns">
+          <button class="verd-btn" onclick="submitVerdict(true)">✓ Sim, é conexo</button>
+          <button class="verd-btn no" onclick="submitVerdict(false)">✗ Não é conexo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="panel log-box">
+      <div class="panel-header">
+        <span>Registro</span>
+        <span id="log-count" style="color:var(--cyan);font-size:0.6rem;">0 perguntas</span>
+      </div>
+      <textarea id="log" readonly></textarea>
+    </div>
+
+    <!-- Rules -->
+    <div class="panel">
+      <div class="panel-header"><span>Regras</span></div>
+      <div class="rules">
+        · Um grafo é <strong>conexo</strong> se todo vértice alcança todos os outros.<br>
+        · Pergunte se dois vértices estão ligados por uma aresta.<br>
+        · Use lógica para minimizar perguntas.<br>
+        · Declare seu veredito quando tiver certeza.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Constants ──
+const N = 5;
+const TOTAL_PAIRS = N*(N-1)/2; // 10
+
+// ── State ──
+let grafo = [];
+let queriedPairs = new Set();
+let selected = [];
+let qCount = 0;
+let yesCount = 0;
+let noCount = 0;
+let gameOver = false;
+
+// SVG node positions (pentagon layout)
+const cx = 250, cy = 200, r = 140;
+const nodePos = Array.from({length:N}, (_,i) => {
+  const angle = (2*Math.PI*i/N) - Math.PI/2;
+  return {x: cx + r*Math.cos(angle), y: cy + r*Math.sin(angle)};
+});
+
+// ── Generate graph ──
+function generateGrafo() {
+  const p = 0.3 + Math.random()*0.5; // density 0.3–0.8
+  grafo = Array.from({length:N}, () => Array(N).fill(0));
+  for(let i=0;i<N;i++)
+    for(let j=i+1;j<N;j++)
+      if(Math.random()<p){ grafo[i][j]=1; grafo[j][i]=1; }
+}
+
+function isConexo() {
+  const vis = Array(N).fill(false);
+  const dfs = u => { vis[u]=true; for(let v=0;v<N;v++) if(grafo[u][v]&&!vis[v]) dfs(v); };
+  dfs(0);
+  return vis.every(Boolean);
+}
+
+// ── Build SVG ──
+function buildSVG() {
+  const svg = document.getElementById('graph-canvas');
+  svg.innerHTML = '';
+
+  // edges (hidden, rendered as dim lines)
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++) {
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', nodePos[i].x);
+    line.setAttribute('y1', nodePos[i].y);
+    line.setAttribute('x2', nodePos[j].x);
+    line.setAttribute('y2', nodePos[j].y);
+    line.classList.add('edge');
+    line.id = `edge-${i}-${j}`;
+    svg.appendChild(line);
+  }
+
+  // nodes
+  for(let i=0;i<N;i++) {
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.style.cursor = 'pointer';
+    g.onclick = () => selectVertex(i);
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx', nodePos[i].x);
+    circle.setAttribute('cy', nodePos[i].y);
+    circle.setAttribute('r', 22);
+    circle.classList.add('node-circle');
+    circle.id = `node-${i}`;
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x', nodePos[i].x);
+    label.setAttribute('y', nodePos[i].y);
+    label.classList.add('node-label');
+    label.textContent = i+1;
+
+    g.appendChild(circle); g.appendChild(label);
+    svg.appendChild(g);
+  }
+}
+
+function buildButtons() {
+  const grid = document.getElementById('vertex-grid');
+  grid.innerHTML = '';
+  for(let i=0;i<N;i++) {
+    const btn = document.createElement('button');
+    btn.className = 'vbtn';
+    btn.textContent = `V${i+1}`;
+    btn.id = `vbtn-${i}`;
+    btn.onclick = () => selectVertex(i);
+    grid.appendChild(btn);
+  }
+}
+
+// ── Select vertex ──
+function selectVertex(i) {
+  if(gameOver) return;
+
+  if(selected.includes(i)) {
+    // deselect
+    selected = selected.filter(x=>x!==i);
+    highlightNode(i, null);
+    updateSlots();
+    return;
+  }
+
+  if(selected.length===0) {
+    selected=[i];
+    highlightNode(i,'sel1');
+  } else if(selected.length===1) {
+    if(selected[0]===i) return;
+    selected.push(i);
+    highlightNode(i,'sel2');
+    updateSlots();
+    setTimeout(()=>askEdge(selected[0],selected[1]),120);
+    return;
+  }
+  updateSlots();
+}
+
+function highlightNode(i, cls) {
+  const nc = document.getElementById(`node-${i}`);
+  const nb = document.getElementById(`vbtn-${i}`);
+  nc.classList.remove('sel1','sel2');
+  nb.classList.remove('sel1','sel2');
+  if(cls){ nc.classList.add(cls); nb.classList.add(cls); }
+}
+
+function updateSlots() {
+  const sa = document.getElementById('slot-a');
+  const sb = document.getElementById('slot-b');
+  sa.className='slot'+(selected.length>=1?' s1':'');
+  sb.className='slot'+(selected.length>=2?' s2':'');
+  sa.textContent = selected.length>=1 ? `V${selected[0]+1}` : 'u';
+  sb.textContent = selected.length>=2 ? `V${selected[1]+1}` : 'v';
+}
+
+// ── Ask edge ──
+function askEdge(u, v) {
+  const key = `${Math.min(u,v)}-${Math.max(u,v)}`;
+  const exists = grafo[u][v]===1;
+  const already = queriedPairs.has(key);
+
+  if(!already) {
+    queriedPairs.add(key);
+    qCount++;
+    if(exists) yesCount++; else noCount++;
+    updateStats();
+  }
+
+  // Update edge visuals
+  const eu = Math.min(u,v), ev = Math.max(u,v);
+  const edge = document.getElementById(`edge-${eu}-${ev}`);
+  edge.classList.add('queried');
+  if(exists) edge.classList.add('exists');
+
+  const msg = exists
+    ? `[${String(qCount).padStart(2,'0')}] V${u+1} — V${v+1}: ✓ ARESTA EXISTE`
+    : `[${String(qCount).padStart(2,'0')}] V${u+1} — V${v+1}: ✗ sem aresta`;
+
+  logLine(msg);
+
+  // Reset selection
+  selected.forEach(i=>highlightNode(i,null));
+  selected=[];
+  updateSlots();
+}
+
+// ── Verdict ──
+function submitVerdict(claim) {
+  if(gameOver) return;
+  const reality = isConexo();
+  const correct = claim===reality;
+  gameOver = true;
+
+  // Reveal all edges
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++) {
+    const e = document.getElementById(`edge-${i}-${j}`);
+    if(grafo[i][j]===1) e.classList.add('exists');
+  }
+
+  const overlay = document.getElementById('result-overlay');
+  overlay.classList.add('show');
+
+  if(correct) {
+    document.getElementById('res-icon').textContent = '◈';
+    document.getElementById('res-title').textContent = correct ? 'Correto!' : 'Errado!';
+    document.getElementById('res-title').style.color = '#00e5ff';
+    document.getElementById('res-desc').textContent =
+      `O grafo ${reality?'É':'NÃO é'} conexo. Você acertou usando ${qCount} pergunta${qCount!==1?'s':''}!`;
+  } else {
+    document.getElementById('res-icon').textContent = '✗';
+    document.getElementById('res-title').textContent = 'Errado!';
+    document.getElementById('res-title').style.color = '#ff6b35';
+    document.getElementById('res-desc').textContent =
+      `O grafo ${reality?'É':'NÃO é'} conexo, mas você disse ${claim?'sim':'não'}. Tente novamente!`;
+  }
+
+  logLine('');
+  logLine(`— Resultado: grafo ${reality?'CONEXO':'NÃO CONEXO'} — ${correct?'ACERTO':'ERRO'} —`);
+}
+
+// ── Stats ──
+function updateStats() {
+  document.getElementById('stat-q').textContent = qCount;
+  document.getElementById('stat-yes').textContent = yesCount;
+  document.getElementById('stat-no').textContent = noCount;
+  document.getElementById('stat-rem').textContent = TOTAL_PAIRS - queriedPairs.size;
+}
+
+// ── Log ──
+function logLine(txt) {
+  const log = document.getElementById('log');
+  log.value += txt+'\n';
+  log.scrollTop = log.scrollHeight;
+  document.getElementById('log-count').textContent = qCount+(qCount===1?' pergunta':' perguntas');
+}
+
+// ── New Game ──
+function newGame() {
+  generateGrafo();
+  queriedPairs = new Set();
+  selected = [];
+  qCount = 0; yesCount = 0; noCount = 0;
+  gameOver = false;
+  buildSVG();
+  buildButtons();
+  updateStats();
+  updateSlots();
+  document.getElementById('log').value = '';
+  document.getElementById('log-count').textContent = '0 perguntas';
+  document.getElementById('result-overlay').classList.remove('show');
+  logLine(`— Novo grafo gerado com ${N} vértices. —`);
+  logLine(`— Clique em dois vértices para perguntar sobre uma aresta. —`);
+  logLine('');
+}
+
+// ── Init ──
+newGame();
+</script>
+</body>
+</html>
