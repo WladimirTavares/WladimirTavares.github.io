@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>O Problema da Celebridade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --surface: #161616;
+            --card: #1e1e1e;
+            --border: #2a2a2a;
+            --gold: #c9a84c;
+            --gold-light: #e8c96d;
+            --gold-dim: rgba(201,168,76,0.15);
+            --red: #c0392b;
+            --green: #27ae60;
+            --text: #e8e0d0;
+            --muted: #7a7060;
+            --highlight: #f5f0e8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 80px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* ── Header ── */
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        header .eyebrow {
+            font-size: 0.7rem;
+            letter-spacing: 0.35em;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.4rem, 6vw, 4rem);
+            font-weight: 900;
+            color: var(--highlight);
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+        header h1 span {
+            color: var(--gold);
+        }
+        header p {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+        }
+
+        /* ── Setup card ── */
+        .setup-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 36px 40px;
+            width: 100%;
+            max-width: 520px;
+            margin-bottom: 36px;
+            position: relative;
+            overflow: hidden;
+        }
+        .setup-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .setup-card label {
+            display: block;
+            font-size: 0.68rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        input[type="number"] {
+            flex: 1;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            color: var(--highlight);
+            font-family: 'DM Mono', monospace;
+            font-size: 1.4rem;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-inner-spin-button { display: none; }
+        input[type="number"]:focus { border-color: var(--gold); }
+
+        .btn-primary {
+            background: var(--gold);
+            color: #0d0d0d;
+            border: none;
+            border-radius: 2px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 0 24px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            white-space: nowrap;
+        }
+        .btn-primary:hover { background: var(--gold-light); }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+        /* ── Rules ── */
+        .rules {
+            background: var(--gold-dim);
+            border: 1px solid rgba(201,168,76,0.25);
+            border-radius: 2px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            font-size: 0.72rem;
+            line-height: 1.8;
+            color: #c8b888;
+        }
+        .rules strong { color: var(--gold); }
+
+        /* ── Game area ── */
+        #game-area {
+            width: 100%;
+            max-width: 700px;
+            display: none;
+            flex-direction: column;
+            gap: 28px;
+        }
+        #game-area.visible { display: flex; }
+
+        /* ── Stats bar ── */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 14px 20px;
+        }
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .stat-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            line-height: 1;
+        }
+        .stat-value.warn { color: var(--red); }
+        .stat-divider {
+            width: 1px;
+            height: 36px;
+            background: var(--border);
+        }
+
+        /* ── Instruction ── */
+        .instruction {
+            text-align: center;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        .instruction strong { color: var(--text); }
+
+        /* ── Person buttons ── */
+        .people-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .person-btn {
+            position: relative;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 12px 18px;
+            cursor: pointer;
+            transition: all 0.15s;
+            min-width: 80px;
+            text-align: center;
+        }
+        .person-btn:hover:not(:disabled) {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: var(--gold-dim);
+        }
+        .person-btn.selected {
+            border-color: var(--gold);
+            background: var(--gold-dim);
+            color: var(--gold-light);
+            box-shadow: 0 0 16px rgba(201,168,76,0.2);
+        }
+        .person-btn.selected::after {
+            content: '●';
+            position: absolute;
+            top: 4px; right: 6px;
+            font-size: 0.5rem;
+            color: var(--gold);
+        }
+        .person-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+        .person-btn.eliminated {
+            border-color: var(--red);
+            color: var(--red);
+            opacity: 0.4;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        .person-btn.celebrity {
+            border-color: var(--gold);
+            background: linear-gradient(135deg, rgba(201,168,76,0.3), rgba(201,168,76,0.08));
+            color: var(--gold-light);
+            box-shadow: 0 0 32px rgba(201,168,76,0.35);
+            cursor: default;
+        }
+
+        /* ── Selection hint ── */
+        .selection-hint {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--muted);
+            min-height: 24px;
+        }
+        .slot {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 4px 14px;
+            color: var(--text);
+            min-width: 80px;
+            text-align: center;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            transition: all 0.2s;
+        }
+        .slot.filled {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .arrow {
+            font-size: 0.85rem;
+            color: var(--border);
+        }
+
+        /* ── Log ── */
+        .log-wrapper {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .log-header {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.62rem;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+        }
+        #log {
+            background: transparent;
+            border: none;
+            width: 100%;
+            resize: none;
+            padding: 16px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.9;
+            color: var(--text);
+            outline: none;
+            min-height: 200px;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+
+        /* ── Result overlay ── */
+        .result-banner {
+            display: none;
+            background: var(--surface);
+            border: 1px solid var(--gold);
+            border-radius: 2px;
+            padding: 28px 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .result-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 70%);
+        }
+        .result-banner.visible { display: block; }
+        .result-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .result-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--highlight);
+            margin-bottom: 8px;
+        }
+        .result-desc {
+            font-size: 0.75rem;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        /* ── Scrollbar ── */
+        #log::-webkit-scrollbar { width: 4px; }
+        #log::-webkit-scrollbar-track { background: transparent; }
+        #log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        /* ── Reset btn ── */
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            color: var(--muted);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-ghost:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="eyebrow">Problema Clássico de Algoritmos</div>
+    <h1>A <span>Celebridade</span></h1>
+    <p>Encontre quem todos conhecem — mas que não conhece ninguém.</p>
+</header>
+
+<!-- Setup -->
+<div class="setup-card" id="setup-card">
+    <label>Quantas pessoas estão na festa?</label>
+    <div class="input-row">
+        <input type="number" id="n-input" min="2" max="20" value="5" placeholder="n">
+        <button class="btn-primary" onclick="startGame()">Começar →</button>
+    </div>
+
+    <div class="rules">
+        <strong>Regras:</strong><br>
+        · Há exatamente <strong>uma celebridade</strong> (ou nenhuma) na festa.<br>
+        · A celebridade é <strong>conhecida por todos</strong> e <strong>não conhece ninguém</strong>.<br>
+        · Para perguntar <em>"A conhece B?"</em>, clique em <strong>A</strong> e depois em <strong>B</strong>.<br>
+        · Você tem no máximo <strong>3(n−1)</strong> perguntas para identificá-la.<br>
+        · Use a lógica: se A conhece B → A não é celebridade; se A não conhece B → B não é celebridade.
+    </div>
+</div>
+
+<!-- Game -->
+<div id="game-area">
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-label">Pessoas</div>
+            <div class="stat-value" id="stat-n">—</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+            <div class="stat-label">Perguntas usadas</div>
+            <div class="stat-value" id="stat-q">0</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+            <div class="stat-label">Limite</div>
+            <div class="stat-value" id="stat-limit">—</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+            <div class="stat-label">Restantes</div>
+            <div class="stat-value" id="stat-rem">—</div>
+        </div>
+    </div>
+
+    <div class="instruction">
+        Clique em <strong>dois botões</strong> para perguntar: <em>"A pessoa A conhece a pessoa B?"</em>
+    </div>
+
+    <div class="selection-hint">
+        <span class="slot" id="slot-a">A</span>
+        <span class="arrow">→ conhece →</span>
+        <span class="slot" id="slot-b">B</span>
+    </div>
+
+    <div class="people-grid" id="people-grid"></div>
+
+    <div class="log-wrapper">
+        <div class="log-header">
+            <span>Registro de Perguntas</span>
+            <span id="log-count">0 perguntas</span>
+        </div>
+        <textarea id="log" readonly></textarea>
+    </div>
+
+    <div class="result-banner" id="result-banner">
+        <div class="result-icon" id="result-icon"></div>
+        <div class="result-title" id="result-title"></div>
+        <div class="result-desc" id="result-desc"></div>
+        <button class="btn-primary" onclick="resetGame()">Nova Festa →</button>
+    </div>
+
+    <div style="text-align:center">
+        <button class="btn-ghost" onclick="resetGame()">↺ Reiniciar</button>
+    </div>
+
+</div>
+
+<script>
+    // ── State ──
+    let n = 0;
+    let limit = 0;
+    let questions = 0;
+    let selected = [];
+    let knows = [];       // knows[i][j] = true/false (hidden from player)
+    let celebrity = -1;   // index, or -1 if none
+    let gameOver = false;
+    let buttons = [];
+
+    // ── Start ──
+    function startGame() {
+        n = parseInt(document.getElementById('n-input').value);
+        if (isNaN(n) || n < 2 || n > 20) {
+            alert('Por favor, insira um número entre 2 e 20.');
+            return;
+        }
+
+        // Generate hidden world
+        generateWorld();
+
+        limit = 3 * (n - 1);
+        questions = 0;
+        selected = [];
+        gameOver = false;
+
+        // UI
+        document.getElementById('setup-card').style.display = 'none';
+        document.getElementById('game-area').classList.add('visible');
+
+        updateStats();
+        buildGrid();
+        clearLog();
+        logLine(`— Festa com ${n} pessoas. Limite: ${limit} perguntas. —`);
+        logLine(`— Dica: se A conhece B → elimine A; se A não conhece B → elimine B. —`);
+        logLine('');
+
+        document.getElementById('result-banner').classList.remove('visible');
+    }
+
+    function generateWorld() {
+        // Decide if there is a celebrity (70% chance yes)
+        const hasCelebrity = Math.random() < 0.70;
+
+        // Initialize matrix: knows[i][j]
+        knows = Array.from({length: n}, () => Array(n).fill(false));
+
+        if (hasCelebrity) {
+            celebrity = Math.floor(Math.random() * n);
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    if (i === j) continue;
+                    if (i === celebrity) {
+                        knows[i][j] = false; // celebrity knows nobody
+                    } else if (j === celebrity) {
+                        knows[i][j] = true;  // everyone knows celebrity
+                    } else {
+                        knows[i][j] = Math.random() < 0.5;
+                    }
+                }
+            }
+        } else {
+            celebrity = -1;
+            // Random, but ensure no one satisfies celebrity conditions
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    if (i === j) continue;
+                    knows[i][j] = Math.random() < 0.5;
+                }
+            }
+            // Make sure nobody accidentally became celebrity
+            // For each person that knows nobody, make them know someone
+            for (let i = 0; i < n; i++) {
+                const knowsNobody = !knows[i].some((v, j) => j !== i && v);
+                const knownByAll = knows.every((row, k) => k === i || row[i]);
+                if (knowsNobody && knownByAll) {
+                    // accidentally a celebrity — fix
+                    const target = (i + 1) % n;
+                    knows[i][target] = true;
+                }
+            }
+        }
+    }
+
+    function buildGrid() {
+        const grid = document.getElementById('people-grid');
+        grid.innerHTML = '';
+        buttons = [];
+        for (let i = 0; i < n; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'person-btn';
+            btn.textContent = `Pessoa ${i + 1}`;
+            btn.dataset.index = i;
+            btn.onclick = () => selectPerson(i);
+            grid.appendChild(btn);
+            buttons.push(btn);
+        }
+    }
+
+    // ── Selection logic ──
+    function selectPerson(i) {
+        if (gameOver) return;
+        if (buttons[i].disabled || buttons[i].classList.contains('eliminated')) return;
+
+        if (selected.length === 0) {
+            selected = [i];
+            buttons[i].classList.add('selected');
+            updateSlots();
+        } else if (selected.length === 1) {
+            if (selected[0] === i) {
+                // deselect
+                selected = [];
+                buttons[i].classList.remove('selected');
+                updateSlots();
+                return;
+            }
+            selected.push(i);
+            updateSlots();
+            askQuestion(selected[0], selected[1]);
+        }
+    }
+
+    function updateSlots() {
+        const sa = document.getElementById('slot-a');
+        const sb = document.getElementById('slot-b');
+        if (selected.length === 0) {
+            sa.textContent = 'A'; sa.classList.remove('filled');
+            sb.textContent = 'B'; sb.classList.remove('filled');
+        } else if (selected.length === 1) {
+            sa.textContent = `Pessoa ${selected[0] + 1}`; sa.classList.add('filled');
+            sb.textContent = 'B'; sb.classList.remove('filled');
+        } else {
+            sa.textContent = `Pessoa ${selected[0] + 1}`; sa.classList.add('filled');
+            sb.textContent = `Pessoa ${selected[1] + 1}`; sb.classList.add('filled');
+        }
+    }
+
+    // ── Ask question ──
+    function askQuestion(a, b) {
+        questions++;
+        updateStats();
+
+        const answer = knows[a][b];
+        const answerText = answer ? 'SIM' : 'NÃO';
+        const consequence = answer
+            ? `→ Pessoa ${a+1} não é celebridade.`
+            : `→ Pessoa ${b+1} não é celebridade.`;
+
+        logLine(`[${String(questions).padStart(2,'0')}] Pessoa ${a+1} conhece Pessoa ${b+1}? ${answerText}   ${consequence}`);
+
+        // Reset selection
+        buttons[a].classList.remove('selected');
+        selected = [];
+        updateSlots();
+
+        // Check limit
+        if (questions >= limit) {
+            endGame(false, 'Você atingiu o limite de perguntas!');
+        }
+    }
+
+    // ── Guess celebrity ──
+    function makeGuess(index) {
+        if (gameOver) return;
+        // This is now handled via a "Declarar" button added below
+    }
+
+    // ── End game ──
+    function endGame(found, msg) {
+        gameOver = true;
+        const banner = document.getElementById('result-banner');
+
+        if (found && celebrity !== -1) {
+            document.getElementById('result-icon').textContent = '★';
+            document.getElementById('result-title').textContent = `Celebridade: Pessoa ${celebrity + 1}`;
+            document.getElementById('result-desc').textContent =
+                `${msg}\nVocê usou ${questions} de ${limit} perguntas.`;
+            buttons[celebrity].classList.add('celebrity');
+        } else if (found && celebrity === -1) {
+            document.getElementById('result-icon').textContent = '✓';
+            document.getElementById('result-title').textContent = 'Correto! Não há celebridade.';
+            document.getElementById('result-desc').textContent =
+                `${msg}\nVocê usou ${questions} de ${limit} perguntas.`;
+        } else {
+            document.getElementById('result-icon').textContent = '✗';
+            document.getElementById('result-title').textContent = 'Fim de jogo!';
+            const celebText = celebrity !== -1
+                ? `A celebridade era a Pessoa ${celebrity + 1}.`
+                : 'Não havia celebridade nesta festa.';
+            document.getElementById('result-desc').textContent = `${msg} ${celebText}`;
+            if (celebrity !== -1) buttons[celebrity].classList.add('celebrity');
+        }
+
+        banner.classList.add('visible');
+        logLine('');
+        logLine(`— Fim! ${celebrity !== -1 ? 'Celebridade: Pessoa '+(celebrity+1) : 'Sem celebridade.'} —`);
+    }
+
+    function resetGame() {
+        document.getElementById('setup-card').style.display = '';
+        document.getElementById('game-area').classList.remove('visible');
+        document.getElementById('result-banner').classList.remove('visible');
+        document.getElementById('people-grid').innerHTML = '';
+        selected = [];
+        gameOver = false;
+        updateSlots();
+    }
+
+    // ── Stats & Log ──
+    function updateStats() {
+        document.getElementById('stat-n').textContent = n;
+        document.getElementById('stat-q').textContent = questions;
+        document.getElementById('stat-limit').textContent = limit;
+        const rem = limit - questions;
+        const remEl = document.getElementById('stat-rem');
+        remEl.textContent = rem;
+        remEl.className = 'stat-value' + (rem <= Math.floor(limit * 0.25) ? ' warn' : '');
+    }
+
+    function logLine(text) {
+        const log = document.getElementById('log');
+        log.value += text + '\n';
+        log.scrollTop = log.scrollHeight;
+        const count = questions;
+        document.getElementById('log-count').textContent = count + (count === 1 ? ' pergunta' : ' perguntas');
+    }
+
+    function clearLog() {
+        document.getElementById('log').value = '';
+        document.getElementById('log-count').textContent = '0 perguntas';
+    }
+
+    // ── Declare buttons ──
+    // Add declare section after grid
+    document.addEventListener('DOMContentLoaded', () => {
+        const gameArea = document.getElementById('game-area');
+        const declareSection = document.createElement('div');
+        declareSection.id = 'declare-section';
+        declareSection.style.cssText = 'display:flex;flex-direction:column;gap:12px;align-items:center;';
+        declareSection.innerHTML = `
+            <div style="font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);">Declarar resultado</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;" id="declare-grid"></div>
+            <button class="btn-ghost" onclick="declareNoCelebrity()" style="font-size:0.68rem;">✗ Não há celebridade</button>
+        `;
+        gameArea.insertBefore(declareSection, gameArea.querySelector('.log-wrapper'));
+    });
+
+    // Rebuild declare grid when game starts
+    const origBuildGrid = buildGrid;
+    buildGrid = function() {
+        origBuildGrid();
+        rebuildDeclareGrid();
+    };
+
+    function rebuildDeclareGrid() {
+        const dg = document.getElementById('declare-grid');
+        if (!dg) return;
+        dg.innerHTML = '';
+        for (let i = 0; i < n; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'btn-ghost';
+            btn.style.cssText = 'font-size:0.65rem;padding:6px 14px;';
+            btn.textContent = `★ Pessoa ${i+1}`;
+            btn.dataset.index = i;
+            btn.onclick = () => declareGuess(i);
+            dg.appendChild(btn);
+        }
+    }
+
+    function declareGuess(index) {
+        if (gameOver) return;
+        if (index === celebrity) {
+            endGame(true, 'Declaração correta!');
+        } else {
+            endGame(false, `Pessoa ${index+1} não é a celebridade.`);
+        }
+    }
+
+    function declareNoCelebrity() {
+        if (gameOver) return;
+        if (celebrity === -1) {
+            endGame(true, 'Correto! Você identificou que não há celebridade.');
+        } else {
+            endGame(false, 'Errado! Há uma celebridade nesta festa.');
+        }
+    }
+</script>
+
+</body>
+</html>
