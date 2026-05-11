@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Cobertura com Triminós</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,900;1,700&family=Azeret+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #f5f0e8;
+  --paper:     #faf7f2;
+  --ink:       #1a1410;
+  --ink-soft:  #4a4038;
+  --ink-faint: #b0a898;
+  --red:       #c0392b;
+  --amber:     #d4860a;
+  --teal:      #1a6b5a;
+  --blue:      #1a3d6b;
+  --missing:   #1a1410;
+  --grid-line: #d8d0c4;
+  --shadow:    rgba(26,20,16,0.12);
+
+  /* tromino colors */
+  --t0: #e85d4a;   /* rot 0  – coral red */
+  --t1: #3a8c7e;   /* rot 1  – teal */
+  --t2: #d4860a;   /* rot 2  – amber */
+  --t3: #2e5fa3;   /* rot 3  – blue */
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Azeret Mono', monospace;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 36px 16px 80px;
+  position: relative;
+}
+
+/* halftone grain */
+body::before {
+  content:'';
+  position:fixed;inset:0;
+  background-image: radial-gradient(circle, var(--ink) 0.5px, transparent 0.5px);
+  background-size: 4px 4px;
+  opacity: 0.04;
+  pointer-events:none;
+}
+
+/* ── Header ── */
+header {
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+}
+.tag {
+  display: inline-block;
+  font-size: 0.58rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border: 1px solid var(--grid-line);
+  padding: 3px 10px;
+  margin-bottom: 12px;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink);
+}
+h1 em {
+  font-style: italic;
+  color: var(--red);
+}
+.desc {
+  margin-top: 10px;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Setup ── */
+.setup {
+  background: var(--paper);
+  border: 1px solid var(--grid-line);
+  padding: 24px 32px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 4px 4px 0 var(--grid-line);
+}
+.setup-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.n-btns {
+  display: flex;
+  gap: 10px;
+}
+.nbtn {
+  width: 52px; height: 52px;
+  background: var(--bg);
+  border: 1.5px solid var(--grid-line);
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.12s;
+  position: relative;
+}
+.nbtn:hover {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.nbtn.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.nbtn sub {
+  font-size: 0.65rem;
+  font-family: 'Azeret Mono', monospace;
+  font-weight: 400;
+}
+.start-btn {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  font-family: 'Azeret Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 11px 32px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  box-shadow: 3px 3px 0 rgba(192,57,43,0.3);
+}
+.start-btn:hover { opacity: 0.88; transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(192,57,43,0.3); }
+.start-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 rgba(192,57,43,0.3); }
+
+/* ── Main layout ── */
+.main {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  max-width: 1000px;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Board ── */
+#board-wrap {
+  position: relative;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  box-shadow: 6px 6px 0 var(--ink-soft);
+  flex-shrink: 0;
+}
+
+#board-canvas {
+  display: block;
+  cursor: default;
+}
+
+/* ── Right panel ── */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 220px;
+  max-width: 260px;
+}
+
+/* ── Tromino tray ── */
+.tray {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink-soft);
+  padding: 18px;
+}
+.tray-title {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 14px;
+  text-align: center;
+}
+.tromino-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.tromino-card {
+  background: var(--bg);
+  border: 1.5px solid var(--grid-line);
+  padding: 10px;
+  cursor: grab;
+  transition: all 0.12s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.tromino-card:hover {
+  border-color: var(--ink);
+  transform: translate(-1px,-1px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.tromino-card.selected {
+  border-color: var(--ink);
+  background: var(--ink);
+  transform: translate(-1px,-1px);
+  box-shadow: 3px 3px 0 rgba(26,20,16,0.4);
+}
+.tromino-card.selected canvas { filter: invert(1); }
+.tromino-card canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+.rot-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color 0.12s;
+}
+.tromino-card.selected .rot-label { color: rgba(245,240,232,0.6); }
+
+/* ── Info panel ── */
+.info-panel {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink-soft);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+}
+.info-key {
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+}
+.info-val {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--ink);
+}
+.info-divider {
+  height: 1px;
+  background: var(--grid-line);
+}
+.progress-bar-wrap {
+  background: var(--bg);
+  border: 1px solid var(--grid-line);
+  height: 8px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--teal);
+  transition: width 0.3s;
+  width: 0%;
+}
+
+/* ── Action btns ── */
+.action-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.act-btn {
+  border: 1.5px solid var(--ink);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Azeret Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 9px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.act-btn:hover {
+  background: var(--ink);
+  color: var(--bg);
+}
+.act-btn.danger { border-color: var(--red); color: var(--red); }
+.act-btn.danger:hover { background: var(--red); color: #fff; }
+
+/* ── Hint box ── */
+.hint-box {
+  background: rgba(26,107,90,0.07);
+  border: 1px solid rgba(26,107,90,0.3);
+  padding: 10px 12px;
+  font-size: 0.63rem;
+  color: var(--teal);
+  line-height: 1.7;
+}
+.hint-box strong { color: var(--teal); }
+
+/* ── Win overlay ── */
+.win-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(245,240,232,0.92);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.win-overlay.show { display: flex; }
+.win-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+.win-title {
+  font-family: 'Fraunces', serif;
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.win-sub {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.1em;
+}
+.win-btns {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ── Cursor feedback ── */
+#board-canvas.hover-ok { cursor: pointer; }
+#board-canvas.hover-bad { cursor: not-allowed; }
+
+/* ── Drag ghost ── */
+#drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 200;
+  opacity: 0.7;
+  display: none;
+  image-rendering: pixelated;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Indução Estrutural · Clássico</div>
+  <h1>Cobertura com <em>Triminós</em></h1>
+  <p class="desc">
+    Um tabuleiro 2<sup>n</sup>×2<sup>n</sup> com uma célula removida pode sempre ser coberto por triminós em L.
+    Escolha <em>n</em>, selecione uma rotação e clique para colocar.
+  </p>
+</header>
+
+<!-- Setup -->
+<div class="setup" id="setup-panel">
+  <div class="setup-label">Escolha o tamanho do tabuleiro</div>
+  <div class="n-btns">
+    <button class="nbtn" data-n="1" onclick="selectN(1)">2<sub>×2</sub></button>
+    <button class="nbtn" data-n="2" onclick="selectN(2)">4<sub>×4</sub></button>
+    <button class="nbtn active" data-n="3" onclick="selectN(3)">8<sub>×8</sub></button>
+    <button class="nbtn" data-n="4" onclick="selectN(4)">16<sub>×16</sub></button>
+  </div>
+  <button class="start-btn" onclick="startGame()">Iniciar Jogo →</button>
+</div>
+
+<!-- Main game -->
+<div class="main" id="main-area" style="display:none;">
+
+  <!-- Board -->
+  <div id="board-wrap">
+    <canvas id="board-canvas"></canvas>
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+
+    <!-- Tromino tray -->
+    <div class="tray">
+      <div class="tray-title">Selecione a Rotação</div>
+      <div class="tromino-options" id="tromino-options"></div>
+    </div>
+
+    <!-- Info -->
+    <div class="info-panel">
+      <div class="info-row">
+        <span class="info-key">Tabuleiro</span>
+        <span class="info-val" id="info-size">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Peças colocadas</span>
+        <span class="info-val" id="info-placed">0</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Faltam</span>
+        <span class="info-val" id="info-remain">—</span>
+      </div>
+      <div class="info-divider"></div>
+      <div style="font-size:0.58rem;color:var(--ink-faint);letter-spacing:0.15em;text-transform:uppercase;">Progresso</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    </div>
+
+    <!-- Hint -->
+    <div class="hint-box" id="hint-box">
+      <strong>Dica:</strong> A célula preta é a que foi removida.
+      Clique na célula <em>superior-esquerda</em> de onde deseja colocar o triminó.
+      A peça ocupa 3 células em L conforme a rotação escolhida.
+    </div>
+
+    <!-- Actions -->
+    <div class="action-btns">
+      <button class="act-btn" onclick="undoLast()">↩ Desfazer último</button>
+      <button class="act-btn" onclick="autoSolveStep()">◈ Resolver passo</button>
+      <button class="act-btn danger" onclick="resetBoard()">✕ Reiniciar</button>
+      <button class="act-btn" onclick="goSetup()">← Trocar n</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Win overlay -->
+<div class="win-overlay" id="win-overlay">
+  <div class="win-icon">◈</div>
+  <div class="win-title">Coberto!</div>
+  <div class="win-sub" id="win-sub">Você cobriu o tabuleiro com sucesso.</div>
+  <div class="win-btns">
+    <button class="start-btn" onclick="goSetup()">← Jogar novamente</button>
+  </div>
+</div>
+
+<canvas id="drag-ghost" width="1" height="1"></canvas>
+
+<script>
+// ═══════════════════════════════════════════
+// CONSTANTS & STATE
+// ═══════════════════════════════════════════
+
+// L-tromino rotations: each is 3 [row,col] offsets relative to anchor (top-left of 2×2)
+// Anchor = top-left cell of bounding 2×2
+// Rotation 0: bottom-left missing (┘ shape)  → cells (0,0),(0,1),(1,0)
+// Rotation 1: bottom-right missing (└ shape) → cells (0,0),(0,1),(1,1)  wait — let me define carefully
+//
+// We use the standard 4 L-trominoes:
+// Each tromino fits in a 2×2 square minus one corner.
+//   ROT 0: top-left + top-right + bottom-left  (missing: bottom-right)
+//   ROT 1: top-left + top-right + bottom-right (missing: bottom-left)
+//   ROT 2: top-left + bottom-left + bottom-right (missing: top-right)
+//   ROT 3: top-right + bottom-left + bottom-right (missing: top-left)
+
+const ROTS = [
+  [[0,0],[0,1],[1,0]],  // 0: ┘ (bottom-right missing)
+  [[0,0],[0,1],[1,1]],  // 1: └ (bottom-left missing)
+  [[0,0],[1,0],[1,1]],  // 2: ┐ (top-right missing)
+  [[0,1],[1,0],[1,1]],  // 3: ┌ (top-left missing)
+];
+
+const ROT_NAMES = ['↘ canto vazio', '↙ canto vazio', '↗ canto vazio', '↖ canto vazio'];
+const ROT_LABELS = ['Rot. 0', 'Rot. 1', 'Rot. 2', 'Rot. 3'];
+const COLORS = ['#e85d4a','#3a8c7e','#d4860a','#2e5fa3'];
+const COLORS_LIGHT = ['#f5b5ae','#9fd4cc','#f0c97a','#8fb3e0'];
+
+let n = 3;
+let SIZE = 8;
+let board = [];    // 0 = empty, -1 = missing, 1..k = tromino id
+let history = [];  // for undo
+let placedCount = 0;
+let totalPieces = 0;
+let selectedRot = 0;
+let hoverCell = null;
+let cellSize = 48;
+const CANVAS_MAX = 520;
+
+// ═══════════════════════════════════════════
+// SETUP
+// ═══════════════════════════════════════════
+
+function selectN(val) {
+  n = val;
+  document.querySelectorAll('.nbtn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.n) === val);
+  });
+}
+
+function startGame() {
+  SIZE = Math.pow(2, n);
+  cellSize = Math.min(Math.floor(CANVAS_MAX / SIZE), 56);
+  // For n=4 (16x16) reduce
+  if(SIZE === 16) cellSize = Math.min(cellSize, 32);
+  if(SIZE === 2)  cellSize = 80;
+
+  // Init board
+  board = Array.from({length:SIZE}, () => Array(SIZE).fill(0));
+
+  // Place missing cell randomly
+  const mr = Math.floor(Math.random()*SIZE);
+  const mc = Math.floor(Math.random()*SIZE);
+  board[mr][mc] = -1;
+
+  history = [];
+  placedCount = 0;
+  totalPieces = (SIZE*SIZE - 1) / 3;
+  selectedRot = 0;
+
+  // Canvas
+  const canvas = document.getElementById('board-canvas');
+  canvas.width  = SIZE * cellSize;
+  canvas.height = SIZE * cellSize;
+
+  // UI
+  document.getElementById('setup-panel').style.display = 'none';
+  document.getElementById('main-area').style.display = 'flex';
+  document.getElementById('win-overlay').classList.remove('show');
+
+  document.getElementById('info-size').textContent = `${SIZE}×${SIZE}`;
+  document.getElementById('info-remain').textContent = totalPieces;
+
+  buildTrominos();
+  drawBoard();
+  updateInfo();
+  setupBoardEvents();
+}
+
+function goSetup() {
+  document.getElementById('setup-panel').style.display = '';
+  document.getElementById('main-area').style.display = 'none';
+  document.getElementById('win-overlay').classList.remove('show');
+}
+
+function resetBoard() {
+  startGame();
+}
+
+// ═══════════════════════════════════════════
+// TROMINO TRAY
+// ═══════════════════════════════════════════
+
+function buildTrominos() {
+  const container = document.getElementById('tromino-options');
+  container.innerHTML = '';
+
+  ROTS.forEach((rot, ri) => {
+    const card = document.createElement('div');
+    card.className = 'tromino-card' + (ri===selectedRot ? ' selected' : '');
+    card.onclick = () => {
+      selectedRot = ri;
+      document.querySelectorAll('.tromino-card').forEach((c,i) => {
+        c.classList.toggle('selected', i===ri);
+      });
+      if(hoverCell) drawBoard(hoverCell.r, hoverCell.c);
+    };
+
+    const cv = document.createElement('canvas');
+    const S = 22;
+    cv.width = S*2; cv.height = S*2;
+    drawTrominoPreview(cv, rot, COLORS[ri], S);
+
+    const lbl = document.createElement('div');
+    lbl.className = 'rot-label';
+    lbl.textContent = ROT_LABELS[ri];
+
+    card.appendChild(cv);
+    card.appendChild(lbl);
+    container.appendChild(card);
+
+    // drag support
+    card.addEventListener('mousedown', e => {
+      e.preventDefault();
+      selectedRot = ri;
+      document.querySelectorAll('.tromino-card').forEach((c,i)=>c.classList.toggle('selected',i===ri));
+    });
+  });
+}
+
+function drawTrominoPreview(canvas, rot, color, S) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // draw 2x2 ghost
+  ctx.fillStyle = 'rgba(0,0,0,0.05)';
+  for(let r=0;r<2;r++) for(let c=0;c<2;c++) {
+    ctx.fillRect(c*S+1, r*S+1, S-2, S-2);
+  }
+  // draw tromino cells
+  rot.forEach(([dr,dc]) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(dc*S+1, dr*S+1, S-2, S-2);
+    // inner highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.fillRect(dc*S+2, dr*S+2, S-4, 4);
+  });
+}
+
+// ═══════════════════════════════════════════
+// BOARD DRAWING
+// ═══════════════════════════════════════════
+
+const PIECE_COLORS = [
+  '#e85d4a','#3a8c7e','#d4860a','#2e5fa3',
+  '#7c4dab','#c0392b','#1a6b5a','#e67e22',
+  '#2980b9','#8e44ad','#16a085','#e74c3c',
+  '#f39c12','#27ae60','#2c3e50','#d35400',
+  '#1abc9c','#9b59b6','#3498db','#e91e63',
+];
+
+function pieceColor(id) {
+  if(id <= 0) return null;
+  return PIECE_COLORS[(id-1) % PIECE_COLORS.length];
+}
+
+function drawBoard(hoverR, hoverC) {
+  const canvas = document.getElementById('board-canvas');
+  const ctx = canvas.getContext('2d');
+  const S = cellSize;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // background
+  ctx.fillStyle = '#faf7f2';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // cells
+  for(let r=0;r<SIZE;r++) {
+    for(let c=0;c<SIZE;c++) {
+      const v = board[r][c];
+      const x=c*S, y=r*S;
+
+      if(v === -1) {
+        // missing cell
+        ctx.fillStyle = '#1a1410';
+        ctx.fillRect(x,y,S,S);
+        // small X
+        ctx.strokeStyle = 'rgba(245,240,232,0.3)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x+S*0.3,y+S*0.3); ctx.lineTo(x+S*0.7,y+S*0.7);
+        ctx.moveTo(x+S*0.7,y+S*0.3); ctx.lineTo(x+S*0.3,y+S*0.7);
+        ctx.stroke();
+      } else if(v === 0) {
+        ctx.fillStyle = '#faf7f2';
+        ctx.fillRect(x,y,S,S);
+      } else {
+        const col = pieceColor(v);
+        ctx.fillStyle = col;
+        ctx.fillRect(x+1,y+1,S-2,S-2);
+        // highlight
+        ctx.fillStyle = 'rgba(255,255,255,0.18)';
+        ctx.fillRect(x+2,y+2,S-4,5);
+        // id text for larger cells
+        if(S >= 32) {
+          ctx.fillStyle = 'rgba(255,255,255,0.5)';
+          ctx.font = `bold ${Math.round(S*0.22)}px "Azeret Mono"`;
+          ctx.textAlign='center';ctx.textBaseline='middle';
+          ctx.fillText(v, x+S/2, y+S/2);
+        }
+      }
+    }
+  }
+
+  // hover preview
+  if(hoverR !== undefined && hoverC !== undefined) {
+    const rot = ROTS[selectedRot];
+    const valid = canPlace(hoverR, hoverC, rot);
+    ctx.globalAlpha = valid ? 0.55 : 0.25;
+    ctx.fillStyle = valid ? COLORS[selectedRot] : '#c0392b';
+    rot.forEach(([dr,dc]) => {
+      const rr=hoverR+dr, cc=hoverC+dc;
+      if(rr>=0&&rr<SIZE&&cc>=0&&cc<SIZE) {
+        ctx.fillRect(cc*S+1, rr*S+1, S-2, S-2);
+      }
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  // grid lines
+  ctx.strokeStyle = '#d8d0c4';
+  ctx.lineWidth = 0.5;
+  for(let r=0;r<=SIZE;r++) {
+    ctx.beginPath();
+    ctx.moveTo(0,r*S); ctx.lineTo(SIZE*S,r*S);
+    ctx.stroke();
+  }
+  for(let c=0;c<=SIZE;c++) {
+    ctx.beginPath();
+    ctx.moveTo(c*S,0); ctx.lineTo(c*S,SIZE*S);
+    ctx.stroke();
+  }
+
+  // thick border
+  ctx.strokeStyle = '#1a1410';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1,1,canvas.width-2,canvas.height-2);
+
+  // sub-quadrant lines (power-of-2 blocks) for visual hint
+  if(n >= 3) {
+    ctx.strokeStyle = 'rgba(26,20,16,0.15)';
+    ctx.lineWidth = 1;
+    const step = Math.floor(SIZE/4);
+    for(let i=step;i<SIZE;i+=step) {
+      ctx.beginPath();
+      ctx.moveTo(i*S,0); ctx.lineTo(i*S,SIZE*S);
+      ctx.moveTo(0,i*S); ctx.lineTo(SIZE*S,i*S);
+      ctx.stroke();
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// PLACEMENT LOGIC
+// ═══════════════════════════════════════════
+
+function canPlace(r, c, rot) {
+  return rot.every(([dr,dc]) => {
+    const rr=r+dr, cc=c+dc;
+    return rr>=0 && rr<SIZE && cc>=0 && cc<SIZE && board[rr][cc]===0;
+  });
+}
+
+function placePiece(r, c, rot) {
+  if(!canPlace(r,c,rot)) return false;
+  const id = placedCount + 1;
+  rot.forEach(([dr,dc]) => { board[r+dr][c+dc] = id; });
+  history.push({r,c,rot,id});
+  placedCount++;
+  updateInfo();
+  drawBoard();
+  checkWin();
+  return true;
+}
+
+function undoLast() {
+  if(history.length===0) return;
+  const last = history.pop();
+  last.rot.forEach(([dr,dc]) => { board[last.r+dr][last.c+dc] = 0; });
+  placedCount--;
+  updateInfo();
+  drawBoard();
+}
+
+// ═══════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════
+
+function setupBoardEvents() {
+  const canvas = document.getElementById('board-canvas');
+
+  canvas.onmousemove = e => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const c = Math.floor(x / cellSize);
+    const r = Math.floor(y / cellSize);
+    if(r>=0&&r<SIZE&&c>=0&&c<SIZE) {
+      hoverCell = {r,c};
+      drawBoard(r,c);
+      const ok = canPlace(r,c,ROTS[selectedRot]);
+      canvas.style.cursor = ok ? 'pointer' : 'default';
+    }
+  };
+
+  canvas.onmouseleave = () => {
+    hoverCell = null;
+    canvas.style.cursor = 'default';
+    drawBoard();
+  };
+
+  canvas.onclick = e => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const c = Math.floor(x / cellSize);
+    const r = Math.floor(y / cellSize);
+    if(r>=0&&r<SIZE&&c>=0&&c<SIZE) {
+      placePiece(r, c, ROTS[selectedRot]);
+      if(hoverCell) drawBoard(hoverCell.r, hoverCell.c);
+    }
+  };
+}
+
+// ═══════════════════════════════════════════
+// INFO & WIN
+// ═══════════════════════════════════════════
+
+function updateInfo() {
+  document.getElementById('info-placed').textContent = placedCount;
+  document.getElementById('info-remain').textContent = totalPieces - placedCount;
+  const pct = (placedCount / totalPieces) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function checkWin() {
+  const done = board.every(row => row.every(v => v !== 0));
+  if(done) {
+    document.getElementById('win-sub').textContent =
+      `Você cobriu o tabuleiro ${SIZE}×${SIZE} usando ${placedCount} triminós!`;
+    setTimeout(() => document.getElementById('win-overlay').classList.add('show'), 400);
+  }
+}
+
+// ═══════════════════════════════════════════
+// AUTO SOLVE (recursive, one step per click)
+// ═══════════════════════════════════════════
+
+// Standard divide-and-conquer L-tromino solver
+function autoSolveStep() {
+  // Do one full solve step via the inductive algorithm
+  // Find first empty 2×2 that can receive a tromino
+  solveInductive(0, 0, SIZE, findMissingOrFilled());
+  if(hoverCell) drawBoard(hoverCell.r, hoverCell.c);
+  else drawBoard();
+  updateInfo();
+  checkWin();
+}
+
+function findMissingOrFilled() {
+  // find the missing cell
+  for(let r=0;r<SIZE;r++) for(let c=0;c<SIZE;c++) if(board[r][c]===-1) return {r,c};
+  return null;
+}
+
+// Inductive tiling: tile the r0..r0+sz-1, c0..c0+sz-1 quadrant
+// missingR, missingC: the one cell that's already "occupied" in this quadrant
+function solveInductive(r0, c0, sz, missing) {
+  if(sz === 1) return; // base: single cell, already occupied
+
+  const half = sz / 2;
+  const mr = missing.r, mc = missing.c;
+
+  // Which sub-quadrant contains the missing cell?
+  const qr = (mr >= r0+half) ? 1 : 0;
+  const qc = (mc >= c0+half) ? 1 : 0;
+
+  // Centre cells of the four quadrants
+  const centre = {r: r0+half-1, c: c0+half-1}; // top-left quad corner
+
+  // Place a tromino at the centre covering the 3 quadrants that do NOT have the missing cell
+  // Determine which 3 centre cells to cover
+  // The 4 centre cells are:
+  //  TL: (r0+half-1, c0+half-1)
+  //  TR: (r0+half-1, c0+half)
+  //  BL: (r0+half,   c0+half-1)
+  //  BR: (r0+half,   c0+half)
+
+  // The quadrant with the missing cell won't get a centre tromino cell
+  // Other 3 quadrants: mark their "inner corner" cell as occupied by new tromino
+
+  const cells = [
+    {r: r0+half-1, c: c0+half-1, qr:0, qc:0}, // TL
+    {r: r0+half-1, c: c0+half,   qr:0, qc:1}, // TR
+    {r: r0+half,   c: c0+half-1, qr:1, qc:0}, // BL
+    {r: r0+half,   c: c0+half,   qr:1, qc:1}, // BR
+  ];
+
+  const toFill = cells.filter(cell => !(cell.qr===qr && cell.qc===qc));
+
+  // Only place if all 3 cells are empty
+  const canPlaceCenter = toFill.every(cell => board[cell.r][cell.c]===0);
+  if(canPlaceCenter) {
+    const id = placedCount + 1;
+    toFill.forEach(cell => { board[cell.r][cell.c] = id; });
+    history.push({r:toFill[0].r, c:toFill[0].c, rot:toFill, id, custom:true});
+    placedCount++;
+  }
+
+  // Recurse into 4 sub-quadrants
+  // Each sub-quadrant has one "given" occupied cell (the missing or the tromino centre)
+  cells.forEach(cell => {
+    const isOccupied = (cell.qr===qr && cell.qc===qc)
+      ? {r:mr, c:mc}
+      : {r:cell.r, c:cell.c};
+    const subR = r0 + cell.qr * half;
+    const subC = c0 + cell.qc * half;
+    if(half > 1) solveInductive(subR, subC, half, isOccupied);
+  });
+}
+
+// Override undo for custom multi-cell entries
+const origUndo = undoLast;
+undoLast = function() {
+  if(history.length===0) return;
+  const last = history.pop();
+  if(last.custom) {
+    last.rot.forEach(cell => { board[cell.r][cell.c] = 0; });
+  } else {
+    last.rot.forEach(([dr,dc]) => { board[last.r+dr][last.c+dc] = 0; });
+  }
+  placedCount--;
+  updateInfo();
+  drawBoard();
+};
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+selectN(3);
+</script>
+</body>
+</html>
