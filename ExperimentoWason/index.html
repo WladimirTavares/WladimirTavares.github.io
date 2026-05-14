@@ -428,9 +428,9 @@
   }
   .analogy-grid {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
     gap: 0;
-    align-items: center;
+    align-items: stretch;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -552,13 +552,32 @@
   .prog-dot.done { background: var(--accent); }
   .prog-dot.active { background: var(--accent2); }
 
+  
+  @media (max-width: 760px) {
+    .revelation-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .analogy-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .analogy-equals {
+      display: none;
+    }
+
+    .analogy-divider {
+      width: 100%;
+      height: 1px;
+    }
+  }
+
   @media (max-width: 520px) {
     .choices-grid { grid-template-columns: 1fr 1fr; }
     .scores-row { grid-template-columns: 1fr 1fr; }
     .home-btn-grid { grid-template-columns: 1fr; }
-    .analogy-grid { grid-template-columns: 1fr; }
-    .analogy-equals { display: none; }
-    .analogy-divider { width: 100%; height: 1px; }
     .card { padding: 22px 18px; }
   }
 </style>
@@ -782,73 +801,261 @@
     </div>
   </div>
 
-  <!-- Analogy explanation -->
-  <div class="analogy-section card">
-    <div class="card-eyebrow">A grande revelação</div>
-    <h2>Os dois experimentos são idênticos</h2>
-    <p style="margin-bottom:20px">
-      Logicamente, as duas tarefas são exatamente a mesma. A diferença no desempenho
-      revela como o contexto concreto facilita o raciocínio humano.
-    </p>
+  <!-- ═══════════════ GRANDE REVELAÇÃO ═══════════════ -->
+  <div class="card" style="width:100%;padding:28px">
 
-    <div class="analogy-grid">
-      <div class="analogy-col">
-        <h4>Experimento I · Cartas</h4>
-        <div class="rule-text">Se <strong>D</strong> → então <strong>3</strong></div>
-        <div class="analogy-item">
-          <div class="analogy-dot dot-check">✓</div>
-          <div><strong>Carta D:</strong> precisa virar — se não tiver 3 do outro lado, a regra falha</div>
-        </div>
-        <div class="analogy-item">
-          <div class="analogy-dot dot-x">✕</div>
-          <div><strong>Carta 3:</strong> não precisa — mesmo que tenha D, só confirma; mas se tiver outra letra, a regra ainda pode valer para D</div>
-        </div>
-        <div class="analogy-item">
-          <div class="analogy-dot dot-check">✓</div>
-          <div><strong>Carta 4:</strong> precisa virar — se tiver D do outro lado, a regra foi violada</div>
-        </div>
-        <div class="analogy-item">
-          <div class="analogy-dot dot-x">✕</div>
-          <div><strong>Carta F:</strong> não precisa — F não é D, logo não importa o número</div>
-        </div>
-      </div>
+    <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:20px">
+      <div style="
+        width:42px;
+        height:42px;
+        border-radius:50%;
+        background:var(--gold-light);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:1.3rem;
+        flex-shrink:0;
+      ">💡</div>
 
-      <div class="analogy-divider"></div>
-      <div class="analogy-equals">=</div>
-      <div class="analogy-divider"></div>
+      <div>
+        <div class="card-eyebrow" style="margin-bottom:6px">A grande revelação</div>
+        <h2 style="margin-bottom:8px">Os dois experimentos são idênticos</h2>
 
-      <div class="analogy-col">
-        <h4>Experimento II · Bar</h4>
-        <div class="rule-text">Se <strong>álcool</strong> → então <strong>≥ 18 anos</strong></div>
-        <div class="analogy-item">
-          <div class="analogy-dot dot-x">✕</div>
-          <div><strong>Maria (idosa):</strong> não precisa — ela certamente tem ≥ 18 anos; qualquer bebida é OK</div>
-        </div>
-        <div class="analogy-item">
-          <div class="analogy-dot dot-check">✓</div>
-          <div><strong>João (cerveja):</strong> precisa abordar — se for menor, a regra foi violada</div>
-        </div>
-        <div class="analogy-item">
-          <div class="analogy-dot dot-check">✓</div>
-          <div><strong>Giovana (criança):</strong> precisa abordar — se estiver bebendo álcool, a regra foi violada</div>
-        </div>
-        <div class="analogy-item">
-          <div class="analogy-dot dot-x">✕</div>
-          <div><strong>Pedro (coca-cola):</strong> não precisa — coca-cola não é álcool; não importa a idade</div>
-        </div>
+        <p style="
+          margin:0;
+          color:var(--ink2);
+          line-height:1.7;
+          max-width:700px;
+        ">
+          Logicamente, as duas tarefas possuem exatamente a mesma estrutura.
+          O que muda é apenas o contexto apresentado.
+        </p>
       </div>
     </div>
 
-    <!-- Mapping table -->
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:18px 22px;margin-top:4px">
-      <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Correspondência lógica</div>
-      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;font-size:0.88rem;color:var(--ink2)">
-        <span>Letra <strong>D</strong> na carta</span><span style="color:var(--border-strong);font-size:1.1rem">≡</span><span>Beber bebida alcoólica</span>
-        <span>Número <strong>3</strong> na carta</span><span style="color:var(--border-strong);font-size:1.1rem">≡</span><span>Ter 18 anos ou mais</span>
-        <span>Carta <strong>D</strong> → checar número</span><span style="color:var(--border-strong);font-size:1.1rem">≡</span><span>João (cerveja) → checar idade</span>
-        <span>Carta <strong>4</strong> → checar letra</span><span style="color:var(--border-strong);font-size:1.1rem">≡</span><span>Giovana (criança) → checar bebida</span>
+    <div style="
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+      margin-top:24px;
+    " class="revelation-grid">
+
+      <!-- EXP 1 -->
+      <div style="
+        border:1px solid #d7e2ee;
+        border-radius:10px;
+        overflow:hidden;
+        background:#fbfdff;
+      ">
+
+        <div style="
+          padding:18px 20px;
+          border-bottom:1px solid #d7e2ee;
+          background:#f4f8fc;
+        ">
+          <div style="
+            display:flex;
+            align-items:center;
+            gap:12px;
+            margin-bottom:8px;
+          ">
+            <div style="
+              width:36px;
+              height:36px;
+              border-radius:8px;
+              background:#ffffff;
+              border:2px solid #8eb6db;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-family:'Lora',serif;
+              font-size:1.2rem;
+              font-weight:700;
+              color:#2a6b8a;
+            ">3</div>
+
+            <div>
+              <div style="
+                font-weight:700;
+                color:#2a6b8a;
+                font-size:1.05rem;
+              ">
+                Experimento I
+              </div>
+
+              <div style="
+                font-size:0.84rem;
+                color:var(--ink3);
+              ">
+                Cartas (números e letras)
+              </div>
+            </div>
+          </div>
+
+          <div style="
+            font-size:0.72rem;
+            text-transform:uppercase;
+            letter-spacing:0.12em;
+            color:var(--ink3);
+            margin-bottom:8px;
+            font-weight:600;
+          ">
+            Regra da tarefa
+          </div>
+
+          <div style="
+            background:white;
+            border:1px solid #d7e2ee;
+            border-radius:6px;
+            padding:12px 14px;
+            color:#2a6b8a;
+            font-style:italic;
+            line-height:1.6;
+          ">
+            Se há uma letra D de um lado da carta,
+            então existe um número 3 do outro lado.
+          </div>
+        </div>
+
+        <div style="padding:18px 20px">
+          <div style="
+            font-size:0.84rem;
+            color:var(--ink3);
+            margin-bottom:8px;
+          ">
+            Você deve verificar:
+          </div>
+
+          <div style="
+            font-size:1.05rem;
+            font-weight:700;
+            color:#234f70;
+          ">
+            Carta D e Carta 4
+          </div>
+        </div>
+      </div>
+
+      <!-- EXP 2 -->
+      <div style="
+        border:1px solid #d5e7d7;
+        border-radius:10px;
+        overflow:hidden;
+        background:#fbfefb;
+      ">
+
+        <div style="
+          padding:18px 20px;
+          border-bottom:1px solid #d5e7d7;
+          background:#f4fbf5;
+        ">
+          <div style="
+            display:flex;
+            align-items:center;
+            gap:12px;
+            margin-bottom:8px;
+          ">
+            <div style="
+              width:36px;
+              height:36px;
+              border-radius:8px;
+              background:white;
+              border:2px solid #9bc6a0;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:1.2rem;
+            ">🍺</div>
+
+            <div>
+              <div style="
+                font-weight:700;
+                color:#2e7d4f;
+                font-size:1.05rem;
+              ">
+                Experimento II
+              </div>
+
+              <div style="
+                font-size:0.84rem;
+                color:var(--ink3);
+              ">
+                Pessoas (idade e bebida)
+              </div>
+            </div>
+          </div>
+
+          <div style="
+            font-size:0.72rem;
+            text-transform:uppercase;
+            letter-spacing:0.12em;
+            color:var(--ink3);
+            margin-bottom:8px;
+            font-weight:600;
+          ">
+            Regra da tarefa
+          </div>
+
+          <div style="
+            background:white;
+            border:1px solid #d5e7d7;
+            border-radius:6px;
+            padding:12px 14px;
+            color:#2e7d4f;
+            font-style:italic;
+            line-height:1.6;
+          ">
+            Se uma pessoa está bebendo álcool,
+            então ela deve possuir pelo menos 18 anos.
+          </div>
+        </div>
+
+        <div style="padding:18px 20px">
+          <div style="
+            font-size:0.84rem;
+            color:var(--ink3);
+            margin-bottom:8px;
+          ">
+            Você deve verificar:
+          </div>
+
+          <div style="
+            font-size:1.05rem;
+            font-weight:700;
+            color:#2e7d4f;
+          ">
+            João (cerveja) e Giovana (criança)
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="
+      margin-top:22px;
+      background:#fff8eb;
+      border:1px solid #f0ddae;
+      border-radius:8px;
+      padding:18px 20px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    ">
+
+      <div style="font-size:1.4rem">⭐</div>
+
+      <div style="
+        color:var(--ink2);
+        line-height:1.7;
+        font-size:0.95rem;
+      ">
+        <strong style="color:#9b6b00">Conclusão:</strong>
+        a estrutura lógica é exatamente a mesma nos dois casos.
+        Porém, o cérebro humano costuma raciocinar muito melhor quando
+        a situação envolve contextos sociais concretos.
       </div>
     </div>
+
   </div>
 
   <div class="insight-box">
@@ -1075,31 +1282,69 @@
       <strong>Acertaram ambos:</strong> ${bothRate}% (${historyData.bothCorrect})
     `;
 
-    // Reveal exp1 cards now (delayed until results screen)
-    if (exp1done) {
-      document.querySelectorAll('#choices1 .choice-card').forEach(c => {
-        c.classList.remove('correct-reveal','wrong-reveal','missed-reveal');
-        const id = c.dataset.id;
-        const selected = sel1.has(id);
-        const needed = correct1.has(id);
-        if (selected && needed) c.classList.add('correct-reveal');
-        else if (selected && !needed) c.classList.add('wrong-reveal');
-        else if (!selected && needed) c.classList.add('missed-reveal');
-      });
-    }
+    // ── Build review cards ──
+    buildReview(
+      'choices1-review',
+      [
+        {id:'3', main:'3', sub:'número'},
+        {id:'D', main:'D', sub:'letra'},
+        {id:'4', main:'4', sub:'número'},
+        {id:'F', main:'F', sub:'letra'}
+      ],
+      sel1,
+      correct1,
+      false
+    );
 
-    // Reveal exp2 cards
-    if (exp2done) {
-      document.querySelectorAll('#choices2 .choice-card').forEach(c => {
-        c.classList.remove('correct-reveal','wrong-reveal','missed-reveal');
-        const id = c.dataset.id;
-        const selected = sel2.has(id);
-        const needed = correct2.has(id);
-        if (selected && needed) c.classList.add('correct-reveal');
-        else if (selected && !needed) c.classList.add('wrong-reveal');
-        else if (!selected && needed) c.classList.add('missed-reveal');
-      });
-    }
+    buildReview(
+      'choices2-review',
+      [
+        {id:'maria', icon:'👵', name:'Maria', detail:'idosa'},
+        {id:'joao', icon:'🍺', name:'João', detail:'cerveja'},
+        {id:'giovana', icon:'🧒', name:'Giovana', detail:'criança'},
+        {id:'pedro', icon:'🥤', name:'Pedro', detail:'coca-cola'}
+      ],
+      sel2,
+      correct2,
+      true
+    );
+  }
+
+
+  function buildReview(containerId, items, selectedSet, correctSet, isPeople) {
+    const container = document.getElementById(containerId);
+
+    container.innerHTML = '';
+
+    items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'choice-card';
+
+      const selected = selectedSet.has(item.id);
+      const needed = correctSet.has(item.id);
+
+      if (selected && needed)
+        div.classList.add('correct-reveal');
+      else if (selected && !needed)
+        div.classList.add('wrong-reveal');
+      else if (!selected && needed)
+        div.classList.add('missed-reveal');
+
+      if (isPeople) {
+        div.innerHTML = `
+          <span class="person-icon">${item.icon}</span>
+          <div class="person-name">${item.name}</div>
+          <div class="person-detail">${item.detail}</div>
+        `;
+      } else {
+        div.innerHTML = `
+          <div class="choice-main">${item.main}</div>
+          <div class="choice-sub">${item.sub}</div>
+        `;
+      }
+
+      container.appendChild(div);
+    });
   }
 
   function updateNav() {
