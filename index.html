@@ -1,39 +1,331 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Botões e Números Secretos</title>
-    
-</head>
-<body >
-    Exemplos de programas:
-    <ul>
-    <li><a href="maiorNumero/index.html">Maior Número</a></li>
-    <li><a href="GuessingNumber/index.html">Acerte o número</a></li>
-    <li><a href="problemaFofoca/index.html">Problema da Fofoca</a></li>
-    <li><a href="JogoFatoracao/index.html">Jogo da Fatoracao</a></li>
-    <li><a href="GrafoConexo/grafo_conexo.html">Grafo Conexo</a></li>
-    <li><a href="JogoCelebridade/index.html">Jogo da Celebridade</a></li>
-	<li><a href="BolinhaMaisPesada/index.html">Jogo da Bolinha Mais Pesada</a></li>
-	<li><a href="JogoTrimino/index.html">Jogo Triminó</a></li>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogos de Raciocínio e Computação</title>
 
-    <li><a href="petsaude/figma/index.html">Repositorio de Ideias - Versao 1 </a></li>
-    <li><a href="petsaude/repositorio-saude.html">Repositorio de Ideias - Versao 2 </a></li>
-    <li><a href="petsaude/repositorio-saude-v2.html">Repositorio de Ideias - Versao 3 </a></li>
-    <li><a href="petsaude/repositorio-saude-v3.html">Repositorio de Ideias - Versao 4 </a></li>
-    <li><a href="petsaude/RIDS.pdf">Apresentacao </a></li>
-    <li><a href="https://scratch.mit.edu/projects/707687082/"> Jogo do MDC (Scratch) </a></li>
-    <li><a href="https://scratch.mit.edu/projects/889682618/"> Representação em números romanos (Scratch)</a></li>
-    <li><a href="https://scratch.mit.edu/projects/723433979/"> Jogos dos Animais (Scratch)</a></li>
-    <li><a href="https://scratch.mit.edu/projects/723435414/"> Descubra o número (Scratch)</a></li>
-    <li><a href="https://scratch.mit.edu/projects/701620985/"> Paradoxo do Aniversário (Scratch)</a></li>
-    <li><a href="https://scratch.mit.edu/projects/889859606/"> Jogo do MDC 2 (Scratch)</a></li>
-    
-    
-    
-    
-    
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    header {
+      background: #1e3a8a;
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #1e3a8a;
+    }
+
+    .card p {
+      margin-bottom: 16px;
+      text-align: justify;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #2563eb;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #1d4ed8;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #e5e7eb;
+      margin-top: 40px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Jogos de Raciocínio e Pensamento Computacional</h1>
+  <p>Explore desafios interativos de lógica, matemática, algoritmos e estratégia.</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Jogo: Encontre o Maior</h2>
+    <p>
+      Neste jogo, você irá exercitar o sequenciamento de comandos e desvios condicionais
+      para resolver um desafio de lógica de forma divertida e interativa.
+    </p>
+    <p>
+      Seu objetivo será descobrir o maior valor fazendo comparações estratégicas entre as cartas.
+    </p>
+    <a class="btn" href="https://wladimirtavares.github.io/maiorNumero/index.html" target="_blank">
+      Jogar
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>Experimento de Wason</h2>
+    <p>
+      O psicólogo Peter Wason propôs dois experimentos clássicos para investigar como as pessoas
+      raciocinam diante de regras condicionais do tipo “se... então...”.
+    </p>
+    <p>
+      No primeiro experimento, apresentado de forma abstrata, menos de 10% das pessoas conseguem
+      identificar corretamente a solução lógica. Já no segundo, formulado em um contexto mais concreto
+      e próximo do cotidiano, a taxa de acerto costuma ultrapassar 60%.
+    </p>
+    <p><strong>Tente você também!</strong></p>
+
+    <a class="btn" href="https://wladimirtavares.github.io/ExperimentoWason/index.html" target="_blank">
+      Jogar
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>Jogo da Fatoração</h2>
+    <p>
+      Neste jogo, sua missão é descobrir um número secreto entre 1 e 100.
+    </p>
+    <p>
+      Para isso, você pode fazer perguntas do tipo:
+      <em>“O número x divide o número secreto?”</em>
+    </p>
+    <p>
+      A partir das respostas, você deverá analisar possibilidades, eliminar números
+      e usar estratégias para encontrar o segredo com o menor número possível de perguntas.
+    </p>
+
+    <a class="btn" href="https://wladimirtavares.github.io/JogoFatoracao/index.html" target="_blank">
+      Jogar
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>Jogo da Bolinha Mais Pesada</h2>
+    <p>
+      Uma das bolinhas é mais pesada que as demais.
+      Seu desafio é descobrir qual delas é usando apenas uma balança de comparação.
+    </p>
+    <p>
+      Mas cuidado: cada pesagem é importante!
+      Tente encontrar a bolinha mais pesada utilizando o menor número possível de pesagens.
+    </p>
+    <p>
+      Ao longo do jogo, você irá exercitar estratégias de divisão de casos
+      e tomada de decisão para resolver o problema de forma eficiente.
+    </p>
+
+    <a class="btn" href="https://wladimirtavares.github.io/BolinhaMaisPesada/index.html" target="_blank">
+      Jogar
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>Jogo da Celebridade</h2>
+    <p>
+      Neste jogo, seu desafio é descobrir se existe uma celebridade em uma festa.
+    </p>
+
+    <p>Uma celebridade é uma pessoa que:</p>
+
+    <ul>
+      <li>é conhecida por todos;</li>
+      <li>mas não conhece ninguém da festa.</li>
     </ul>
-        
+
+    <p>
+      Para investigar, você pode fazer perguntas do tipo:
+      <em>“A conhece B?”</em>
+    </p>
+
+    <p>
+      Seu objetivo é identificar a celebridade — ou concluir que ela não existe —
+      usando o menor número possível de perguntas.
+    </p>
+
+    <p>
+      Você possui no máximo <strong>3(n−1)</strong> perguntas para resolver o desafio com certeza.
+    </p>
+
+    <p>
+      Ao longo do jogo, você irá exercitar estratégias de eliminação,
+      divisão de problemas e tomada de decisão.
+    </p>
+
+    <a class="btn" href="https://wladimirtavares.github.io/JogoCelebridade/index.html" target="_blank">
+      Jogar
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>Cobertura com Triminós</h2>
+
+    <p>
+      Um tabuleiro 2ⁿ×2ⁿ possui uma única célula removida.
+      Seu desafio é cobrir todo o restante do tabuleiro utilizando apenas peças
+      em formato de L, chamadas triminós.
+    </p>
+
+    <p>
+      Mas existe um detalhe importante:
+      você deve encontrar uma estratégia inteligente que resolva o problema
+      sem usar tentativa e erro.
+    </p>
+
+    <p>
+      Ao longo do jogo, você poderá exercitar a habilidade de decompor
+      um grande problema em problemas menores e semelhantes.
+    </p>
+
+    <p><strong>Será que você consegue completar o tabuleiro?</strong></p>
+
+    <a class="btn" href="https://wladimirtavares.github.io/JogoTrimino/index.html" target="_blank">
+      Jogar
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>Problema da Fofoca</h2>
+
+    <p>
+      Imagine um grupo com N pessoas.
+      Cada pessoa conhece inicialmente apenas um segredo diferente.
+    </p>
+
+    <p>
+      Sempre que duas pessoas conversam por telefone,
+      elas compartilham entre si todas as fofocas que conhecem naquele momento.
+    </p>
+
+    <p>
+      Assim, ao final da ligação, as duas passam a saber exatamente os mesmos segredos.
+    </p>
+
+    <p>
+      Por exemplo, com 5 pessoas é possível fazer com que todos descubram
+      todos os segredos usando apenas 6 ligações.
+    </p>
+
+    <p>
+      Seu desafio é descobrir estratégias eficientes para espalhar informações
+      o mais rápido possível.
+    </p>
+
+    <p><strong>Teste sua lógica e descubra se você é um verdadeiro mestre da fofoca!</strong></p>
+
+    <a class="btn" href="https://wladimirtavares.github.io/problemaFofoca/index.html" target="_blank">
+      Jogar
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>Jogo do Grafo Conexo</h2>
+
+    <p>
+      Um grafo secreto com 5 vértices foi gerado pelo computador.
+      Seu desafio é descobrir se esse grafo é conexo ou não.
+    </p>
+
+    <p>
+      Para investigar a estrutura do grafo, você pode fazer perguntas do tipo:
+      <em>“Existe uma aresta entre os vértices vi e vj?”</em>
+    </p>
+
+    <p>
+      A cada resposta, novas informações sobre o grafo são reveladas,
+      e você deverá usar raciocínio lógico para decidir se é possível
+      chegar de qualquer vértice a qualquer outro através de caminhos no grafo.
+    </p>
+
+    <p>
+      O objetivo é determinar corretamente se o grafo secreto é conexo
+      utilizando o menor número possível de perguntas.
+    </p>
+
+    <a class="btn" href="https://wladimirtavares.github.io/GrafoConexo/grafo_conexo.html" target="_blank">
+      Jogar
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>Jogo da Permutação</h2>
+
+    <p>
+      Neste jogo, o computador gera uma permutação secreta contendo
+      de 3 a 8 números distintos.
+    </p>
+
+    <p>
+      Seu desafio é descobrir exatamente qual é essa permutação.
+    </p>
+
+    <p>
+      Para investigar a sequência secreta, você pode propor uma nova permutação ao oráculo.
+      Como resposta, o oráculo informa quantos elementos estão na posição correta,
+      mas não revela quais são eles.
+    </p>
+
+    <p>
+      A partir dessas pistas, você deverá usar lógica, dedução e criação de estratégias
+      para eliminar possibilidades e identificar a permutação correta.
+    </p>
+
+    <p>
+      Experimente diferentes abordagens, teste suas estratégias e descubra
+      quantas perguntas são necessárias para resolver o desafio.
+    </p>
+
+    <a class="btn" href="#" target="_blank">
+      Jogar
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  Jogos educativos de lógica, matemática e pensamento computacional.
+</footer>
+
 </body>
 </html>
-
