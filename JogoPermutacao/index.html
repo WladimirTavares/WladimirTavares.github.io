@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Permutação Secreta</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f4ef;
+  --paper: #ffffff;
+  --ink: #1c1917;
+  --muted: #78716c;
+  --border: rgba(0,0,0,0.1);
+  --border2: rgba(0,0,0,0.18);
+  --accent: #d97706;
+  --accent-bg: rgba(217,119,6,0.08);
+  --hit: #15803d;
+  --hit-bg: rgba(21,128,61,0.08);
+  --miss: #b91c1c;
+  --ball-1: #3b82f6; --ball-1l: #dbeafe;
+  --ball-2: #8b5cf6; --ball-2l: #ede9fe;
+  --ball-3: #ec4899; --ball-3l: #fce7f3;
+  --ball-4: #f59e0b; --ball-4l: #fef3c7;
+  --ball-5: #10b981; --ball-5l: #d1fae5;
+  --ball-6: #ef4444; --ball-6l: #fee2e2;
+  --ball-7: #6366f1; --ball-7l: #e0e7ff;
+  --ball-8: #0ea5e9; --ball-8l: #e0f2fe;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); }
+body {
+  font-family: 'Syne', sans-serif;
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 3rem;
+  background: var(--bg);
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: 0.2rem;
+}
+h1 span { color: var(--accent); }
+
+.subtitle {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-family: 'Inconsolata', monospace;
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.card {
+  background: var(--paper);
+  border: 0.5px solid var(--border2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 680px;
+  margin-bottom: 1rem;
+}
+
+/* Setup */
+.setup-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.setup-row label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-family: 'Inconsolata', monospace;
+}
+.size-btns { display: flex; gap: 6px; }
+.size-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border2);
+  background: var(--bg);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.12s;
+  color: var(--ink);
+}
+.size-btn:hover { border-color: var(--accent); color: var(--accent); }
+.size-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.btn {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border2);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.12s;
+  letter-spacing: 0.01em;
+}
+.btn:hover { border-color: var(--ink); }
+.btn:active { transform: scale(0.97); }
+.btn.primary {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+.btn.primary:hover { background: #333; }
+.btn.accent {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.btn.accent:hover { background: #b45309; border-color: #b45309; }
+
+/* Ball pool */
+.section-label {
+  font-size: 0.65rem;
+  font-family: 'Inconsolata', monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.ball-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 52px;
+  padding: 10px;
+  border: 1.5px dashed var(--border2);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.ball {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+}
+.ball:active { cursor: grabbing; transform: scale(1.08); }
+.ball.dragging { opacity: 0.4; }
+
+/* Slots */
+.slots-area {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin: 1rem 0;
+}
+
+.slot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.slot-index {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.slot {
+  width: 52px; height: 52px;
+  border-radius: 10px;
+  border: 2px dashed var(--border2);
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.12s, background 0.12s;
+  position: relative;
+}
+.slot.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+.slot.filled { border-style: solid; border-color: transparent; }
+.slot.correct { box-shadow: 0 0 0 2.5px var(--hit); }
+.slot.wrong { box-shadow: 0 0 0 2.5px var(--miss); }
+
+/* Actions row */
+.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* Score badge */
+.oracle-result {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.85rem;
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: var(--hit-bg);
+  color: var(--hit);
+  border: 1px solid rgba(21,128,61,0.2);
+  font-weight: 600;
+  display: none;
+}
+
+/* History */
+.history-box {
+  background: var(--paper);
+  border: 0.5px solid var(--border2);
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  width: 100%;
+  max-width: 680px;
+}
+.history-title {
+  font-size: 0.65rem;
+  font-family: 'Inconsolata', monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.history-empty {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-family: 'Inconsolata', monospace;
+}
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.8rem;
+}
+.h-attempt {
+  color: var(--muted);
+  min-width: 24px;
+  font-size: 0.7rem;
+}
+.h-perm {
+  display: flex;
+  gap: 4px;
+}
+.h-ball {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+}
+.h-arrow { color: var(--muted); }
+.h-score {
+  font-weight: 600;
+  margin-left: 4px;
+}
+.h-score.full { color: var(--hit); }
+.h-score.partial { color: var(--accent); }
+.h-score.zero { color: var(--miss); }
+
+/* Win overlay */
+.win-banner {
+  background: var(--hit-bg);
+  border: 1.5px solid rgba(21,128,61,0.25);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  color: var(--hit);
+  font-family: 'Inconsolata', monospace;
+  display: none;
+  margin-bottom: 0.5rem;
+}
+.win-banner strong { font-size: 1rem; }
+
+.reveal-box {
+  background: var(--accent-bg);
+  border: 1.5px solid rgba(217,119,6,0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.8rem;
+  color: var(--accent);
+  display: none;
+  margin-top: 0.5rem;
+}
+
+</style>
+</head>
+<body>
+
+<h1>PERMUTA<span>ÇÃO</span></h1>
+<p class="subtitle">descubra a permutação secreta pelo oráculo</p>
+
+<!-- Setup card -->
+<div class="card" id="setup-card">
+  <div class="setup-row">
+    <label>tamanho (n):</label>
+    <div class="size-btns" id="size-btns"></div>
+    <button class="btn primary" onclick="startGame()">▶ iniciar</button>
+  </div>
+</div>
+
+<!-- Game card -->
+<div class="card" id="game-card" style="display:none">
+
+  <div class="win-banner" id="win-banner"></div>
+
+  <div class="section-label">bolinhas disponíveis</div>
+  <div class="ball-pool" id="pool" ondragover="poolDragOver(event)" ondrop="poolDrop(event)"></div>
+
+  <div style="margin-top:1.2rem">
+    <div class="section-label">sua permutação — arraste as bolinhas para as posições</div>
+    <div class="slots-area" id="slots"></div>
+  </div>
+
+  <div class="actions" id="actions">
+    <button class="btn accent" onclick="testOracle()">🔮 testar oráculo</button>
+    <button class="btn" onclick="clearSlots()">✕ limpar</button>
+    <button class="btn" onclick="resetGame()">↻ novo jogo</button>
+    <span class="oracle-result" id="oracle-result"></span>
+  </div>
+
+  <div class="reveal-box" id="reveal-box"></div>
+</div>
+
+<!-- History -->
+<div class="history-box" id="history-box" style="display:none">
+  <div class="history-title">tentativas testadas</div>
+  <div class="history-list" id="history-list">
+    <span class="history-empty">nenhuma tentativa ainda.</span>
+  </div>
+</div>
+
+<script>
+const COLORS = [
+  {bg:'#3b82f6',lt:'#dbeafe'},{bg:'#8b5cf6',lt:'#ede9fe'},
+  {bg:'#ec4899',lt:'#fce7f3'},{bg:'#f59e0b',lt:'#fef3c7'},
+  {bg:'#10b981',lt:'#d1fae5'},{bg:'#ef4444',lt:'#fee2e2'},
+  {bg:'#6366f1',lt:'#e0e7ff'},{bg:'#0ea5e9',lt:'#e0f2fe'},
+];
+
+let n = 4, secret = [], slots = [], attempts = [], won = false;
+let dragSrc = null, dragSrcType = null, dragSrcIdx = null;
+
+// ── Size buttons ──────────────────────────────────────────────
+const sizeBtns = document.getElementById('size-btns');
+[3,4,5,6,7,8].forEach(k => {
+  const b = document.createElement('button');
+  b.className = 'size-btn' + (k === 4 ? ' active' : '');
+  b.textContent = k;
+  b.onclick = () => {
+    n = k;
+    document.querySelectorAll('.size-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+  };
+  sizeBtns.appendChild(b);
+});
+
+// ── Start ─────────────────────────────────────────────────────
+function startGame() {
+  secret = shuffle([...Array(n).keys()].map(i => i+1));
+  slots = Array(n).fill(null);
+  attempts = [];
+  won = false;
+
+  document.getElementById('setup-card').style.display = 'none';
+  document.getElementById('game-card').style.display = 'block';
+  document.getElementById('history-box').style.display = 'block';
+  document.getElementById('win-banner').style.display = 'none';
+  document.getElementById('reveal-box').style.display = 'none';
+  document.getElementById('oracle-result').style.display = 'none';
+
+  renderPool();
+  renderSlots();
+  renderHistory();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ── Pool ──────────────────────────────────────────────────────
+function poolBalls() {
+  const inSlots = new Set(slots.filter(x => x !== null));
+  return [...Array(n).keys()].map(i => i+1).filter(v => !inSlots.has(v));
+}
+
+function renderPool() {
+  const pool = document.getElementById('pool');
+  pool.innerHTML = '';
+  poolBalls().forEach(v => pool.appendChild(makeBall(v, 'pool', null)));
+}
+
+function makeBall(value, srcType, srcIdx) {
+  const c = COLORS[(value - 1) % COLORS.length];
+  const d = document.createElement('div');
+  d.className = 'ball';
+  d.draggable = true;
+  d.textContent = value;
+  d.style.background = c.bg;
+  d.style.color = '#fff';
+  d.dataset.value = value;
+  d.dataset.srcType = srcType;
+  if (srcIdx !== null) d.dataset.srcIdx = srcIdx;
+
+  d.addEventListener('dragstart', e => {
+    dragSrc = value;
+    dragSrcType = srcType;
+    dragSrcIdx = srcIdx;
+    setTimeout(() => d.classList.add('dragging'), 0);
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  d.addEventListener('dragend', () => d.classList.remove('dragging'));
+  return d;
+}
+
+// ── Slots ─────────────────────────────────────────────────────
+function renderSlots() {
+  const area = document.getElementById('slots');
+  area.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const wrap = document.createElement('div');
+    wrap.className = 'slot-wrap';
+
+    const idx = document.createElement('div');
+    idx.className = 'slot-index';
+    idx.textContent = `pos ${i+1}`;
+
+    const slot = document.createElement('div');
+    slot.className = 'slot' + (slots[i] !== null ? ' filled' : '');
+    slot.dataset.idx = i;
+
+    slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('drag-over'); });
+    slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+    slot.addEventListener('drop', e => { e.preventDefault(); slot.classList.remove('drag-over'); dropOnSlot(i); });
+
+    if (slots[i] !== null) {
+      slot.appendChild(makeBall(slots[i], 'slot', i));
+    }
+
+    wrap.appendChild(idx);
+    wrap.appendChild(slot);
+    area.appendChild(wrap);
+  }
+}
+
+function dropOnSlot(idx) {
+  if (dragSrc === null) return;
+
+  // if slot already has a ball, swap / send back to pool
+  if (slots[idx] !== null) {
+    const displaced = slots[idx];
+    if (dragSrcType === 'slot') {
+      slots[dragSrcIdx] = displaced; // swap
+    }
+    // if from pool, displaced goes to pool (implicit: not in slots)
+    if (dragSrcType === 'pool') {
+      // displaced just stays out (pool recalculates)
+    }
+    if (dragSrcType === 'slot') {
+      // already handled above
+    }
+  } else {
+    if (dragSrcType === 'slot') slots[dragSrcIdx] = null;
+  }
+
+  slots[idx] = dragSrc;
+  dragSrc = null;
+  clearOracleHints();
+  renderPool();
+  renderSlots();
+}
+
+function poolDragOver(e) { e.preventDefault(); }
+function poolDrop(e) {
+  e.preventDefault();
+  if (dragSrc === null || dragSrcType !== 'slot') return;
+  slots[dragSrcIdx] = null;
+  dragSrc = null;
+  clearOracleHints();
+  renderPool();
+  renderSlots();
+}
+
+function clearOracleHints() {
+  document.getElementById('oracle-result').style.display = 'none';
+  document.querySelectorAll('.slot').forEach(s => { s.classList.remove('correct','wrong'); });
+}
+
+// ── Oracle ────────────────────────────────────────────────────
+function testOracle() {
+  if (won) return;
+  if (slots.some(s => s === null)) {
+    showOracle('preencha todas as posições antes de testar!', false, true);
+    return;
+  }
+
+  const hits = slots.filter((v, i) => v === secret[i]).length;
+  const full = hits === n;
+
+  attempts.push({ perm: [...slots], hits });
+  renderHistory();
+
+  if (full) {
+    won = true;
+    showOracle(`✓ perfeito! você descobriu a permutação em ${attempts.length} tentativa(s)!`, true, false);
+    const wb = document.getElementById('win-banner');
+    wb.style.display = 'block';
+    wb.innerHTML = `<strong>🎉 você venceu!</strong> ${attempts.length} tentativa(s) para decifrar a permutação secreta.`;
+    highlightSlots();
+  } else {
+    showOracle(`🔮 oráculo: ${hits} de ${n} posições corretas`, false, false);
+  }
+}
+
+function showOracle(msg, good, warn) {
+  const el = document.getElementById('oracle-result');
+  el.textContent = msg;
+  el.style.display = 'inline-block';
+  if (good) { el.style.background='var(--hit-bg)'; el.style.color='var(--hit)'; el.style.borderColor='rgba(21,128,61,0.3)'; }
+  else if (warn) { el.style.background='rgba(217,119,6,0.08)'; el.style.color='var(--accent)'; el.style.borderColor='rgba(217,119,6,0.3)'; }
+  else { el.style.background='var(--bg)'; el.style.color='var(--ink)'; el.style.borderColor='var(--border2)'; }
+}
+
+function highlightSlots() {
+  document.querySelectorAll('.slot').forEach((s, i) => {
+    if (slots[i] !== null) {
+      s.classList.add(slots[i] === secret[i] ? 'correct' : 'wrong');
+    }
+  });
+}
+
+// ── Controls ──────────────────────────────────────────────────
+function clearSlots() {
+  slots = Array(n).fill(null);
+  clearOracleHints();
+  renderPool();
+  renderSlots();
+}
+
+function resetGame() {
+  document.getElementById('setup-card').style.display = 'block';
+  document.getElementById('game-card').style.display = 'none';
+  document.getElementById('history-box').style.display = 'none';
+}
+
+// ── History ───────────────────────────────────────────────────
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (attempts.length === 0) {
+    list.innerHTML = '<span class="history-empty">nenhuma tentativa ainda.</span>';
+    return;
+  }
+  list.innerHTML = '';
+  [...attempts].reverse().forEach((a, ri) => {
+    const num = attempts.length - ri;
+    const row = document.createElement('div');
+    row.className = 'history-row';
+
+    const numEl = document.createElement('span');
+    numEl.className = 'h-attempt';
+    numEl.textContent = `#${num}`;
+
+    const permEl = document.createElement('div');
+    permEl.className = 'h-perm';
+    a.perm.forEach((v, i) => {
+      const c = COLORS[(v-1) % COLORS.length];
+      const b = document.createElement('div');
+      b.className = 'h-ball';
+      b.style.background = c.bg;
+      b.style.color = '#fff';
+      b.title = `pos ${i+1} = ${v}`;
+      b.textContent = v;
+      permEl.appendChild(b);
+    });
+
+    const arrow = document.createElement('span');
+    arrow.className = 'h-arrow';
+    arrow.textContent = '→';
+
+    const scoreEl = document.createElement('span');
+    scoreEl.className = 'h-score ' + (a.hits === n ? 'full' : a.hits === 0 ? 'zero' : 'partial');
+    scoreEl.textContent = `${a.hits}/${n} corretas`;
+
+    row.appendChild(numEl);
+    row.appendChild(permEl);
+    row.appendChild(arrow);
+    row.appendChild(scoreEl);
+    list.appendChild(row);
+  });
+  list.scrollTop = 0;
+}
+
+// ── Init ──────────────────────────────────────────────────────
+document.getElementById('history-box').style.display = 'none';
+</script>
+</body>
+</html>
