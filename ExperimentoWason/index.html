@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experimento de Wason</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f4ef;
+    --surface: #ffffff;
+    --surface2: #f0ece4;
+    --border: #ddd8ce;
+    --border-strong: #c5bfb4;
+    --ink: #2c2820;
+    --ink2: #5a5248;
+    --ink3: #8a8278;
+    --accent: #b85c2a;
+    --accent-light: #f5e8df;
+    --accent2: #2a6b8a;
+    --accent2-light: #ddeef5;
+    --green: #2e7d4f;
+    --green-light: #e0f2e9;
+    --red: #c0392b;
+    --red-light: #fdeaea;
+    --gold: #b8922a;
+    --gold-light: #fdf4e0;
+    --shadow: 0 2px 12px rgba(44,40,32,0.08);
+    --shadow-lg: 0 8px 32px rgba(44,40,32,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; width: 100%; max-width: 760px; padding: 48px 24px 80px; flex-direction: column; align-items: center; gap: 32px; }
+  .screen.active { display: flex; }
+
+  /* ── Header strip ── */
+  .top-strip {
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 0 var(--border);
+  }
+  .top-strip-inner {
+    width: 100%;
+    max-width: 760px;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .site-title {
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+  }
+  .nav-scores {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .score-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--ink2);
+    white-space: nowrap;
+  }
+  .score-pill span { color: var(--accent); font-weight: 600; }
+
+  /* ── Hero ── */
+  .hero {
+    width: 100%;
+    text-align: center;
+    padding: 16px 0 0;
+  }
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-family: 'Lora', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 18px;
+  }
+  .hero-desc {
+    font-size: 1.02rem;
+    color: var(--ink2);
+    line-height: 1.75;
+    max-width: 580px;
+    margin: 0 auto 10px;
+  }
+  .citation {
+    display: inline-block;
+    background: var(--gold-light);
+    border: 1px solid #e8d4a0;
+    border-radius: 4px;
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--gold);
+    margin-top: 6px;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin: 0 auto;
+    opacity: 0.5;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 36px;
+    width: 100%;
+    box-shadow: var(--shadow);
+  }
+  .card-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .card h2 {
+    font-family: 'Lora', serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+  .card p {
+    font-size: 0.97rem;
+    color: var(--ink2);
+    line-height: 1.75;
+    margin-bottom: 12px;
+  }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ── Rule box ── */
+  .rule-box {
+    background: var(--accent2-light);
+    border: 1.5px solid #a8cfe0;
+    border-radius: 6px;
+    padding: 16px 22px;
+    margin: 20px 0;
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--accent2);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* ── Task instruction ── */
+  .task-label {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 12px 18px;
+    margin: 16px 0 24px;
+    font-size: 0.93rem;
+    color: var(--ink);
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  /* ── Choice cards ── */
+  .choices-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 14px;
+  }
+  .choices-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .choice-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: center;
+    position: relative;
+    user-select: none;
+  }
+  .choice-card:hover {
+    border-color: var(--accent2);
+    background: var(--accent2-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(42,107,138,0.12);
+  }
+  .choice-card.selected {
+    border-color: var(--accent2);
+    background: var(--accent2-light);
+    box-shadow: 0 0 0 3px rgba(42,107,138,0.18);
+  }
+  .choice-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 0.85rem;
+    color: var(--accent2);
+    font-weight: 700;
+  }
+  .choice-card.correct-reveal {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  .choice-card.wrong-reveal {
+    border-color: var(--red);
+    background: var(--red-light);
+  }
+  .choice-card.missed-reveal {
+    border-color: var(--gold);
+    background: var(--gold-light);
+    animation: pulse-gold 1s ease 2;
+  }
+  @keyframes pulse-gold {
+    0%,100% { box-shadow: none; }
+    50% { box-shadow: 0 0 0 4px rgba(184,146,42,0.25); }
+  }
+
+  .choice-main {
+    font-family: 'Lora', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+  .choice-sub {
+    font-size: 0.8rem;
+    color: var(--ink3);
+    line-height: 1.4;
+  }
+
+  /* Person cards (exp 2) */
+  .choice-card .person-icon {
+    font-size: 2rem;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .choice-card .person-name {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .choice-card .person-detail {
+    font-size: 0.78rem;
+    color: var(--ink3);
+    line-height: 1.4;
+  }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 12px 28px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(184,92,42,0.25);
+  }
+  .btn-primary:hover {
+    background: #a04e22;
+    box-shadow: 0 4px 14px rgba(184,92,42,0.3);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--ink2);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 6px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 12px 26px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); background: var(--accent2-light); }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  /* ── Feedback ── */
+  .feedback-box {
+    display: none;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-top: 20px;
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+  .feedback-box.success {
+    background: var(--green-light);
+    border: 1.5px solid #a8dbc0;
+    color: #1a5c38;
+    display: block;
+  }
+  .feedback-box.fail {
+    background: var(--red-light);
+    border: 1.5px solid #f0b8b8;
+    color: #8b1f1f;
+    display: block;
+  }
+  .feedback-box strong { font-weight: 700; }
+
+  /* ── Result page ── */
+  .result-hero {
+    text-align: center;
+    padding: 8px 0;
+  }
+  .result-hero h2 {
+    font-family: 'Lora', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .result-hero p { font-size: 1rem; color: var(--ink2); }
+
+  .scores-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+  }
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .score-card .exp-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 8px;
+  }
+  .score-card .big-score {
+    font-family: 'Lora', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .score-card .big-score.hit { color: var(--green); }
+  .score-card .big-score.miss { color: var(--red); }
+  .score-card .score-denom { font-size: 0.85rem; color: var(--ink3); }
+
+  /* ── Analogy explanation ── */
+  .analogy-section { width: 100%; }
+  .analogy-section h3 {
+    font-family: 'Lora', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .analogy-col {
+    padding: 22px 24px;
+  }
+  .analogy-col h4 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 10px;
+  }
+  .analogy-col .rule-text {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .analogy-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.88rem;
+    color: var(--ink2);
+    line-height: 1.4;
+  }
+  .analogy-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+  .dot-check { background: var(--green-light); color: var(--green); }
+  .dot-x { background: var(--red-light); color: var(--red); }
+  .analogy-equals {
+    padding: 0 8px;
+    font-size: 1.8rem;
+    color: var(--border-strong);
+    font-weight: 300;
+    text-align: center;
+  }
+  .analogy-divider { width: 1px; background: var(--border); align-self: stretch; }
+
+  .insight-box {
+    background: var(--accent-light);
+    border: 1.5px solid #e0c0a8;
+    border-radius: 8px;
+    padding: 20px 24px;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+  .insight-box strong { color: var(--accent); }
+  .insight-box p { margin-bottom: 10px; }
+  .insight-box p:last-child { margin-bottom: 0; }
+
+  /* ── Nav home buttons ── */
+  .home-btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+  }
+  .home-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 24px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    display: block;
+  }
+  .home-btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+  .home-btn .hb-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+  .home-btn .hb-title {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+  .home-btn .hb-desc { font-size: 0.8rem; color: var(--ink3); line-height: 1.4; }
+
+  /* ── Progress dots ── */
+  .progress-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+  .prog-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s;
+  }
+  .prog-dot.done { background: var(--accent); }
+  .prog-dot.active { background: var(--accent2); }
+
+  @media (max-width: 520px) {
+    .choices-grid { grid-template-columns: 1fr 1fr; }
+    .scores-row { grid-template-columns: 1fr 1fr; }
+    .home-btn-grid { grid-template-columns: 1fr; }
+    .analogy-grid { grid-template-columns: 1fr; }
+    .analogy-equals { display: none; }
+    .analogy-divider { width: 100%; height: 1px; }
+    .card { padding: 22px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sticky nav -->
+<div class="top-strip">
+  <div class="top-strip-inner">
+    <div class="site-title">Experimento de Wason</div>
+    <div class="nav-scores">
+      <div class="score-pill">Exp. I: <span id="nav-score1">—</span></div>
+      <div class="score-pill">Exp. II: <span id="nav-score2">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="hero">
+    <div class="eyebrow">Psicologia Cognitiva · 1968</div>
+    <h1>Experimento de<br>Peter Wason</h1>
+    <p class="hero-desc">
+      Uma investigação clássica sobre a dificuldade humana de realizar
+      inferências a partir de sentenças condicionais de forma abstrata.
+    </p>
+    <span class="citation">
+      Wason, P. C. (1968). Reasoning about a rule. <em>Quarterly Journal of Experimental Psychology</em>, 20(3), 273–281.
+    </span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card" style="max-width:580px">
+    <div class="card-eyebrow">Sobre o experimento</div>
+    <h2>O que será testado?</h2>
+    <p>
+      Wason investigou como as pessoas raciocinam diante de regras condicionais —
+      do tipo "se… então…" — e como diferentes contextos afetam esse raciocínio.
+    </p>
+    <p>
+      Você passará por dois experimentos em sequência. Leia cada situação com atenção
+      e tome sua decisão antes de confirmar.
+    </p>
+  </div>
+
+  <div class="home-btn-grid" style="max-width:580px">
+    <a class="home-btn" onclick="goTo('screen-exp1')" style="grid-column:1/-1">
+      <span class="hb-icon">🧪</span>
+      <div class="hb-title">Fazer os Experimentos</div>
+      <div class="hb-desc">Experimento I seguido do Experimento II</div>
+    </a>
+  </div>
+
+  <div class="home-btn-grid" style="max-width:580px">
+    <a class="home-btn" onclick="goTo('screen-results')" style="grid-column:1/-1">
+      <span class="hb-icon">📊</span>
+      <div class="hb-title">Resultado Geral</div>
+      <div class="hb-desc">Veja sua taxa de acerto nos dois experimentos e entenda a explicação</div>
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════ EXP 1 ═══════════════ -->
+<div class="screen" id="screen-exp1">
+  <div class="progress-row">
+    <div class="prog-dot active"></div>
+    <div class="prog-dot"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-eyebrow">Experimento I</div>
+    <h2>As Quatro Cartas</h2>
+    <p>
+      Quatro cartas estão sobre a mesa. Cada carta possui
+      <strong>uma letra de um lado</strong> e <strong>um número do outro lado</strong>.
+    </p>
+
+    <div class="rule-box">
+      "Se de um lado tem a letra <strong>D</strong>, então do outro lado há o número <strong>3</strong>."
+    </div>
+
+    <div class="task-label">
+      ❓ Quais cartas você precisa virar para verificar se a regra é válida?<br>
+      <span style="font-weight:400;font-size:0.88rem;color:var(--ink3)">Selecione o <em>mínimo necessário</em> de cartas e clique em Confirmar.</span>
+    </div>
+
+    <div class="choices-label">As quatro cartas</div>
+    <div class="choices-grid" id="choices1">
+      <div class="choice-card" data-id="3" onclick="toggleChoice(this,'exp1')">
+        <div class="choice-main">3</div>
+        <div class="choice-sub">número</div>
+      </div>
+      <div class="choice-card" data-id="D" onclick="toggleChoice(this,'exp1')">
+        <div class="choice-main">D</div>
+        <div class="choice-sub">letra</div>
+      </div>
+      <div class="choice-card" data-id="4" onclick="toggleChoice(this,'exp1')">
+        <div class="choice-main">4</div>
+        <div class="choice-sub">número</div>
+      </div>
+      <div class="choice-card" data-id="F" onclick="toggleChoice(this,'exp1')">
+        <div class="choice-main">F</div>
+        <div class="choice-sub">letra</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="btn-confirm1" onclick="confirm1()" disabled>Confirmar seleção</button>
+      <button class="btn-secondary" onclick="goTo('screen-home')">← Voltar</button>
+    </div>
+
+    <div class="feedback-box" id="feedback1"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ EXP 2 ═══════════════ -->
+<div class="screen" id="screen-exp2">
+  <div class="progress-row">
+    <div class="prog-dot done"></div>
+    <div class="prog-dot active"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-eyebrow">Experimento II</div>
+    <h2>A Noite no Bar</h2>
+    <p>
+      Quatro pessoas estão em um bar. Você é um policial.
+      Pode ver o que <strong>duas delas estão bebendo</strong>, mas não sabe a idade.
+      Sabe a <strong>idade das outras duas</strong>, mas não o que bebem.
+    </p>
+
+    <div class="rule-box">
+      "Se uma pessoa está bebendo bebida alcoólica, então ela tem pelo menos 18 anos."
+    </div>
+
+    <div class="task-label">
+      ❓ Quais pessoas você precisa abordar para verificar se a regra está sendo respeitada?<br>
+      <span style="font-weight:400;font-size:0.88rem;color:var(--ink3)">Selecione apenas as que <em>realmente importam</em> e clique em Confirmar.</span>
+    </div>
+
+    <div class="choices-label">As quatro pessoas</div>
+    <div class="choices-grid" id="choices2">
+      <div class="choice-card" data-id="maria" onclick="toggleChoice(this,'exp2')">
+        <span class="person-icon">👵</span>
+        <div class="person-name">Maria</div>
+        <div class="person-detail">Uma senhora idosa — claramente maior de idade. O que ela bebe é desconhecido.</div>
+      </div>
+      <div class="choice-card" data-id="joao" onclick="toggleChoice(this,'exp2')">
+        <span class="person-icon">🍺</span>
+        <div class="person-name">João</div>
+        <div class="person-detail">Está bebendo cerveja. Idade desconhecida.</div>
+      </div>
+      <div class="choice-card" data-id="giovana" onclick="toggleChoice(this,'exp2')">
+        <span class="person-icon">🧒</span>
+        <div class="person-name">Giovana</div>
+        <div class="person-detail">Uma criança da escola primária — claramente menor de idade. O que bebe é desconhecido.</div>
+      </div>
+      <div class="choice-card" data-id="pedro" onclick="toggleChoice(this,'exp2')">
+        <span class="person-icon">🥤</span>
+        <div class="person-name">Pedro</div>
+        <div class="person-detail">Está bebendo coca-cola. Idade desconhecida.</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="btn-confirm2" onclick="confirm2()" disabled>Confirmar seleção</button>
+      <button class="btn-secondary" onclick="goTo('screen-home')">← Voltar</button>
+    </div>
+
+    <div class="feedback-box" id="feedback2"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ RESULTS ═══════════════ -->
+<div class="screen" id="screen-results">
+
+  <div class="result-hero">
+    <div class="eyebrow">Resultado Geral</div>
+    <h2 style="font-family:'Lora',serif;font-size:2rem;color:var(--ink);margin-bottom:8px">Seu Desempenho</h2>
+    <p style="color:var(--ink3);font-size:0.95rem">Veja quanto você acertou em cada experimento</p>
+  </div>
+
+  <div class="scores-row">
+    <div class="score-card">
+      <div class="exp-label">Experimento I · Cartas</div>
+      <div class="big-score" id="score1-display">—</div>
+      <div class="score-denom" id="score1-label">tentativas</div>
+    </div>
+    <div class="score-card">
+      <div class="exp-label">Experimento II · Bar</div>
+      <div class="big-score" id="score2-display">—</div>
+      <div class="score-denom" id="score2-label">tentativas</div>
+    </div>
+  </div>
+
+  <div class="card" style="width:100%;margin-top:18px">
+    <div class="card-eyebrow">Histórico Geral</div>
+    <h2 style="font-size:1.2rem;margin-bottom:18px">Estatísticas acumuladas</h2>
+    <div id="history-stats" style="font-size:0.95rem;line-height:1.9;color:var(--ink2)"></div>
+  </div>
+
+  <!-- Answer review -->
+  <div class="card" style="width:100%">
+    <div class="card-eyebrow">Suas respostas</div>
+    <h2 style="font-size:1.2rem;margin-bottom:20px">O que você escolheu em cada experimento</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+      <div>
+        <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Experimento I — Cartas</div>
+        <div class="choices-grid" id="choices1-review" style="pointer-events:none;margin-bottom:0"></div>
+        <div style="margin-top:10px;font-size:0.78rem;color:var(--ink3);line-height:1.5">
+          <span style="display:inline-block;width:10px;height:10px;background:var(--green-light);border:1.5px solid var(--green);border-radius:2px;margin-right:5px;vertical-align:middle"></span>Certa e escolhida
+          <span style="display:inline-block;width:10px;height:10px;background:var(--red-light);border:1.5px solid var(--red);border-radius:2px;margin-right:5px;margin-left:12px;vertical-align:middle"></span>Errada e escolhida
+          <span style="display:inline-block;width:10px;height:10px;background:var(--gold-light);border:1.5px solid var(--gold);border-radius:2px;margin-right:5px;margin-left:12px;vertical-align:middle"></span>Certa mas não escolhida
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Experimento II — Bar</div>
+        <div class="choices-grid" id="choices2-review" style="pointer-events:none;margin-bottom:0"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analogy explanation -->
+  <div class="analogy-section card">
+    <div class="card-eyebrow">A grande revelação</div>
+    <h2>Os dois experimentos são idênticos</h2>
+    <p style="margin-bottom:20px">
+      Logicamente, as duas tarefas são exatamente a mesma. A diferença no desempenho
+      revela como o contexto concreto facilita o raciocínio humano.
+    </p>
+
+    <div class="analogy-grid">
+      <div class="analogy-col">
+        <h4>Experimento I · Cartas</h4>
+        <div class="rule-text">Se <strong>D</strong> → então <strong>3</strong></div>
+        <div class="analogy-item">
+          <div class="analogy-dot dot-check">✓</div>
+          <div><strong>Carta D:</strong> precisa virar — se não tiver 3 do outro lado, a regra falha</div>
+        </div>
+        <div class="analogy-item">
+          <div class="analogy-dot dot-x">✕</div>
+          <div><strong>Carta 3:</strong> não precisa — mesmo que tenha D, só confirma; mas se tiver outra letra, a regra ainda pode valer para D</div>
+        </div>
+        <div class="analogy-item">
+          <div class="analogy-dot dot-check">✓</div>
+          <div><strong>Carta 4:</strong> precisa virar — se tiver D do outro lado, a regra foi violada</div>
+        </div>
+        <div class="analogy-item">
+          <div class="analogy-dot dot-x">✕</div>
+          <div><strong>Carta F:</strong> não precisa — F não é D, logo não importa o número</div>
+        </div>
+      </div>
+
+      <div class="analogy-divider"></div>
+      <div class="analogy-equals">=</div>
+      <div class="analogy-divider"></div>
+
+      <div class="analogy-col">
+        <h4>Experimento II · Bar</h4>
+        <div class="rule-text">Se <strong>álcool</strong> → então <strong>≥ 18 anos</strong></div>
+        <div class="analogy-item">
+          <div class="analogy-dot dot-x">✕</div>
+          <div><strong>Maria (idosa):</strong> não precisa — ela certamente tem ≥ 18 anos; qualquer bebida é OK</div>
+        </div>
+        <div class="analogy-item">
+          <div class="analogy-dot dot-check">✓</div>
+          <div><strong>João (cerveja):</strong> precisa abordar — se for menor, a regra foi violada</div>
+        </div>
+        <div class="analogy-item">
+          <div class="analogy-dot dot-check">✓</div>
+          <div><strong>Giovana (criança):</strong> precisa abordar — se estiver bebendo álcool, a regra foi violada</div>
+        </div>
+        <div class="analogy-item">
+          <div class="analogy-dot dot-x">✕</div>
+          <div><strong>Pedro (coca-cola):</strong> não precisa — coca-cola não é álcool; não importa a idade</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mapping table -->
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:18px 22px;margin-top:4px">
+      <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Correspondência lógica</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;font-size:0.88rem;color:var(--ink2)">
+        <span>Letra <strong>D</strong> na carta</span><span style="color:var(--border-strong);font-size:1.1rem">≡</span><span>Beber bebida alcoólica</span>
+        <span>Número <strong>3</strong> na carta</span><span style="color:var(--border-strong);font-size:1.1rem">≡</span><span>Ter 18 anos ou mais</span>
+        <span>Carta <strong>D</strong> → checar número</span><span style="color:var(--border-strong);font-size:1.1rem">≡</span><span>João (cerveja) → checar idade</span>
+        <span>Carta <strong>4</strong> → checar letra</span><span style="color:var(--border-strong);font-size:1.1rem">≡</span><span>Giovana (criança) → checar bebida</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p>
+      <strong>Por que a maioria erra o Experimento I mas acerta o II?</strong>
+    </p>
+    <p>
+      No problema das cartas, a maioria das pessoas escolhe <em>D e 3</em> — buscando
+      <em>confirmar</em> a regra. Mas a lógica exige que se <em>tente falsificá-la</em>:
+      é preciso checar o <strong>D</strong> (antecedente verdadeiro) e o <strong>4</strong>
+      (consequente falso, que pode esconder um D violador).
+    </p>
+    <p>
+      No bar, o contexto social ativa um raciocínio de <em>detecção de trapaça</em>:
+      intuitivamente checamos quem está bebendo álcool (João) e quem pode ser menor (Giovana).
+      Esse mecanismo cognitivo é muito mais natural do que a lógica formal abstrata.
+    </p>
+    <p>
+      Wason chamou isso de <strong>viés de confirmação</strong>: tendemos a buscar evidências
+      que <em>confirmem</em> uma hipótese em vez de evidências que poderiam <em>refutá-la</em>.
+    </p>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-primary" onclick="goTo('screen-home')">← Voltar ao início</button>
+    <button class="btn-secondary" onclick="resetAll()">↺ Refazer experimentos</button>
+  </div>
+</div>
+
+<script>
+  // ── State ──
+  let score1 = 0, attempts1 = 0;
+  let score2 = 0, attempts2 = 0;
+  let exp1done = false, exp2done = false;
+
+  // ── Persistent History ──
+  const STORAGE_KEY = 'wason-history';
+
+  function loadHistory() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+      totalParticipants: 0,
+      exp1Correct: 0,
+      exp2Correct: 0,
+      bothCorrect: 0,
+      attempts: []
+    };
+  }
+
+  function saveHistory(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  let historyData = loadHistory();
+
+  const correct1 = new Set(['D','4']);
+  const correct2 = new Set(['joao','giovana']);
+
+  let sel1 = new Set();
+  let sel2 = new Set();
+
+  // ── Navigation ──
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    if (id === 'screen-results') updateResultsPage();
+  }
+
+  // ── Toggle choice ──
+  function toggleChoice(el, exp) {
+    const sel = exp === 'exp1' ? sel1 : sel2;
+    const id = el.dataset.id;
+    if (sel.has(id)) {
+      sel.delete(id);
+      el.classList.remove('selected');
+    } else {
+      sel.add(id);
+      el.classList.add('selected');
+    }
+    const btnId = exp === 'exp1' ? 'btn-confirm1' : 'btn-confirm2';
+    document.getElementById(btnId).disabled = sel.size === 0;
+  }
+
+  // ── Confirm Exp 1 ──
+  function confirm1() {
+    if (exp1done) return;
+    exp1done = true;
+    attempts1++;
+
+    const isCorrect = sel1.size === correct1.size && [...correct1].every(x => sel1.has(x));
+    if (isCorrect) score1++;
+
+    // Lock cards silently — no reveal, no feedback
+    document.querySelectorAll('#choices1 .choice-card').forEach(c => {
+      c.onclick = null;
+      c.style.cursor = 'default';
+    });
+    document.getElementById('btn-confirm1').disabled = true;
+    updateNav();
+
+    // Go straight to exp2
+    setTimeout(() => goTo('screen-exp2'), 300);
+  }
+
+  // ── Confirm Exp 2 ──
+  function confirm2() {
+    if (exp2done) return;
+    exp2done = true;
+    attempts2++;
+
+    const cards = document.querySelectorAll('#choices2 .choice-card');
+    cards.forEach(c => {
+      c.onclick = null;
+      c.style.cursor = 'default';
+      const id = c.dataset.id;
+      const selected = sel2.has(id);
+      const needed = correct2.has(id);
+      if (selected && needed) c.classList.add('correct-reveal');
+      else if (selected && !needed) c.classList.add('wrong-reveal');
+      else if (!selected && needed) c.classList.add('missed-reveal');
+    });
+
+    const isCorrect = sel2.size === correct2.size && [...correct2].every(x => sel2.has(x));
+    if (isCorrect) score2++;
+
+    const fb = document.getElementById('feedback2');
+    fb.className = 'feedback-box ' + (isCorrect ? 'success' : 'fail');
+    if (isCorrect) {
+      fb.innerHTML = `<strong>✓ Correto!</strong> Você identificou as pessoas certas: <strong>João</strong> e <strong>Giovana</strong>.<br>
+        João bebe cerveja → precisa confirmar que tem ≥ 18 anos.<br>
+        Giovana é criança → precisa confirmar que não está bebendo álcool.`;
+    } else {
+      fb.innerHTML = `<strong>✗ Não exatamente.</strong> As pessoas corretas são <strong>João</strong> e <strong>Giovana</strong> (destacadas em amarelo).<br>
+        <strong>João</strong> (cerveja): precisa checar a idade — se for menor, a regra foi violada.<br>
+        <strong>Giovana</strong> (criança): precisa checar a bebida — se for álcool, a regra foi violada.<br>
+        <strong>Maria</strong> (idosa) e <strong>Pedro</strong> (coca-cola) não representam risco à regra.`;
+    }
+
+    document.getElementById('btn-confirm2').disabled = true;
+    updateNav();
+
+    // Save persistent history
+    registerAttempt();
+
+    setTimeout(() => {
+      document.getElementById('feedback2').insertAdjacentHTML('beforeend',
+        `<br><br><button class="btn-primary" onclick="goTo('screen-results')" style="margin-top:4px">Ver Resultado Geral →</button>`
+      );
+    }, 400);
+  }
+
+
+  function registerAttempt() {
+    const exp1Correct =
+      sel1.size === correct1.size &&
+      [...correct1].every(x => sel1.has(x));
+
+    const exp2Correct =
+      sel2.size === correct2.size &&
+      [...correct2].every(x => sel2.has(x));
+
+    historyData.totalParticipants++;
+
+    if (exp1Correct) historyData.exp1Correct++;
+    if (exp2Correct) historyData.exp2Correct++;
+    if (exp1Correct && exp2Correct) historyData.bothCorrect++;
+
+    historyData.attempts.push({
+      timestamp: new Date().toISOString(),
+      exp1Correct,
+      exp2Correct,
+      exp1Selection: [...sel1],
+      exp2Selection: [...sel2]
+    });
+
+    saveHistory(historyData);
+  }
+
+  // ── Results ──
+  function updateResultsPage() {
+    const s1 = document.getElementById('score1-display');
+    const s2 = document.getElementById('score2-display');
+
+    if (attempts1 === 0) {
+      s1.textContent = '—';
+      s1.className = 'big-score';
+      document.getElementById('score1-label').textContent = 'ainda não realizado';
+    } else {
+      const pct1 = Math.round((score1/attempts1)*100);
+      s1.textContent = pct1 + '%';
+      s1.className = 'big-score ' + (score1 > 0 ? 'hit' : 'miss');
+      document.getElementById('score1-label').textContent = `${score1} acerto(s) em ${attempts1} tentativa(s)`;
+    }
+
+    if (attempts2 === 0) {
+      s2.textContent = '—';
+      s2.className = 'big-score';
+      document.getElementById('score2-label').textContent = 'ainda não realizado';
+    } else {
+      const pct2 = Math.round((score2/attempts2)*100);
+      s2.textContent = pct2 + '%';
+      s2.className = 'big-score ' + (score2 > 0 ? 'hit' : 'miss');
+      document.getElementById('score2-label').textContent = `${score2} acerto(s) em ${attempts2} tentativa(s)`;
+    }
+
+    // Persistent historical statistics
+    const totalParticipants = historyData.totalParticipants;
+    const exp1Rate = totalParticipants > 0
+      ? Math.round((historyData.exp1Correct / totalParticipants) * 100)
+      : 0;
+
+    const exp2Rate = totalParticipants > 0
+      ? Math.round((historyData.exp2Correct / totalParticipants) * 100)
+      : 0;
+
+    const bothRate = totalParticipants > 0
+      ? Math.round((historyData.bothCorrect / totalParticipants) * 100)
+      : 0;
+
+    document.getElementById('history-stats').innerHTML = `
+      <strong>Total de participantes:</strong> ${totalParticipants}<br>
+      <strong>Acertaram o Experimento I:</strong> ${exp1Rate}% (${historyData.exp1Correct})<br>
+      <strong>Acertaram o Experimento II:</strong> ${exp2Rate}% (${historyData.exp2Correct})<br>
+      <strong>Acertaram ambos:</strong> ${bothRate}% (${historyData.bothCorrect})
+    `;
+
+    // Reveal exp1 cards now (delayed until results screen)
+    if (exp1done) {
+      document.querySelectorAll('#choices1 .choice-card').forEach(c => {
+        c.classList.remove('correct-reveal','wrong-reveal','missed-reveal');
+        const id = c.dataset.id;
+        const selected = sel1.has(id);
+        const needed = correct1.has(id);
+        if (selected && needed) c.classList.add('correct-reveal');
+        else if (selected && !needed) c.classList.add('wrong-reveal');
+        else if (!selected && needed) c.classList.add('missed-reveal');
+      });
+    }
+
+    // Reveal exp2 cards
+    if (exp2done) {
+      document.querySelectorAll('#choices2 .choice-card').forEach(c => {
+        c.classList.remove('correct-reveal','wrong-reveal','missed-reveal');
+        const id = c.dataset.id;
+        const selected = sel2.has(id);
+        const needed = correct2.has(id);
+        if (selected && needed) c.classList.add('correct-reveal');
+        else if (selected && !needed) c.classList.add('wrong-reveal');
+        else if (!selected && needed) c.classList.add('missed-reveal');
+      });
+    }
+  }
+
+  function updateNav() {
+    document.getElementById('nav-score1').textContent = attempts1 === 0 ? '—' : Math.round((score1/attempts1)*100) + '%';
+    document.getElementById('nav-score2').textContent = attempts2 === 0 ? '—' : Math.round((score2/attempts2)*100) + '%';
+  }
+
+  // ── Reset ──
+  function resetAll() {
+    score1 = 0; attempts1 = 0;
+    score2 = 0; attempts2 = 0;
+    exp1done = false; exp2done = false;
+    sel1 = new Set(); sel2 = new Set();
+
+    // Reset exp1 cards
+    document.querySelectorAll('#choices1 .choice-card').forEach(c => {
+      c.className = 'choice-card';
+      c.onclick = () => toggleChoice(c, 'exp1');
+      c.style.cursor = '';
+    });
+    document.getElementById('feedback1').className = 'feedback-box';
+    document.getElementById('feedback1').innerHTML = '';
+    document.getElementById('btn-confirm1').disabled = true;
+
+    // Reset exp2 cards
+    document.querySelectorAll('#choices2 .choice-card').forEach(c => {
+      c.className = 'choice-card';
+      c.onclick = () => toggleChoice(c, 'exp2');
+      c.style.cursor = '';
+    });
+    document.getElementById('feedback2').className = 'feedback-box';
+    document.getElementById('feedback2').innerHTML = '';
+    document.getElementById('btn-confirm2').disabled = true;
+
+    updateNav();
+    goTo('screen-home');
+  }
+</script>
+
+</body>
+</html>
