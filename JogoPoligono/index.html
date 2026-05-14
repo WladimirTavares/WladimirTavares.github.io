@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polígono — Jogo de Geometria</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --surface2: #edeae3;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1a1a;
+  --text-muted: #6b6b6b;
+  --accent: #0f7b5a;
+  --accent2: #5b3fc4;
+  --warn: #b45309;
+  --danger: #c0392b;
+  --grid: rgba(0,0,0,0.05);
+  --axis: rgba(0,0,0,0.18);
+  --point-color: #0f7b5a;
+  --poly-color: #5b3fc4;
+  --hull-color: #b45309;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1.5rem 1rem 2rem;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(15,123,90,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(91,63,196,0.05) 0%, transparent 60%);
+}
+
+header {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 0.5px solid var(--border2);
+}
+
+header h1 {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+header p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+}
+
+.layout {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.canvas-wrap {
+  position: relative;
+  border: 0.5px solid var(--border2);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.phase-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.5);
+  border: 0.5px solid var(--border2);
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.info-bar {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-bar .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,100%{opacity:1} 50%{opacity:0.3}
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+button {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  padding: 8px 14px;
+  border-radius: 5px;
+  border: 0.5px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: all 0.15s;
+}
+button:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.25); }
+button:active { transform: scale(0.97); }
+button.primary { border-color: var(--accent); color: var(--accent); }
+button.primary:hover { background: rgba(110,231,183,0.1); }
+button.danger-btn { border-color: var(--danger); color: var(--danger); }
+
+input[type=number] {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  width: 64px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: 0.5px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  text-align: center;
+}
+
+input[type=range] {
+  accent-color: var(--accent);
+  width: 100px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.metric {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+
+.metric .lbl {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.metric .val {
+  font-size: 1.3rem;
+  font-weight: 500;
+  font-family: 'Space Mono', monospace;
+}
+
+.result-box {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+
+.result-box .rtitle {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.good { color: var(--accent); }
+.bad { color: var(--danger); }
+.neutral { color: var(--warn); }
+
+.legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+.legend-line { width: 18px; height: 2px; border-radius: 1px; }
+
+.n-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+}
+
+.diff-display {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.star { color: var(--warn); }
+
+.ineq-box {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+.ineq-box .ititle {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.ineq-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ineq-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  color: var(--text);
+  white-space: nowrap;
+}
+.ineq-tag.hull-tag {
+  border-color: rgba(180,83,9,0.4);
+  color: var(--warn);
+  background: rgba(180,83,9,0.06);
+}
+.ineq-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 8px 0 6px;
+  font-family: 'Space Mono', monospace;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>POLÍGONO_</h1>
+  <p>encontre o menor polígono que contém todos os pontos</p>
+</header>
+
+<div class="layout">
+  <div class="canvas-wrap">
+    <canvas id="c"></canvas>
+    <div class="phase-tag" id="phase-tag">colocar pontos</div>
+  </div>
+
+  <div class="info-bar">
+    <div class="dot" id="dot"></div>
+    <span id="msg">Gere os pontos para começar.</span>
+  </div>
+
+  <div class="controls" id="ctrl-gen">
+    <span class="n-label">Pontos:</span>
+    <input type="range" id="n-slider" min="3" max="12" value="6">
+    <span id="n-val" style="font-family:'Space Mono',monospace;font-size:0.8rem;min-width:14px">6</span>
+    <button class="primary" onclick="generatePoints()">↻ Gerar pontos</button>
+  </div>
+
+  <div class="controls" id="ctrl-guess" style="display:none">
+    <span class="n-label">Retas:</span>
+    <input type="number" id="guess-input" min="3" max="20" value="4">
+    <button class="primary" onclick="startDraw()">Desenhar polígono →</button>
+    <button onclick="generatePoints()">↻ Novo jogo</button>
+  </div>
+
+  <div class="controls" id="ctrl-draw" style="display:none">
+    <button class="primary" onclick="finishPolygon()">✓ Finalizar polígono</button>
+    <button onclick="undoVertex()">↩ Desfazer vértice</button>
+    <button onclick="generatePoints()">↻ Novo jogo</button>
+  </div>
+
+  <div class="controls" id="ctrl-result" style="display:none">
+    <button class="primary" onclick="generatePoints()">↻ Jogar novamente</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--point-color)"></div>pontos gerados</div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--poly-color)"></div>seu polígono</div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--hull-color);border-top:2px dashed var(--hull-color);height:0"></div>convex hull (mínimo)</div>
+  </div>
+
+  <div class="metrics" id="metrics" style="display:none">
+    <div class="metric"><div class="lbl">Retas usadas</div><div class="val" id="m-sides">—</div></div>
+    <div class="metric"><div class="lbl">Sua área</div><div class="val" id="m-area">—</div></div>
+    <div class="metric"><div class="lbl">Área mínima</div><div class="val" id="m-hull">—</div></div>
+  </div>
+
+  <div class="result-box" id="result-box" style="display:none">
+    <div class="rtitle">resultado</div>
+    <div id="result-content"></div>
+  </div>
+
+  <div class="ineq-box" id="ineq-box" style="display:none">
+    <div class="ititle">desigualdades do sistema</div>
+    <div id="ineq-content"></div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = 800, H = 480;
+canvas.width = W; canvas.height = H;
+const SCALE = 36;
+const ORIG = { x: W / 2, y: H / 2 };
+
+let points = [], userPoly = [], phase = 'idle', guessedSides = null;
+
+const px = x => ORIG.x + x * SCALE;
+const py = y => ORIG.y - y * SCALE;
+const cx = mx => (mx - ORIG.x) / SCALE;
+const cy = my => -(my - ORIG.y) / SCALE;
+
+// Slider
+const slider = document.getElementById('n-slider');
+const nVal = document.getElementById('n-val');
+slider.addEventListener('input', () => nVal.textContent = slider.value);
+
+// Colors
+const C = {
+  bg: '#faf9f6',
+  surface: '#ffffff',
+  grid: 'rgba(0,0,0,0.05)',
+  axis: 'rgba(0,0,0,0.2)',
+  text: 'rgba(0,0,0,0.3)',
+  point: '#0f7b5a',
+  poly: '#5b3fc4',
+  hull: '#b45309',
+  first: '#c0392b',
+};
+
+function drawGrid() {
+  ctx.fillStyle = C.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  for (let gx = -11; gx <= 11; gx++) {
+    const x = px(gx);
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H);
+    ctx.strokeStyle = gx === 0 ? C.axis : C.grid;
+    ctx.lineWidth = gx === 0 ? 1 : 0.5;
+    ctx.stroke();
+    if (gx !== 0 && gx % 2 === 0 && Math.abs(gx) < 11) {
+      ctx.fillStyle = C.text;
+      ctx.font = '10px Space Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(gx, x, ORIG.y + 14);
+    }
+  }
+  for (let gy = -7; gy <= 7; gy++) {
+    const y = py(gy);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y);
+    ctx.strokeStyle = gy === 0 ? C.axis : C.grid;
+    ctx.lineWidth = gy === 0 ? 1 : 0.5;
+    ctx.stroke();
+    if (gy !== 0 && gy % 2 === 0 && Math.abs(gy) < 7) {
+      ctx.fillStyle = C.text;
+      ctx.font = '10px Space Mono, monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(gy, ORIG.x - 6, y + 4);
+    }
+  }
+  // Origin dot
+  ctx.beginPath(); ctx.arc(ORIG.x, ORIG.y, 2.5, 0, Math.PI*2);
+  ctx.fillStyle = C.axis; ctx.fill();
+}
+
+function drawPoints() {
+  points.forEach((p, i) => {
+    const x = px(p.x), y = py(p.y);
+    // glow
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, 12);
+    grad.addColorStop(0, 'rgba(15,123,90,0.15)');
+    grad.addColorStop(1, 'transparent');
+    ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI*2);
+    ctx.fillStyle = grad; ctx.fill();
+    // dot
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2);
+    ctx.fillStyle = C.point; ctx.fill();
+    // label
+    ctx.fillStyle = C.point;
+    ctx.font = '10px Space Mono, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`(${p.x},${p.y})`, x + 8, y - 6);
+  });
+}
+
+function drawUserPoly() {
+  if (userPoly.length < 1) return;
+  ctx.beginPath();
+  ctx.moveTo(px(userPoly[0].x), py(userPoly[0].y));
+  for (let i = 1; i < userPoly.length; i++)
+    ctx.lineTo(px(userPoly[i].x), py(userPoly[i].y));
+  if (phase === 'result') {
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(91,63,196,0.1)';
+    ctx.fill();
+  }
+  ctx.strokeStyle = C.poly;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([]);
+  ctx.stroke();
+
+  userPoly.forEach((p, i) => {
+    ctx.beginPath(); ctx.arc(px(p.x), py(p.y), i === 0 ? 6 : 4, 0, Math.PI*2);
+    ctx.fillStyle = i === 0 ? C.first : C.poly;
+    ctx.fill();
+  });
+}
+
+function drawHull(hull) {
+  if (!hull || hull.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(px(hull[0].x), py(hull[0].y));
+  for (let i = 1; i < hull.length; i++) ctx.lineTo(px(hull[i].x), py(hull[i].y));
+  ctx.closePath();
+  ctx.strokeStyle = C.hull;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(180,83,9,0.07)';
+  ctx.fill();
+}
+
+function drawCursor(mx, my) {
+  if (phase !== 'draw' || userPoly.length === 0) return;
+  const last = userPoly[userPoly.length - 1];
+  ctx.beginPath();
+  ctx.moveTo(px(last.x), py(last.y));
+  ctx.lineTo(mx, my);
+  ctx.strokeStyle = 'rgba(91,63,196,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+let mousePos = null;
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  mousePos = {
+    x: (e.clientX - rect.left) * (W / rect.width),
+    y: (e.clientY - rect.top) * (H / rect.height)
+  };
+  if (phase === 'draw') render();
+});
+canvas.addEventListener('mouseleave', () => { mousePos = null; if (phase === 'draw') render(); });
+
+function render(hull) {
+  drawGrid();
+  if (phase === 'result' && hull) drawHull(hull);
+  else if (phase === 'result' && window._hull) drawHull(window._hull);
+  drawUserPoly();
+  drawPoints();
+  if (phase === 'draw' && mousePos) drawCursor(mousePos.x, mousePos.y);
+}
+
+// Geometry
+function convexHull(pts) {
+  if (pts.length < 3) return pts.slice();
+  const sorted = [...pts].sort((a, b) => a.x === b.x ? a.y - b.y : a.x - b.x);
+  const cross = (O, A, B) => (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
+  const lower = [];
+  for (const p of sorted) {
+    while (lower.length >= 2 && cross(lower[lower.length-2], lower[lower.length-1], p) <= 0) lower.pop();
+    lower.push(p);
+  }
+  const upper = [];
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const p = sorted[i];
+    while (upper.length >= 2 && cross(upper[upper.length-2], upper[upper.length-1], p) <= 0) upper.pop();
+    upper.push(p);
+  }
+  lower.pop(); upper.pop();
+  return lower.concat(upper);
+}
+
+function polygonArea(poly) {
+  let a = 0, n = poly.length;
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    a += poly[i].x * poly[j].y - poly[j].x * poly[i].y;
+  }
+  return Math.abs(a) / 2;
+}
+
+function pointInPolygon(pt, poly) {
+  let inside = false, n = poly.length;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    const xi = poly[i].x, yi = poly[i].y, xj = poly[j].x, yj = poly[j].y;
+    if (((yi > pt.y) !== (yj > pt.y)) && (pt.x < (xj - xi) * (pt.y - yi) / (yj - yi) + xi))
+      inside = !inside;
+  }
+  return inside;
+}
+
+function ptOnSegment(pt, a, b, tol = 0.05) {
+  const cross = Math.abs((b.x - a.x) * (pt.y - a.y) - (b.y - a.y) * (pt.x - a.x));
+  if (cross > tol * Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y), 1)) return false;
+  return Math.min(a.x, b.x) - tol <= pt.x && pt.x <= Math.max(a.x, b.x) + tol &&
+         Math.min(a.y, b.y) - tol <= pt.y && pt.y <= Math.max(a.y, b.y) + tol;
+}
+
+function pointInOrOnPolygon(pt, poly) {
+  if (pointInPolygon(pt, poly)) return true;
+  for (let i = 0; i < poly.length; i++) {
+    if (ptOnSegment(pt, poly[i], poly[(i + 1) % poly.length])) return true;
+  }
+  return false;
+}
+
+// Generate random integer points, not collinear
+function generatePoints() {
+  const n = parseInt(slider.value);
+  const used = new Set();
+  const pts = [];
+  const range = 5;
+  let tries = 0;
+  while (pts.length < n && tries < 500) {
+    tries++;
+    const x = Math.round((Math.random() * 2 - 1) * range);
+    const y = Math.round((Math.random() * 2 - 1) * range);
+    const key = `${x},${y}`;
+    if (!used.has(key)) { used.add(key); pts.push({ x, y }); }
+  }
+  points = pts;
+  userPoly = [];
+  phase = 'guess';
+  window._hull = null;
+  guessedSides = null;
+
+  document.getElementById('ctrl-gen').style.display = 'flex';
+  document.getElementById('ctrl-guess').style.display = 'flex';
+  document.getElementById('ctrl-draw').style.display = 'none';
+  document.getElementById('ctrl-result').style.display = 'none';
+  document.getElementById('metrics').style.display = 'none';
+  document.getElementById('result-box').style.display = 'none';
+  document.getElementById('ineq-box').style.display = 'none';
+
+  setPhaseTag('adivinhe as retas');
+  setMsg(`${n} pontos gerados. Quantas retas você precisa para cobri-los? Insira e clique em "Desenhar polígono".`);
+  setDot(true);
+  render();
+}
+
+function startDraw() {
+  const v = parseInt(document.getElementById('guess-input').value);
+  if (!v || v < 3) { setMsg('Um polígono precisa de pelo menos 3 retas!'); return; }
+  guessedSides = v;
+  phase = 'draw';
+  userPoly = [];
+
+  document.getElementById('ctrl-guess').style.display = 'none';
+  document.getElementById('ctrl-draw').style.display = 'flex';
+
+  setPhaseTag('desenhando polígono');
+  setMsg(`Você apostou ${v} retas. Clique para adicionar vértices. O 1º vértice é vermelho — clique perto dele para fechar.`);
+  document.getElementById('ineq-box').style.display = 'none';
+  render();
+}
+
+function undoVertex() {
+  if (userPoly.length > 0) { userPoly.pop(); updateIneqBox(userPoly, null); render(); }
+  setMsg(`${userPoly.length} vértice(s). Clique perto do 1º ponto vermelho para fechar.`);
+}
+
+canvas.addEventListener('click', e => {
+  if (phase !== 'draw') return;
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (W / rect.width);
+  const my = (e.clientY - rect.top) * (H / rect.height);
+
+  if (userPoly.length > 2) {
+    const fx = px(userPoly[0].x), fy = py(userPoly[0].y);
+    if ((fx - mx) ** 2 + (fy - my) ** 2 < 225) { finishPolygon(); return; }
+  }
+  userPoly.push({ x: parseFloat(cx(mx).toFixed(2)), y: parseFloat(cy(my).toFixed(2)) });
+  setMsg(`${userPoly.length} vértice(s). Clique perto do 1º ponto vermelho para fechar.`);
+  updateIneqBox(userPoly, null);
+  render();
+});
+
+function finishPolygon() {
+  if (userPoly.length < 3) { setMsg('Adicione pelo menos 3 vértices!'); return; }
+  const allIn = points.every(p => pointInOrOnPolygon(p, userPoly));
+  if (!allIn) {
+    setMsg('⚠ Seu polígono não contém todos os pontos! Desfaça vértices e tente novamente.');
+    return;
+  }
+  phase = 'result';
+  const hull = convexHull(points);
+  window._hull = hull;
+  showResult(hull);
+}
+
+function showResult(hull) {
+  const userArea = polygonArea(userPoly);
+  const hullArea = polygonArea(hull);
+  const userSides = userPoly.length;
+  const hullSides = hull.length;
+  const areaDiff = userArea - hullArea;
+  const diffPct = hullArea > 0 ? (areaDiff / hullArea * 100) : 0;
+  const guessOk = guessedSides === userSides;
+  const perfect = guessOk && areaDiff < 0.01;
+
+  document.getElementById('ctrl-draw').style.display = 'none';
+  document.getElementById('ctrl-guess').style.display = 'none';
+  document.getElementById('ctrl-gen').style.display = 'none';
+  document.getElementById('ctrl-result').style.display = 'flex';
+  document.getElementById('metrics').style.display = 'grid';
+  document.getElementById('result-box').style.display = 'block';
+
+  document.getElementById('m-sides').textContent = userSides;
+  document.getElementById('m-sides').style.color = guessOk ? 'var(--accent)' : 'var(--danger)';
+  document.getElementById('m-area').textContent = userArea.toFixed(2) + ' u²';
+  document.getElementById('m-hull').textContent = hullArea.toFixed(2) + ' u²';
+
+  let stars = '';
+  if (perfect) stars = ' <span class="star">★★★</span>';
+  else if (guessOk || diffPct < 20) stars = ' <span class="star">★★</span>';
+  else stars = ' <span class="star">★</span>';
+
+  let html = '';
+  if (perfect) {
+    html = `<span class="good">Perfeito!${stars}</span> Você acertou o número de retas e seu polígono coincide com o menor possível. Área: <strong>${hullArea.toFixed(2)} u²</strong>.`;
+  } else {
+    const sideMsg = guessOk
+      ? `<span class="good">✓ Acertou as retas: ${userSides}</span>`
+      : `<span class="bad">✗ Você disse ${guessedSides} retas, mas usou ${userSides}</span> (o convex hull usa <strong>${hullSides}</strong>).`;
+    const areaMsg = areaDiff < 0.01
+      ? `<span class="good">Área idêntica ao mínimo!</span>`
+      : `Excesso de área: <span class="bad"><strong>${areaDiff.toFixed(2)} u²</strong></span> (+${diffPct.toFixed(1)}% em relação ao mínimo).`;
+    html = `${stars} ${sideMsg}<br>${areaMsg}`;
+  }
+  html += `<div class="diff-display">O polígono amarelo tracejado é o convex hull — a menor área convexa que contém todos os pontos.</div>`;
+  document.getElementById('result-content').innerHTML = html;
+
+  setPhaseTag('resultado');
+  setMsg('');
+  setDot(false);
+  updateIneqBox(userPoly, hull);
+  render(hull);
+}
+
+function setPhaseTag(t) { document.getElementById('phase-tag').textContent = t; }
+function setMsg(t) { document.getElementById('msg').textContent = t; }
+function setDot(on) {
+  const d = document.getElementById('dot');
+  d.style.animation = on ? 'pulse 1.5s ease-in-out infinite' : 'none';
+  d.style.background = on ? 'var(--accent)' : 'var(--text-muted)';
+}
+
+// ── Desigualdades ────────────────────────────────────────────────
+// Dado um polígono com vértices em ordem (sentido anti-horário ou horário),
+// cada aresta A→B define uma semiplano. Determinamos o lado correto
+// verificando que o centroide do polígono satisfaz a desigualdade.
+// Equação da reta por A(x1,y1) e B(x2,y2):
+//   (y2-y1)x - (x2-x1)y + (x2-x1)y1 - (y2-y1)x1 = 0
+// ou seja: ax + by + c = 0  com a=dy, b=-dx, c= dx*y1 - dy*x1
+
+function polyIneqs(poly) {
+  const n = poly.length;
+  // centroid
+  let cx = 0, cy = 0;
+  poly.forEach(p => { cx += p.x; cy += p.y; });
+  cx /= n; cy /= n;
+
+  const ineqs = [];
+  for (let i = 0; i < n; i++) {
+    const A = poly[i], B = poly[(i+1) % n];
+    const dy = B.y - A.y, dx = B.x - A.x;
+    const a = dy, b = -dx, c = dx * A.y - dy * A.x;
+    // sign so that centroid satisfies  a*x + b*y + c  [sign]  0
+    const side = a * cx + b * cy + c;
+    ineqs.push({ a, b, c, lte: side <= 0 });
+  }
+  return ineqs;
+}
+
+function fmtNum(n) {
+  // format coefficient: omit 1/-1, show fractions nicely
+  const r = Math.round(n * 100) / 100;
+  return r;
+}
+
+function ineqStr(iq) {
+  // ax + by + c ≤ 0  →  rearrange to  ax + by ≤ -c  (or ≥)
+  // then simplify sign so leading coeff is positive
+  let { a, b, c, lte } = iq;
+  // round
+  a = Math.round(a * 100) / 100;
+  b = Math.round(b * 100) / 100;
+  c = Math.round(c * 100) / 100;
+
+  // flip so leading nonzero coeff is positive
+  const lead = a !== 0 ? a : b;
+  let sign = 1;
+  if (lead < 0) { a = -a; b = -b; c = -c; sign = -1; lte = !lte; }
+
+  const rhs = -c;
+  const rhsFmt = Math.round(rhs * 100) / 100;
+
+  let lhs = '';
+  if (a !== 0) {
+    if (a === 1) lhs += 'x';
+    else if (a === -1) lhs += '−x';
+    else lhs += (a < 0 ? '−' + Math.abs(a) : a) + 'x';
+  }
+  if (b !== 0) {
+    const absB = Math.abs(b);
+    const bSign = b > 0 ? (lhs ? ' + ' : '') : ' − ';
+    const bCoef = absB === 1 ? '' : absB;
+    lhs += bSign + bCoef + 'y';
+  }
+  if (!lhs) lhs = '0';
+
+  const rel = lte ? ' ≤ ' : ' ≥ ';
+  return lhs + rel + rhsFmt;
+}
+
+function updateIneqBox(userPoly, hull) {
+  const box = document.getElementById('ineq-box');
+  const content = document.getElementById('ineq-content');
+
+  if (!userPoly || userPoly.length < 2) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+
+  let html = '';
+
+  // User polygon inequalities
+  if (userPoly.length >= 3) {
+    const iqsUser = polyIneqs(userPoly);
+    html += '<div class="ineq-subtitle" style="color:var(--poly-color)">seu polígono</div>';
+    html += '<div class="ineq-grid">';
+    iqsUser.forEach((iq, i) => {
+      html += `<span class="ineq-tag" title="Reta ${i+1}">${ineqStr(iq)}</span>`;
+    });
+    html += '</div>';
+  } else if (userPoly.length === 2) {
+    // show the line equation being built
+    html += '<div class="ineq-subtitle" style="color:var(--text-muted)">reta em construção (adicione mais vértices)</div>';
+  }
+
+  // Hull inequalities (only in result phase)
+  if (hull && hull.length >= 3) {
+    const iqsHull = polyIneqs(hull);
+    html += '<div class="ineq-subtitle" style="color:var(--hull-color);margin-top:12px">convex hull (sistema mínimo)</div>';
+    html += '<div class="ineq-grid">';
+    iqsHull.forEach((iq, i) => {
+      html += `<span class="ineq-tag hull-tag" title="Reta ${i+1} do hull">${ineqStr(iq)}</span>`;
+    });
+    html += '</div>';
+    html += '<div style="font-size:0.7rem;color:var(--text-muted);margin-top:8px;font-family:\'Space Mono\',monospace">A região que satisfaz <em>todas</em> as desigualdades acima é exatamente o convex hull.</div>';
+  }
+
+  content.innerHTML = html;
+}
+
+// Init
+drawGrid();
+setMsg('Configure o número de pontos e clique em "Gerar pontos" para começar.');
+setDot(false);
+</script>
+</body>
+</html>
