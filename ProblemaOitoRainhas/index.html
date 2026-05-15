@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8 Rainhas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0c09;
+  --bg2: #16130f;
+  --panel: #1e1a14;
+  --border: rgba(212,180,120,0.15);
+  --border2: rgba(212,180,120,0.3);
+  --gold: #d4b478;
+  --gold2: #f0d090;
+  --light: #f0e8d8;
+  --muted: #7a6e5a;
+  --cell-light: #e8d9b8;
+  --cell-dark: #8b6f47;
+  --cell-light-h: #f5ead0;
+  --cell-dark-h: #a07840;
+  --queen: #f0d090;
+  --blocked: #2a2018;
+  --blocked-border: #3d3020;
+  --attack: rgba(180,60,40,0.22);
+  --attack-border: rgba(220,80,50,0.4);
+  --green: #5a9a6a;
+  --red: #c0402a;
+  --blue: #4a7aaa;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); }
+body {
+  font-family: 'Crimson Pro', serif;
+  color: var(--light);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(212,180,120,0.05) 0%, transparent 70%);
+  padding: 2rem 1rem 4rem;
+}
+
+/* ── HEADER ── */
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--gold2);
+  line-height: 1;
+}
+header h1 em {
+  font-style: italic;
+  color: var(--light);
+}
+header p {
+  font-size: 1rem;
+  color: var(--muted);
+  margin-top: 0.4rem;
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+.rule {
+  width: 100%;
+  max-width: 700px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+  margin: 1.2rem auto;
+}
+
+/* ── MENU ── */
+#menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 480px;
+}
+.menu-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+  text-align: center;
+}
+.mode-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.mode-card {
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 14px 18px;
+  background: var(--panel);
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: left;
+}
+.mode-card:hover { border-color: var(--gold); background: rgba(212,180,120,0.06); }
+.mode-card.selected { border-color: var(--gold2); background: rgba(212,180,120,0.1); }
+.mode-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: var(--gold2);
+  margin-bottom: 4px;
+}
+.mode-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+
+.bloq-config {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.bloq-config label { font-size: 0.88rem; color: var(--gold); }
+.bloq-config input[type=range] { width: 100%; accent-color: var(--gold); }
+.bloq-config .bloq-val { font-size: 1rem; font-weight: 600; color: var(--gold2); text-align: center; }
+
+.btn-start {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  padding: 12px 32px;
+  border-radius: 6px;
+  border: 1px solid var(--gold);
+  background: rgba(212,180,120,0.1);
+  color: var(--gold2);
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: all 0.15s;
+  margin-top: 0.5rem;
+}
+.btn-start:hover { background: rgba(212,180,120,0.2); border-color: var(--gold2); }
+
+/* ── GAME ── */
+#game { display: none; flex-direction: column; align-items: center; gap: 1.2rem; width: 100%; max-width: 700px; }
+
+/* ── STATS ROW ── */
+.stats-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.stat-pill {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 16px;
+  text-align: center;
+  min-width: 90px;
+}
+.stat-pill .lbl {
+  font-size: 0.62rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: 'Crimson Pro', serif;
+}
+.stat-pill .val {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--gold2);
+  line-height: 1;
+}
+
+/* ── BOARD ── */
+.board-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  border: 2px solid var(--border2);
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 1;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.1s;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(0.7rem, 2vw, 1rem);
+  font-weight: 700;
+  aspect-ratio: 1;
+}
+.cell.light { background: var(--cell-light); color: #5a4a30; }
+.cell.dark  { background: var(--cell-dark);  color: #d4b478; }
+.cell.light:hover:not(.blocked):not(.no-hover) { background: var(--cell-light-h); }
+.cell.dark:hover:not(.blocked):not(.no-hover)  { background: var(--cell-dark-h); }
+
+/* Attack overlay */
+.cell.attacked::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--attack);
+  border: 1px solid var(--attack-border);
+  pointer-events: none;
+}
+.cell.attacked { cursor: not-allowed; }
+
+/* Blocked cell */
+.cell.blocked {
+  background: var(--blocked) !important;
+  border: 1px solid var(--blocked-border);
+  cursor: not-allowed;
+}
+.cell.blocked::before {
+  content: '✕';
+  font-size: clamp(0.7rem, 2vw, 1rem);
+  color: #4a3828;
+  font-weight: 900;
+}
+
+/* Queen */
+.cell .queen-icon {
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  user-select: none;
+  animation: queenIn 0.2s cubic-bezier(.34,1.56,.64,1);
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  z-index: 2;
+  position: relative;
+}
+@keyframes queenIn {
+  from { transform: scale(0.4) rotate(-20deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* Weighted value */
+.cell .weight-val {
+  font-size: clamp(0.7rem, 2.2vw, 1.1rem);
+  font-weight: 700;
+  user-select: none;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.cell.light .weight-val { color: #4a3820; }
+.cell.dark  .weight-val { color: #f0d090; }
+
+/* Row/col coords */
+.board-coords-row {
+  display: flex;
+  width: 100%;
+  max-width: 560px;
+  padding-left: 0;
+  justify-content: space-around;
+}
+.coord-lbl {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.7rem;
+  color: var(--muted);
+  width: calc(100% / 8);
+  text-align: center;
+}
+
+/* ── CONTROLS ── */
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn {
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: 1px solid var(--border2);
+  background: var(--panel);
+  color: var(--light);
+  cursor: pointer;
+  transition: all 0.14s;
+  letter-spacing: 0.02em;
+}
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn:active { transform: scale(0.97); }
+.btn.gold { border-color: var(--gold); color: var(--gold2); }
+.btn.gold:hover { background: rgba(212,180,120,0.12); }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── SYMMETRY PANEL ── */
+#symmetry-panel {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+.sym-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.sym-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.mini-board {
+  display: grid;
+  grid-template-columns: repeat(8,1fr);
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+.mini-cell {
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem;
+}
+.mini-cell.light { background: var(--cell-light); }
+.mini-cell.dark  { background: var(--cell-dark); }
+.mini-cell.q     { background: var(--cell-light); }
+.mini-cell.qd    { background: var(--cell-dark); }
+.mini-queen { font-size: 0.6rem; line-height: 1; }
+.sym-label {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ── SCORE BOX (ponderada) ── */
+.score-box {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 14px 20px;
+  width: 100%;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.score-box strong { color: var(--gold2); }
+
+/* ── MESSAGE ── */
+#message {
+  min-height: 32px;
+  font-size: 0.92rem;
+  text-align: center;
+  font-style: italic;
+  color: var(--muted);
+  transition: color 0.3s;
+}
+#message.ok  { color: var(--green); }
+#message.err { color: var(--red); }
+#message.win { color: var(--gold2); font-style: normal; font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>8 <em>Rainhas</em></h1>
+  <p>o problema clássico de xadrez</p>
+</header>
+<div class="rule"></div>
+
+<!-- ══════════════ MENU ══════════════ -->
+<div id="menu">
+  <div class="menu-label">Escolha a variante</div>
+
+  <div class="mode-cards">
+    <div class="mode-card selected" onclick="selectMode('normal',this)">
+      <h3>♛ Clássica</h3>
+      <p>Posicione 8 rainhas sem que nenhuma se ataque. Linha, coluna e diagonais bloqueadas após cada movimento.</p>
+    </div>
+    <div class="mode-card" onclick="selectMode('blocked',this)">
+      <h3>⬛ Com Bloqueios</h3>
+      <p>Casas aleatórias ficam bloqueadas. Você define quantas. Resolva o desafio com os obstáculos.</p>
+    </div>
+    <div class="mode-card" onclick="selectMode('weighted',this)">
+      <h3>⚖ Ponderada</h3>
+      <p>Cada casa tem um valor numérico. Posicione as 8 rainhas maximizando a soma dos pontos coletados.</p>
+    </div>
+  </div>
+
+  <div class="bloq-config" id="bloq-config">
+    <label>Número de bloqueios: <span class="bloq-val" id="bloq-val">8</span></label>
+    <input type="range" id="bloq-range" min="1" max="30" value="8"
+      oninput="document.getElementById('bloq-val').textContent=this.value">
+  </div>
+
+  <button class="btn-start" onclick="startGame()">Iniciar</button>
+</div>
+
+<!-- ══════════════ GAME ══════════════ -->
+<div id="game">
+
+  <div class="stats-row">
+    <div class="stat-pill"><div class="lbl">Rainhas</div><div class="val" id="stat-queens">0</div></div>
+    <div class="stat-pill"><div class="lbl">Restantes</div><div class="val" id="stat-remaining">8</div></div>
+    <div class="stat-pill" id="stat-score-pill" style="display:none"><div class="lbl">Pontos</div><div class="val" id="stat-score">0</div></div>
+    <div class="stat-pill"><div class="lbl">Modo</div><div class="val" id="stat-mode" style="font-size:0.75rem;padding-top:4px">—</div></div>
+  </div>
+
+  <div class="board-coords-row" id="col-labels"></div>
+  <div class="board-wrap">
+    <div id="board"></div>
+  </div>
+  <div class="board-coords-row" id="row-labels"></div>
+
+  <div id="message"></div>
+
+  <div class="controls">
+    <button class="btn" onclick="undoLast()">↩ Desfazer</button>
+    <button class="btn" onclick="resetBoard()">↺ Reiniciar</button>
+    <button class="btn" onclick="goMenu()">‹ Menu</button>
+  </div>
+
+  <!-- Symmetry controls — appear after win -->
+  <div id="symmetry-panel">
+    <div class="sym-title">Simetrias da solução</div>
+    <div class="controls" style="margin-bottom:8px">
+      <button class="btn gold" onclick="rotateSolution(90)">⟳ Girar 90°</button>
+      <button class="btn gold" onclick="rotateSolution(180)">⟳ Girar 180°</button>
+      <button class="btn gold" onclick="rotateSolution(270)">⟳ Girar 270°</button>
+      <button class="btn gold" onclick="reflectSolution('h')">↔ Reflexão H</button>
+      <button class="btn gold" onclick="reflectSolution('v')">↕ Reflexão V</button>
+      <button class="btn gold" onclick="showAllSymmetries()">⬛ Ver todas</button>
+    </div>
+    <div id="sym-grid-wrap" style="display:none">
+      <div class="sym-title" style="font-size:0.85rem;margin-bottom:8px">As 8 transformações desta solução</div>
+      <div class="sym-grid" id="sym-grid"></div>
+    </div>
+  </div>
+
+  <!-- Weighted score -->
+  <div class="score-box" id="score-box" style="display:none"></div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let mode = 'normal';
+let N = 8;
+let queens = [];       // [{r,c}]
+let attacked = [];     // N×N bool
+let blocked = [];      // N×N bool
+let weights = [];      // N×N int (weighted mode)
+let totalScore = 0;
+let gameActive = false;
+let displayQueens = []; // for symmetry display
+
+// ═══════════════════════════════════════════════
+// MENU
+// ═══════════════════════════════════════════════
+function selectMode(m, el) {
+  mode = m;
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const bc = document.getElementById('bloq-config');
+  bc.style.display = m === 'blocked' ? 'flex' : 'none';
+}
+
+function startGame() {
+  document.getElementById('menu').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+  document.getElementById('symmetry-panel').style.display = 'none';
+  document.getElementById('sym-grid-wrap').style.display = 'none';
+  document.getElementById('score-box').style.display = 'none';
+  document.getElementById('stat-score-pill').style.display = mode === 'weighted' ? '' : 'none';
+
+  const modeNames = { normal: 'Clássica', blocked: 'Bloqueios', weighted: 'Ponderada' };
+  document.getElementById('stat-mode').textContent = modeNames[mode];
+
+  initBoard();
+}
+
+function goMenu() {
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('menu').style.display = 'flex';
+}
+
+// ═══════════════════════════════════════════════
+// BOARD INIT
+// ═══════════════════════════════════════════════
+function initBoard() {
+  queens = [];
+  attacked = Array.from({length:N}, ()=>Array(N).fill(false));
+  blocked  = Array.from({length:N}, ()=>Array(N).fill(false));
+  weights  = Array.from({length:N}, ()=>Array(N).fill(0));
+  totalScore = 0;
+  gameActive = true;
+  displayQueens = null;
+
+  if (mode === 'blocked') {
+    const numBlocks = parseInt(document.getElementById('bloq-range').value);
+    placeRandomBlocks(numBlocks);
+  }
+  if (mode === 'weighted') {
+    generateWeights();
+  }
+
+  buildCoords();
+  renderBoard();
+  updateStats();
+  setMsg('', '');
+}
+
+function placeRandomBlocks(n) {
+  let placed = 0, tries = 0;
+  while (placed < n && tries < 500) {
+    const r = Math.floor(Math.random() * N);
+    const c = Math.floor(Math.random() * N);
+    if (!blocked[r][c]) { blocked[r][c] = true; placed++; }
+    tries++;
+  }
+}
+
+function generateWeights() {
+  for (let r = 0; r < N; r++)
+    for (let c = 0; c < N; c++)
+      weights[r][c] = Math.floor(Math.random() * 9) + 1;
+}
+
+function buildCoords() {
+  const cols = document.getElementById('col-labels');
+  const rows = document.getElementById('row-labels');
+  cols.innerHTML = ''; rows.innerHTML = '';
+  'abcdefgh'.split('').forEach(l => {
+    const d = document.createElement('div'); d.className='coord-lbl'; d.textContent=l;
+    cols.appendChild(d);
+  });
+  for (let i=1;i<=8;i++) {
+    const d = document.createElement('div'); d.className='coord-lbl'; d.textContent=i;
+    rows.appendChild(d);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderBoard(queuens_override) {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  const qList = queuens_override || queens;
+
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      const cell = document.createElement('div');
+      const isLight = (r + c) % 2 === 0;
+      cell.className = 'cell ' + (isLight ? 'light' : 'dark');
+      cell.dataset.r = r; cell.dataset.c = c;
+
+      if (blocked[r][c] && !queuens_override) {
+        cell.classList.add('blocked');
+      } else {
+        const hasQueen = qList.some(q => q.r === r && q.c === c);
+        if (hasQueen) {
+          const icon = document.createElement('span');
+          icon.className = 'queen-icon'; icon.textContent = '♛';
+          cell.appendChild(icon);
+          cell.classList.add('no-hover');
+        } else {
+          if (attacked[r][c] && !queuens_override) cell.classList.add('attacked');
+          if (mode === 'weighted' && !queuens_override) {
+            const wv = document.createElement('span');
+            wv.className = 'weight-val'; wv.textContent = weights[r][c];
+            cell.appendChild(wv);
+          }
+          if (!queuens_override) cell.onclick = () => placeQueen(r, c);
+        }
+      }
+
+      board.appendChild(cell);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GAME LOGIC
+// ═══════════════════════════════════════════════
+function computeAttacked() {
+  attacked = Array.from({length:N}, ()=>Array(N).fill(false));
+  queens.forEach(({r, c}) => {
+    for (let i = 0; i < N; i++) {
+      attacked[r][i] = true; // row
+      attacked[i][c] = true; // col
+    }
+    for (let d = -(N-1); d < N; d++) {
+      const rr = r+d, cc = c+d;
+      if (rr>=0&&rr<N&&cc>=0&&cc<N) attacked[rr][cc]=true;
+      const rr2=r+d, cc2=c-d;
+      if (rr2>=0&&rr2<N&&cc2>=0&&cc2<N) attacked[rr2][cc2]=true;
+    }
+  });
+}
+
+function placeQueen(r, c) {
+  if (!gameActive) return;
+  if (blocked[r][c]) { setMsg('Casa bloqueada!', 'err'); return; }
+  if (attacked[r][c]) { setMsg('Casa sob ataque!', 'err'); return; }
+  if (queens.some(q=>q.r===r&&q.c===c)) return;
+
+  const pts = mode === 'weighted' ? weights[r][c] : 0;
+  queens.push({r, c, pts});
+  totalScore += pts;
+  computeAttacked();
+  renderBoard();
+  updateStats();
+
+  if (queens.length === N) {
+    winGame();
+  } else {
+    setMsg(`Rainha em ${String.fromCharCode(97+c)}${r+1}${pts?' (+'+pts+' pts)':''}`, 'ok');
+  }
+}
+
+function undoLast() {
+  if (queens.length === 0) return;
+  const q = queens.pop();
+  totalScore -= (q.pts || 0);
+  computeAttacked();
+  displayQueens = null;
+  document.getElementById('symmetry-panel').style.display = 'none';
+  document.getElementById('sym-grid-wrap').style.display = 'none';
+  document.getElementById('score-box').style.display = 'none';
+  gameActive = true;
+  renderBoard();
+  updateStats();
+  setMsg('Movimento desfeito.', '');
+}
+
+function resetBoard() {
+  initBoard();
+}
+
+function updateStats() {
+  document.getElementById('stat-queens').textContent = queens.length;
+  document.getElementById('stat-remaining').textContent = N - queens.length;
+  if (mode === 'weighted') {
+    document.getElementById('stat-score').textContent = totalScore;
+  }
+}
+
+function setMsg(text, cls) {
+  const el = document.getElementById('message');
+  el.textContent = text; el.className = cls;
+}
+
+// ═══════════════════════════════════════════════
+// WIN
+// ═══════════════════════════════════════════════
+function winGame() {
+  gameActive = false;
+  displayQueens = queens.map(q=>({...q}));
+
+  let msg = '♛ Solução encontrada! As 8 rainhas estão posicionadas.';
+  if (mode === 'weighted') msg += ` Pontuação total: ${totalScore}.`;
+  setMsg(msg, 'win');
+
+  document.getElementById('symmetry-panel').style.display = 'flex';
+
+  if (mode === 'weighted') {
+    const sb = document.getElementById('score-box');
+    sb.style.display = 'block';
+    const sortedQ = [...queens].sort((a,b)=>b.pts-a.pts);
+    sb.innerHTML = `<strong>Resultado Ponderado</strong><br>` +
+      sortedQ.map(q=>`♛ ${String.fromCharCode(97+q.c)}${q.r+1} → <strong>+${q.pts} pts</strong>`).join('<br>') +
+      `<br>━━━━━━━━━<br><strong>Total: ${totalScore} pontos</strong>`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// SYMMETRIES
+// ═══════════════════════════════════════════════
+function applyTransform(qs, kind) {
+  return qs.map(({r, c}) => {
+    if (kind === 'r90')  return { r: c,       c: N-1-r };
+    if (kind === 'r180') return { r: N-1-r,   c: N-1-c };
+    if (kind === 'r270') return { r: N-1-c,   c: r };
+    if (kind === 'fh')   return { r: r,        c: N-1-c };
+    if (kind === 'fv')   return { r: N-1-r,    c: c };
+    if (kind === 'fd')   return { r: c,        c: r };
+    if (kind === 'fad')  return { r: N-1-c,    c: N-1-r };
+    return { r, c };
+  });
+}
+
+function rotateSolution(deg) {
+  if (!displayQueens) return;
+  const kind = {90:'r90',180:'r180',270:'r270'}[deg];
+  displayQueens = applyTransform(displayQueens, kind);
+  // Show on main board (view only)
+  showTransformed(displayQueens, `Rotação ${deg}°`);
+}
+
+function reflectSolution(axis) {
+  if (!displayQueens) return;
+  const kind = axis === 'h' ? 'fh' : 'fv';
+  displayQueens = applyTransform(displayQueens, kind);
+  showTransformed(displayQueens, `Reflexão ${axis === 'h' ? 'Horizontal' : 'Vertical'}`);
+}
+
+function showTransformed(qs, label) {
+  // Temporarily render transformed queens on board without game logic
+  const oldQ = queens;
+  const oldAtk = attacked;
+  attacked = Array.from({length:N},()=>Array(N).fill(false));
+  renderBoard(qs);
+  attacked = oldAtk;
+  setMsg(`Visualizando: ${label}`, 'ok');
+}
+
+function showAllSymmetries() {
+  if (!displayQueens) return;
+  const wrap = document.getElementById('sym-grid-wrap');
+  wrap.style.display = 'block';
+  const grid = document.getElementById('sym-grid');
+  grid.innerHTML = '';
+
+  const transforms = [
+    { key: 'identity', label: 'Original' },
+    { key: 'r90',  label: '↻ 90°' },
+    { key: 'r180', label: '↻ 180°' },
+    { key: 'r270', label: '↻ 270°' },
+    { key: 'fh',   label: '↔ Refl. H' },
+    { key: 'fv',   label: '↕ Refl. V' },
+    { key: 'fd',   label: '⤡ Refl. Diag' },
+    { key: 'fad',  label: '⤢ Refl. Anti' },
+  ];
+
+  transforms.forEach(({key, label}) => {
+    const qs = key === 'identity' ? queens : applyTransform(queens, key);
+    const wrap2 = document.createElement('div');
+
+    const mini = document.createElement('div');
+    mini.className = 'mini-board';
+    for (let r=0;r<N;r++) for (let c=0;c<N;c++) {
+      const mc = document.createElement('div');
+      const isLight = (r+c)%2===0;
+      mc.className = 'mini-cell ' + (isLight?'light':'dark');
+      if (qs.some(q=>q.r===r&&q.c===c)) {
+        mc.innerHTML = '<span class="mini-queen">♛</span>';
+      }
+      mini.appendChild(mc);
+    }
+
+    const lbl = document.createElement('div');
+    lbl.className = 'sym-label'; lbl.textContent = label;
+
+    wrap2.appendChild(mini);
+    wrap2.appendChild(lbl);
+    grid.appendChild(wrap2);
+  });
+
+  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+</script>
+</body>
+</html>
