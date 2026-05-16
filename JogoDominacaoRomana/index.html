@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Dominação Romana - Brasil</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+  }
+
+  body {
+    background: linear-gradient(145deg, #0a0a12 0%, #12121c 100%);
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    padding: 20px;
+  }
+
+  .game-container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    background: rgba(10, 10, 18, 0.75);
+    backdrop-filter: blur(2px);
+    border-radius: 2rem;
+    padding: 1.5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .game-header {
+    text-align: center;
+    margin-bottom: 1.2rem;
+  }
+  .game-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #FFD966, #F4A261, #E76F51);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .sub {
+    font-size: 0.75rem;
+    color: #8e8ea8;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 4px;
+  }
+
+  .dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .map-card {
+    flex: 3;
+    min-width: 500px;
+    background: #0c0c14;
+    border-radius: 1.5rem;
+    border: 1px solid #2a2a38;
+    padding: 16px;
+  }
+  .map-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    background: #d4e6f1;
+    border-radius: 1rem;
+    overflow: visible;
+  }
+  svg {
+    width: 100%;
+    height: auto;
+    background: #d4e6f1;
+    border-radius: 1rem;
+    cursor: pointer;
+  }
+
+  .state {
+    fill: #c8d8e8;
+    stroke: #2c3e50;
+    stroke-width: 0.8;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .state:hover {
+    fill: #e0e8f0;
+    stroke: #F4A261;
+    stroke-width: 1.5;
+  }
+  .state.has-troop {
+    fill: #f0e6d0;
+  }
+
+  .troop-group {
+    cursor: grab;
+    transition: transform 0.1s;
+  }
+  .troop-group:active {
+    cursor: grabbing;
+  }
+  .troop-group.dragging {
+    opacity: 0.6;
+    cursor: grabbing;
+  }
+
+  .state-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 7px;
+    font-weight: 600;
+    fill: #1a2a3a;
+    dominant-baseline: middle;
+    text-anchor: middle;
+    pointer-events: none;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+  }
+
+  .troop-count {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    fill: white;
+    dominant-baseline: middle;
+    text-anchor: middle;
+    pointer-events: none;
+    text-shadow: 0 1px 1px black;
+  }
+
+  .panel {
+    flex: 1.2;
+    min-width: 280px;
+    background: #0c0c14dd;
+    backdrop-filter: blur(12px);
+    border-radius: 1.5rem;
+    border: 1px solid #2a2a3a;
+    padding: 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .objective-box {
+    background: #1a1a28;
+    border-radius: 1rem;
+    padding: 14px;
+    border-left: 4px solid #F4A261;
+  }
+  .objective-box h3 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #F4A261;
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .objective-box p {
+    font-size: 0.8rem;
+    color: #cbd5e6;
+    line-height: 1.4;
+  }
+
+  .stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px dashed #2c2c3e;
+    padding-bottom: 8px;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #a1a1c0;
+  }
+  .stat-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #FFD966;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .troop-preview {
+    background: #1a1a28;
+    border-radius: 1rem;
+    padding: 12px;
+    text-align: center;
+  }
+  .troop-preview h4 {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    margin-bottom: 10px;
+  }
+  .draggable-troop {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #2a2a3a;
+    padding: 10px 20px;
+    border-radius: 60px;
+    cursor: grab;
+    transition: 0.2s;
+    border: 2px solid #F4A261;
+  }
+  .draggable-troop:active {
+    cursor: grabbing;
+  }
+  .draggable-troop span {
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+  }
+
+  .msg-area {
+    background: #16161f;
+    border-radius: 1rem;
+    padding: 12px;
+    text-align: center;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: #cbd5e6;
+  }
+  .reset-btn {
+    background: #1a1a26;
+    border: 1.5px solid #3a3a50;
+    padding: 10px 0;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #e2e2f0;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .reset-btn:hover {
+    background: #F4A26120;
+    border-color: #F4A261;
+    color: #FFD966;
+  }
+
+  .win-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.2s;
+  }
+  .win-modal.show {
+    visibility: visible;
+    opacity: 1;
+  }
+  .win-card {
+    background: linear-gradient(145deg, #181824, #101018);
+    border-radius: 2rem;
+    padding: 1.8rem;
+    text-align: center;
+    border: 1px solid #FFD966;
+    max-width: 360px;
+  }
+  .win-card h2 {
+    font-size: 1.6rem;
+    color: #FFD966;
+  }
+  .win-card button {
+    background: #F4A261;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 60px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 800px) {
+    .map-card { min-width: 350px; }
+    .troop-symbol { width: 20px; height: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="game-container">
+  <div class="game-header">
+    <h1>🪖 DOMINAÇÃO ROMANA · BRASIL</h1>
+    <div class="sub">posicione tropas estratégicas · cada estado sem tropa precisa de um vizinho com DUAS tropas</div>
+  </div>
+
+  <div class="dashboard">
+    <div class="map-card">
+      <div class="map-wrapper">
+        <svg id="brasilSvg" viewBox="0 0 800 700" style="background:#d4e6f1; border-radius:1rem;"></svg>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="objective-box">
+        <h3>🎯 REGRAS DA DOMINAÇÃO ROMANA</h3>
+        <p>✅ Cada estado pode ter 0, 1 ou 2 tropas<br>
+        ✅ Arraste o símbolo ⚔️ para posicionar tropas<br>
+        ✅ Para VITÓRIA: todo estado com 0 tropas deve ter PELO MENOS UM vizinho com 2 tropas<br>
+        ✅ Estados com 1 tropa são neutros (não dominam vizinhos)<br>
+        ✅ Clique em um estado para remover todas as tropas dele</p>
+      </div>
+
+      <div class="stats-list">
+        <div class="stat-item"><span class="stat-label">Estados com 2 tropas</span><span class="stat-number" id="statDouble">0</span></div>
+        <div class="stat-item"><span class="stat-label">Estados com 1 tropa</span><span class="stat-number" id="statSingle">0</span></div>
+        <div class="stat-item"><span class="stat-label">Total de tropas</span><span class="stat-number" id="statTotal">0</span></div>
+        <div class="stat-item"><span class="stat-label">Estados dominados ✓</span><span class="stat-number" id="statCovered">0</span><span class="stat-label">/27</span></div>
+      </div>
+
+      <div class="troop-preview">
+        <h4>⚔️ ARRASTE PARA POSICIONAR</h4>
+        <div id="draggableTroop" class="draggable-troop" draggable="true">
+          <span>⚔️</span>
+          <span style="font-size:0.8rem;">TROPA</span>
+        </div>
+        <div class="sub" style="margin-top:8px;">(até 2 por estado)</div>
+      </div>
+
+      <div class="msg-area" id="messageBox">
+        💡 Arraste o símbolo ⚔️ para cima de um estado
+      </div>
+
+      <button class="reset-btn" id="resetGameBtn">⟳ reiniciar posicionamento</button>
+    </div>
+  </div>
+</div>
+
+<div id="winModal" class="win-modal">
+  <div class="win-card">
+    <h2>🏆 VITÓRIA!</h2>
+    <p>Dominação Romana alcançada!</p>
+    <p id="winStatsMsg" style="margin: 12px 0;"></p>
+    <button id="closeWinBtn">🔁 jogar novamente</button>
+  </div>
+</div>
+
+<script>
+  // ================================================================
+  // DOMINAÇÃO ROMANA - MAPA DO BRASIL
+  // Regra: cada estado sem tropa (0) deve ter pelo menos um vizinho com 2 tropas
+  // ================================================================
+
+  // Dados dos estados (geometria e posições)
+  const statesData = [
+    {id:"RR", cx:270, cy:70, d:"M240,40 L300,35 L320,55 L325,85 L310,110 L275,115 L255,100 L245,75 Z"},
+    {id:"AP", cx:400, cy:65, d:"M370,40 L415,38 L430,60 L425,95 L395,100 L375,85 L370,60 Z"},
+    {id:"AM", cx:200, cy:150, d:"M115,85 L150,75 L195,82 L235,90 L265,108 L285,140 L280,175 L265,210 L225,230 L180,235 L145,220 L115,190 L110,145 Z"},
+    {id:"PA", cx:330, cy:125, d:"M260,82 L305,70 L360,72 L400,90 L405,125 L390,155 L358,175 L328,185 L298,180 L278,165 L268,140 L263,115 Z"},
+    {id:"AC", cx:125, cy:240, d:"M90,218 L120,212 L148,222 L158,245 L152,272 L128,278 L105,268 L90,245 Z"},
+    {id:"RO", cx:190, cy:250, d:"M160,212 L192,206 L218,222 L224,248 L214,275 L188,280 L168,265 L158,242 Z"},
+    {id:"MT", cx:285, cy:260, d:"M228,192 L268,182 L310,192 L340,212 L358,248 L348,285 L322,312 L292,322 L262,312 L240,285 L225,255 L220,222 Z"},
+    {id:"TO", cx:350, cy:195, d:"M312,168 L352,162 L392,172 L412,192 L402,222 L372,232 L342,227 L322,212 L312,192 Z"},
+    {id:"MA", cx:400, cy:165, d:"M362,138 L402,128 L442,138 L462,158 L457,183 L432,198 L402,203 L377,193 L367,173 L362,153 Z"},
+    {id:"PI", cx:448, cy:195, d:"M422,162 L458,152 L495,162 L510,182 L505,208 L485,222 L458,222 L438,212 L428,192 Z"},
+    {id:"CE", cx:478, cy:142, d:"M448,112 L485,105 L525,112 L545,132 L540,157 L515,172 L485,172 L465,162 L455,142 Z"},
+    {id:"RN", cx:538, cy:122, d:"M515,102 L550,97 L575,112 L580,132 L560,142 L540,137 L525,127 L520,112 Z"},
+    {id:"PB", cx:538, cy:162, d:"M518,148 L555,142 L575,158 L570,178 L548,188 L528,183 L518,168 Z"},
+    {id:"PE", cx:518, cy:205, d:"M495,172 L530,167 L560,177 L575,198 L565,218 L545,228 L515,223 L500,208 L490,192 Z"},
+    {id:"AL", cx:532, cy:235, d:"M515,222 L545,217 L560,232 L555,248 L538,253 L525,246 L515,236 Z"},
+    {id:"SE", cx:510, cy:255, d:"M495,238 L525,236 L540,248 L535,263 L515,268 L500,258 Z"},
+    {id:"BA", cx:462, cy:275, d:"M435,208 L475,198 L515,208 L540,228 L545,258 L535,293 L505,318 L475,328 L445,318 L425,293 L415,263 L420,232 Z"},
+    {id:"GO", cx:355, cy:278, d:"M325,232 L368,222 L408,232 L428,258 L425,288 L405,308 L375,313 L350,303 L330,283 L320,258 Z"},
+    {id:"DF", cx:370, cy:293, d:"M360,280 L380,278 L385,290 L383,302 L365,305 L357,295 Z"},
+    {id:"MG", cx:428, cy:345, d:"M395,298 L445,288 L490,303 L510,323 L500,353 L475,373 L445,383 L420,378 L400,363 L385,338 L385,313 Z"},
+    {id:"ES", cx:492, cy:368, d:"M475,338 L510,333 L525,353 L523,376 L505,388 L485,388 L470,373 Z"},
+    {id:"RJ", cx:478, cy:418, d:"M450,388 L485,383 L510,398 L505,418 L485,428 L460,423 L445,408 Z"},
+    {id:"SP", cx:405, cy:428, d:"M375,393 L425,383 L460,393 L470,413 L460,438 L435,453 L405,458 L380,448 L365,428 L365,403 Z"},
+    {id:"MS", cx:315, cy:368, d:"M290,308 L335,298 L375,313 L385,338 L380,368 L360,393 L330,403 L300,398 L280,378 L275,348 L280,323 Z"},
+    {id:"PR", cx:365, cy:463, d:"M345,428 L390,418 L420,433 L425,458 L405,478 L380,488 L350,483 L335,463 L340,443 Z"},
+    {id:"SC", cx:365, cy:513, d:"M340,483 L385,478 L415,493 L420,518 L395,533 L365,538 L340,528 L330,508 Z"},
+    {id:"RS", cx:365, cy:575, d:"M325,533 L370,523 L410,538 L425,568 L410,598 L370,618 L335,608 L310,583 L310,553 Z"}
+  ];
+
+  // Mapa de vizinhanças real
+  const neighborsMap = {
+    "AC": ["AM", "RO"], "AM": ["RR", "PA", "MT", "RO", "AC"], "RR": ["AM", "PA"],
+    "PA": ["AP", "RR", "AM", "MT", "TO", "MA"], "AP": ["PA"], "TO": ["PA", "MA", "PI", "BA", "GO", "MT"],
+    "MA": ["PA", "TO", "PI", "CE"], "PI": ["MA", "CE", "PE", "BA", "TO"], "CE": ["MA", "PI", "RN", "PB", "PE"],
+    "RN": ["CE", "PB"], "PB": ["RN", "CE", "PE", "AL"], "PE": ["PB", "CE", "PI", "BA", "AL", "SE"],
+    "AL": ["PE", "PB", "SE", "BA"], "SE": ["AL", "PE", "BA"], "BA": ["SE", "AL", "PE", "PI", "TO", "GO", "MG", "ES"],
+    "MG": ["BA", "ES", "RJ", "SP", "MS", "GO", "DF"], "ES": ["BA", "MG", "RJ"], "RJ": ["ES", "MG", "SP"],
+    "SP": ["RJ", "MG", "MS", "PR"], "PR": ["SP", "MS", "SC"], "SC": ["PR", "RS"], "RS": ["SC"],
+    "MS": ["MT", "GO", "MG", "SP", "PR"], "MT": ["RO", "AM", "PA", "TO", "GO", "MS"],
+    "GO": ["TO", "BA", "MG", "MS", "MT", "DF"], "DF": ["GO", "MG"], "RO": ["AM", "MT", "AC"]
+  };
+
+  // Estado das tropas: 0, 1 ou 2
+  let troops = {};
+  statesData.forEach(s => { troops[s.id] = 0; });
+
+  // Elementos SVG e drag
+  let currentDragState = null;
+
+  // Nomes bonitos
+  const stateNames = {
+    "AC":"Acre","AL":"Alagoas","AP":"Amapá","AM":"Amazonas","BA":"Bahia","CE":"Ceará","DF":"Distrito Federal",
+    "ES":"Espírito Santo","GO":"Goiás","MA":"Maranhão","MT":"Mato Grosso","MS":"Mato Grosso do Sul","MG":"Minas Gerais",
+    "PA":"Pará","PB":"Paraíba","PR":"Paraná","PE":"Pernambuco","PI":"Piauí","RJ":"Rio de Janeiro","RN":"Rio Grande do Norte",
+    "RS":"Rio Grande do Sul","RO":"Rondônia","RR":"Roraima","SC":"Santa Catarina","SP":"São Paulo","SE":"Sergipe","TO":"Tocantins"
+  };
+
+  // Função para verificar se a dominação está completa
+  function checkVictory() {
+    // Para cada estado com 0 tropas, verificar se tem algum vizinho com 2 tropas
+    let uncovered = [];
+    for (let state of statesData) {
+      if (troops[state.id] === 0) {
+        const neighbors = neighborsMap[state.id] || [];
+        const hasDoubleNeighbor = neighbors.some(nb => troops[nb] === 2);
+        if (!hasDoubleNeighbor) {
+          uncovered.push(state.id);
+        }
+      }
+    }
+    const coveredCount = 27 - uncovered.length;
+    document.getElementById("statCovered").innerText = coveredCount;
+    
+    if (uncovered.length === 0) {
+      // Vitória!
+      const doubleCount = Object.values(troops).filter(v => v === 2).length;
+      const totalTroops = Object.values(troops).reduce((a,b) => a+b, 0);
+      document.getElementById("winStatsMsg").innerHTML = `🎖️ ${doubleCount} estados com 2 tropas<br>📦 ${totalTroops} tropas no total`;
+      document.getElementById("winModal").classList.add("show");
+      return true;
+    }
+    return false;
+  }
+
+  function updateStats() {
+    const doubleCount = Object.values(troops).filter(v => v === 2).length;
+    const singleCount = Object.values(troops).filter(v => v === 1).length;
+    const totalTroops = Object.values(troops).reduce((a,b) => a+b, 0);
+    document.getElementById("statDouble").innerText = doubleCount;
+    document.getElementById("statSingle").innerText = singleCount;
+    document.getElementById("statTotal").innerText = totalTroops;
+    
+    checkVictory();
+  }
+
+  // Atualiza a aparência do estado (cor e ícones das tropas)
+  function updateStateVisual(stateId) {
+    const group = document.getElementById(`state-group-${stateId}`);
+    if (!group) return;
+    
+    // Remove tropas antigas
+    const oldTroops = group.querySelectorAll(".troop-group");
+    oldTroops.forEach(t => t.remove());
+    
+    const count = troops[stateId];
+    const state = statesData.find(s => s.id === stateId);
+    if (!state) return;
+    
+    // Cores de fundo
+    const path = group.querySelector(".state");
+    if (count === 2) {
+      path.setAttribute("fill", "#f0e6d0");
+    } else if (count === 1) {
+      path.setAttribute("fill", "#e0d8c0");
+    } else {
+      path.setAttribute("fill", "#c8d8e8");
+    }
+    
+    // Posiciona os símbolos das tropas
+    const positions = [
+      { dx: -12, dy: -8 },
+      { dx: 12, dy: -8 },
+      { dx: 0, dy: 12 }
+    ];
+    
+    for (let i = 0; i < count; i++) {
+      const pos = positions[i % positions.length];
+      const troopG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      troopG.setAttribute("class", "troop-group");
+      troopG.setAttribute("data-state", stateId);
+      troopG.setAttribute("data-index", i);
+      
+      // Círculo fundo
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", state.cx + pos.dx);
+      circle.setAttribute("cy", state.cy + pos.dy);
+      circle.setAttribute("r", "12");
+      circle.setAttribute("fill", "#8B0000");
+      circle.setAttribute("stroke", "#FFD700");
+      circle.setAttribute("stroke-width", "1.5");
+      
+      // Texto do símbolo militar (⚔️)
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", state.cx + pos.dx);
+      text.setAttribute("y", state.cy + pos.dy + 1);
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("dominant-baseline", "middle");
+      text.setAttribute("font-size", "14");
+      text.setAttribute("fill", "white");
+      text.textContent = "⚔️";
+      
+      troopG.appendChild(circle);
+      troopG.appendChild(text);
+      group.appendChild(troopG);
+    }
+  }
+
+  // Adiciona uma tropa (arrastando)
+  function addTroop(stateId) {
+    if (troops[stateId] >= 2) {
+      document.getElementById("messageBox").innerHTML = `⚠️ ${stateNames[stateId]} já tem 2 tropas (máximo)!`;
+      document.getElementById("messageBox").style.background = "#2a1a22";
+      setTimeout(() => document.getElementById("messageBox").style.background = "#16161f", 1500);
+      return false;
+    }
+    troops[stateId]++;
+    updateStateVisual(stateId);
+    updateStats();
+    const msg = `➕ Tropa adicionada em ${stateNames[stateId]} (agora ${troops[stateId]} tropa${troops[stateId]>1 ? 's' : ''})`;
+    document.getElementById("messageBox").innerHTML = msg;
+    document.getElementById("messageBox").style.background = "#1e2a1e";
+    setTimeout(() => document.getElementById("messageBox").style.background = "#16161f", 1200);
+    return true;
+  }
+
+  // Remove todas as tropas de um estado (clique)
+  function clearState(stateId) {
+    if (troops[stateId] === 0) return;
+    const oldCount = troops[stateId];
+    troops[stateId] = 0;
+    updateStateVisual(stateId);
+    updateStats();
+    document.getElementById("messageBox").innerHTML = `🗑️ Todas as tropas removidas de ${stateNames[stateId]}`;
+    document.getElementById("messageBox").style.background = "#2a2a1e";
+    setTimeout(() => document.getElementById("messageBox").style.background = "#16161f", 1000);
+  }
+
+  // Constroi o mapa SVG
+  function buildMap() {
+    const svg = document.getElementById("brasilSvg");
+    svg.innerHTML = "";
+    
+    // Fundo
+    const bgRect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    bgRect.setAttribute("width","800");
+    bgRect.setAttribute("height","700");
+    bgRect.setAttribute("fill","#d4e6f1");
+    bgRect.setAttribute("rx","8");
+    svg.appendChild(bgRect);
+    
+    statesData.forEach(state => {
+      const group = document.createElementNS("http://www.w3.org/2000/svg","g");
+      group.setAttribute("id", `state-group-${state.id}`);
+      
+      const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+      path.setAttribute("d", state.d);
+      path.setAttribute("class", "state");
+      path.style.fill = "#c8d8e8";
+      path.style.stroke = "#2c3e50";
+      path.style.strokeWidth = "0.8";
+      
+      // Clique no estado = remover tropas
+      path.addEventListener("click", (e) => {
+        e.stopPropagation();
+        clearState(state.id);
+      });
+      
+      // Eventos de drag & drop para adicionar tropas
+      path.addEventListener("dragover", (e) => {
+        e.preventDefault();
+      });
+      
+      path.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        addTroop(state.id);
+      });
+      
+      const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+      text.setAttribute("x", state.cx);
+      text.setAttribute("y", state.cy);
+      text.setAttribute("class", "state-label");
+      text.textContent = state.id;
+      
+      group.appendChild(path);
+      group.appendChild(text);
+      svg.appendChild(group);
+      
+      // Inicializa visual das tropas
+      updateStateVisual(state.id);
+    });
+  }
+
+  // Configura o elemento arrastável (a tropa)
+  function setupDraggable() {
+    const draggable = document.getElementById("draggableTroop");
+    
+    draggable.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", "troop");
+      e.dataTransfer.effectAllowed = "copy";
+      draggable.style.opacity = "0.6";
+    });
+    
+    draggable.addEventListener("dragend", (e) => {
+      draggable.style.opacity = "1";
+    });
+    
+    // Previne comportamento padrão no documento
+    document.body.addEventListener("dragover", (e) => {
+      e.preventDefault();
+    });
+    
+    document.body.addEventListener("drop", (e) => {
+      e.preventDefault();
+    });
+  }
+
+  function resetGame() {
+    statesData.forEach(s => { troops[s.id] = 0; });
+    statesData.forEach(s => updateStateVisual(s.id));
+    updateStats();
+    document.getElementById("messageBox").innerHTML = "🔄 Jogo reiniciado! Arraste ⚔️ para posicionar tropas.";
+    document.getElementById("messageBox").style.background = "#16161f";
+  }
+
+  // Eventos
+  document.getElementById("resetGameBtn").addEventListener("click", resetGame);
+  document.getElementById("closeWinBtn").addEventListener("click", () => {
+    document.getElementById("winModal").classList.remove("show");
+    resetGame();
+  });
+
+  function init() {
+    buildMap();
+    setupDraggable();
+    updateStats();
+  }
+  
+  init();
+</script>
+</body>
+</html>

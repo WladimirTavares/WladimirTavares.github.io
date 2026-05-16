@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Dominação Romana - Brasil Real</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:linear-gradient(145deg,#0a0a12 0%,#12121c 100%);
+  min-height:100vh;
+  font-family:'Inter',sans-serif;
+  padding:20px;
+  color:white;
+}
+
+.game-container{
+  max-width:1400px;
+  margin:auto;
+  background:rgba(10,10,18,.8);
+  border-radius:32px;
+  padding:24px;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 20px 40px rgba(0,0,0,.5);
+}
+
+.game-header{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.game-header h1{
+  font-size:2rem;
+  background:linear-gradient(135deg,#FFD966,#F4A261,#E76F51);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.sub{
+  color:#8e8ea8;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.8rem;
+  margin-top:6px;
+}
+
+.dashboard{
+  display:flex;
+  flex-wrap:wrap;
+  gap:24px;
+}
+
+.map-card{
+  flex:3;
+  min-width:600px;
+  background:#0c0c14;
+  border-radius:24px;
+  padding:18px;
+  border:1px solid #2a2a38;
+}
+
+.map-wrapper{
+  background:#dcebf5;
+  border-radius:18px;
+  overflow:hidden;
+}
+
+svg{
+  width:100%;
+  height:auto;
+  display:block;
+}
+
+.panel{
+  flex:1.1;
+  min-width:280px;
+  background:#0c0c14dd;
+  border-radius:24px;
+  padding:20px;
+  border:1px solid #2a2a3a;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.objective-box{
+  background:#1a1a28;
+  border-left:4px solid #F4A261;
+  padding:16px;
+  border-radius:16px;
+}
+
+.objective-box h3{
+  color:#F4A261;
+  margin-bottom:10px;
+  font-size:.75rem;
+  letter-spacing:1px;
+}
+
+.objective-box p{
+  color:#d5d9ea;
+  line-height:1.5;
+  font-size:.82rem;
+}
+
+.stats-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.stat-item{
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px dashed #2a2a40;
+  padding-bottom:8px;
+}
+
+.stat-label{
+  color:#a8a8c8;
+  font-size:.8rem;
+}
+
+.stat-number{
+  font-size:1.4rem;
+  font-weight:800;
+  color:#FFD966;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.msg-area{
+  background:#16161f;
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.75rem;
+}
+
+.reset-btn{
+  border:none;
+  border-radius:999px;
+  padding:12px;
+  background:#F4A261;
+  color:#111;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.state{
+  fill:#c8d8e8;
+  stroke:#2c3e50;
+  stroke-width:.8;
+  transition:.2s;
+  cursor:pointer;
+}
+
+.state:hover{
+  stroke:#F4A261;
+  stroke-width:1.5;
+}
+
+.state-label{
+  fill:#14202b;
+  font-size:7px;
+  font-weight:700;
+  text-anchor:middle;
+  pointer-events:none;
+}
+
+.troop-circle{
+  fill:#8B0000;
+  stroke:#FFD700;
+  stroke-width:1.5;
+}
+
+.troop-text{
+  fill:white;
+  font-size:13px;
+  text-anchor:middle;
+  dominant-baseline:middle;
+  pointer-events:none;
+}
+
+.loading{
+  padding:40px;
+  text-align:center;
+  color:#FFD966;
+}
+
+.win-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  visibility:hidden;
+  transition:.2s;
+}
+
+.win-modal.show{
+  opacity:1;
+  visibility:visible;
+}
+
+.win-card{
+  background:#181824;
+  padding:32px;
+  border-radius:28px;
+  text-align:center;
+  border:1px solid #FFD966;
+}
+
+.win-card h2{
+  color:#FFD966;
+  margin-bottom:12px;
+}
+
+.win-card button{
+  margin-top:16px;
+  border:none;
+  padding:10px 24px;
+  border-radius:999px;
+  background:#F4A261;
+  font-weight:800;
+  cursor:pointer;
+}
+
+@media(max-width:800px){
+  .map-card{
+    min-width:320px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="game-container">
+
+  <div class="game-header">
+    <h1>🪖 DOMINAÇÃO ROMANA · BRASIL REAL</h1>
+    <div class="sub">mapa geográfico real do Brasil · dados renderizados com D3.js</div>
+  </div>
+
+  <div class="dashboard">
+
+    <div class="map-card">
+      <div class="map-wrapper">
+        <div id="loading" class="loading">🔄 Carregando mapa do Brasil...</div>
+        <svg id="brasilSvg" viewBox="0 0 800 700" style="display:none"></svg>
+      </div>
+    </div>
+
+    <div class="panel">
+
+      <div class="objective-box">
+        <h3>🎯 REGRAS</h3>
+        <p>
+          • Clique em um estado para adicionar tropas.<br>
+          • Cada estado pode possuir 0, 1 ou 2 tropas.<br>
+          • Estados com 0 tropas precisam ter um vizinho com 2 tropas.<br>
+          • Estados com 1 tropa não dominam vizinhos.<br>
+          • Clique repetidamente para alternar entre 0 → 1 → 2 → 0.
+        </p>
+      </div>
+
+      <div class="stats-list">
+        <div class="stat-item"><span class="stat-label">Estados com 2 tropas</span><span class="stat-number" id="doubleCount">0</span></div>
+        <div class="stat-item"><span class="stat-label">Estados com 1 tropa</span><span class="stat-number" id="singleCount">0</span></div>
+        <div class="stat-item"><span class="stat-label">Total de tropas</span><span class="stat-number" id="totalTroops">0</span></div>
+        <div class="stat-item"><span class="stat-label">Estados dominados</span><span class="stat-number" id="coveredCount">0</span></div>
+      </div>
+
+      <div class="msg-area" id="messageBox">
+        💡 Clique em um estado para posicionar tropas.
+      </div>
+
+      <button class="reset-btn" id="resetBtn">⟳ Reiniciar</button>
+
+    </div>
+  </div>
+</div>
+
+<div class="win-modal" id="winModal">
+  <div class="win-card">
+    <h2>🏆 Vitória!</h2>
+    <p>Todos os estados estão dominados.</p>
+    <div id="winStats"></div>
+    <button id="closeWin">🔁 Jogar novamente</button>
+  </div>
+</div>
+
+<script>
+const neighborsMap = {
+  "AC": ["AM", "RO"],
+  "AM": ["RR", "PA", "MT", "RO", "AC", "TO"],
+  "RR": ["AM", "PA"],
+  "PA": ["AP", "RR", "AM", "MT", "TO", "MA"],
+  "AP": ["PA"],
+  "TO": ["PA", "MA", "PI", "BA", "GO", "MT"],
+  "MA": ["PA", "TO", "PI", "CE"],
+  "PI": ["MA", "CE", "PE", "BA", "TO"],
+  "CE": ["MA", "PI", "RN", "PB", "PE"],
+  "RN": ["CE", "PB"],
+  "PB": ["RN", "CE", "PE", "AL"],
+  "PE": ["PB", "CE", "PI", "BA", "AL", "SE"],
+  "AL": ["PE", "PB", "SE", "BA"],
+  "SE": ["AL", "PE", "BA"],
+  "BA": ["SE", "AL", "PE", "PI", "TO", "GO", "MG", "ES"],
+  "MG": ["BA", "ES", "RJ", "SP", "MS", "GO", "DF"],
+  "ES": ["BA", "MG", "RJ"],
+  "RJ": ["ES", "MG", "SP"],
+  "SP": ["RJ", "MG", "MS", "PR"],
+  "PR": ["SP", "MS", "SC"],
+  "SC": ["PR", "RS"],
+  "RS": ["SC"],
+  "MS": ["MT", "GO", "MG", "SP", "PR"],
+  "MT": ["RO", "AM", "PA", "TO", "GO", "MS"],
+  "GO": ["TO", "BA", "MG", "MS", "MT", "DF"],
+  "DF": ["GO", "MG"],
+  "RO": ["AM", "MT", "AC"]
+};
+
+const stateNames = {
+  "AC":"Acre","AL":"Alagoas","AP":"Amapá","AM":"Amazonas","BA":"Bahia","CE":"Ceará",
+  "DF":"Distrito Federal","ES":"Espírito Santo","GO":"Goiás","MA":"Maranhão",
+  "MT":"Mato Grosso","MS":"Mato Grosso do Sul","MG":"Minas Gerais","PA":"Pará",
+  "PB":"Paraíba","PR":"Paraná","PE":"Pernambuco","PI":"Piauí","RJ":"Rio de Janeiro",
+  "RN":"Rio Grande do Norte","RS":"Rio Grande do Sul","RO":"Rondônia","RR":"Roraima",
+  "SC":"Santa Catarina","SP":"São Paulo","SE":"Sergipe","TO":"Tocantins"
+};
+
+let troops = {};
+let currentStates = [];
+
+function initializeTroops(){
+  troops = {};
+  currentStates.forEach(s => troops[s.id] = 0);
+}
+
+function updateStats(){
+  const doubleCount = Object.values(troops).filter(v => v === 2).length;
+  const singleCount = Object.values(troops).filter(v => v === 1).length;
+  const totalTroops = Object.values(troops).reduce((a,b)=>a+b,0);
+
+  let covered = 0;
+
+  for(const state of currentStates){
+    if(isCovered(state.id)) covered++;
+  }
+
+  document.getElementById('doubleCount').innerText = doubleCount;
+  document.getElementById('singleCount').innerText = singleCount;
+  document.getElementById('totalTroops').innerText = totalTroops;
+  document.getElementById('coveredCount').innerText = covered + '/27';
+
+  if(covered === 27){
+    document.getElementById('winStats').innerHTML = `⚔️ ${totalTroops} tropas totais`;
+    document.getElementById('winModal').classList.add('show');
+  }
+}
+
+function isCovered(stateId){
+  if(troops[stateId] > 0) return true;
+  return neighborsMap[stateId].some(nb => troops[nb] === 2);
+}
+
+function troopColor(value){
+  if(value === 2) return '#f0d8a8';
+  if(value === 1) return '#e6e1c6';
+  return '#c8d8e8';
+}
+
+function updateVisual(stateId){
+  const path = document.getElementById(`state-${stateId}`);
+  path.style.fill = troopColor(troops[stateId]);
+
+  d3.select(`#troops-${stateId}`).remove();
+
+  const centroid = JSON.parse(path.dataset.centroid);
+
+  const group = d3.select('#brasilSvg')
+    .append('g')
+    .attr('id', `troops-${stateId}`);
+
+  const positions = [
+    [-10,-8],
+    [10,-8]
+  ];
+
+  for(let i=0;i<troops[stateId];i++){
+    group.append('circle')
+      .attr('cx', centroid[0] + positions[i][0])
+      .attr('cy', centroid[1] + positions[i][1])
+      .attr('r', 12)
+      .attr('class','troop-circle');
+
+    group.append('text')
+      .attr('x', centroid[0] + positions[i][0])
+      .attr('y', centroid[1] + positions[i][1] + 1)
+      .attr('class','troop-text')
+      .text('⚔');
+  }
+}
+
+function handleStateClick(stateId){
+  troops[stateId] = (troops[stateId] + 1) % 3;
+
+  updateVisual(stateId);
+  updateStats();
+
+  document.getElementById('messageBox').innerHTML =
+    `🗺️ ${stateNames[stateId]} → ${troops[stateId]} tropa(s)`;
+}
+
+async function loadMap(){
+  try{
+    const url = 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson';
+
+    const response = await fetch(url);
+    const geoJson = await response.json();
+
+    const projection = d3.geoMercator()
+      .center([-55,-14])
+      .scale(600)
+      .translate([400,350]);
+
+    const path = d3.geoPath().projection(projection);
+
+    currentStates = geoJson.features
+      .map(f => ({
+        id:f.properties.sigla || f.properties.UF || f.properties.uf,
+        geometry:f.geometry
+      }))
+      .filter(s => s.id && s.id.length === 2);
+
+    initializeTroops();
+
+    const svg = d3.select('#brasilSvg');
+    svg.style('display','block');
+
+    document.getElementById('loading').style.display = 'none';
+
+    svg.append('rect')
+      .attr('width',800)
+      .attr('height',700)
+      .attr('fill','#dcebf5');
+
+    currentStates.forEach(state => {
+      const pathData = path(state.geometry);
+      const centroid = path.centroid(state.geometry);
+
+      const group = svg.append('g');
+
+      group.append('path')
+        .attr('d', pathData)
+        .attr('id', `state-${state.id}`)
+        .attr('class','state')
+        .attr('data-centroid', JSON.stringify(centroid))
+        .on('click', () => handleStateClick(state.id));
+
+      group.append('text')
+        .attr('x', centroid[0])
+        .attr('y', centroid[1])
+        .attr('class','state-label')
+        .text(state.id);
+    });
+
+    updateStats();
+
+  }catch(error){
+    console.error(error);
+    document.getElementById('loading').innerHTML = '❌ Erro ao carregar mapa.';
+  }
+}
+
+function resetGame(){
+  initializeTroops();
+
+  currentStates.forEach(s => {
+    updateVisual(s.id);
+  });
+
+  updateStats();
+
+  document.getElementById('messageBox').innerHTML =
+    '🔄 Jogo reiniciado!';
+}
+
+
+document.getElementById('resetBtn').addEventListener('click', resetGame);
+
+document.getElementById('closeWin').addEventListener('click', () => {
+  document.getElementById('winModal').classList.remove('show');
+  resetGame();
+});
+
+loadMap();
+</script>
+
+</body>
+</html>
