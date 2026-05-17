@@ -4,83 +4,306 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jogos de Raciocínio e Computação</title>
-
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #ffffff;
+      --bg2: #f8f9fb;
+      --bg3: #f1f3f6;
+      --border: rgba(0,0,0,0.08);
+      --border-hover: rgba(0,0,0,0.15);
+      --text: #1a1d27;
+      --muted: #5a6378;
+      --faint: #9aa0b4;
+
+      --c-ini:   #22c55e;
+      --c-ini-bg: rgba(34,197,94,0.10);
+      --c-ini-border: rgba(34,197,94,0.25);
+
+      --c-int:   #3b82f6;
+      --c-int-bg: rgba(59,130,246,0.10);
+      --c-int-border: rgba(59,130,246,0.25);
+
+      --c-ava:   #f59e0b;
+      --c-ava-bg: rgba(245,158,11,0.10);
+      --c-ava-border: rgba(245,158,11,0.25);
+
+      --c-exp:   #ef4444;
+      --c-exp-bg: rgba(239,68,68,0.10);
+      --c-exp-border: rgba(239,68,68,0.25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-      color: #333;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      min-height: 100vh;
     }
 
+    /* ── HEADER ── */
     header {
-      background: #1e3a8a;
-      color: white;
-      padding: 30px;
+      position: relative;
+      padding: 64px 32px 56px;
       text-align: center;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
     }
-
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 20% 50%, rgba(59,130,246,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 80% 40%, rgba(245,158,11,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
     header h1 {
-      margin: 0;
-      font-size: 2.2rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      letter-spacing: -0.02em;
+      color: #1a1d27; 
+      /*color: #fff;*/
+      margin-bottom: 12px;
+    }
+    header p {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto;
     }
 
+    /* ── LEGEND / FILTER BAR ── */
+    .controls {
+      max-width: 1100px;
+      margin: 32px auto 0;
+      padding: 0 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .controls-label {
+      font-size: 12px;
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-right: 4px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--muted);
+      transition: all .18s;
+    }
+    .chip:hover { border-color: var(--border-hover); color: var(--text); }
+    .chip.active { color: #fff; }
+    .chip[data-f="all"].active        { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.08); }
+    .chip[data-f="iniciante"].active  { border-color: var(--c-ini-border); background: var(--c-ini-bg); color: var(--c-ini); }
+    .chip[data-f="intermediario"].active { border-color: var(--c-int-border); background: var(--c-int-bg); color: var(--c-int); }
+    .chip[data-f="avancado"].active   { border-color: var(--c-ava-border); background: var(--c-ava-bg); color: var(--c-ava); }
+    .chip[data-f="expert"].active     { border-color: var(--c-exp-border); background: var(--c-exp-bg); color: var(--c-exp); }
+    .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      max-width: 1100px;
+      margin: 40px auto 16px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .section-header[data-level="iniciante"]   { display: none; }
+    .section-header[data-level="intermediario"] { display: none; }
+    .section-header[data-level="avancado"]    { display: none; }
+    .section-header[data-level="expert"]      { display: none; }
+
+    .sh-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .sh-badge.ini  { background: var(--c-ini-bg);  color: var(--c-ini);  border: 1px solid var(--c-ini-border); }
+    .sh-badge.int  { background: var(--c-int-bg);  color: var(--c-int);  border: 1px solid var(--c-int-border); }
+    .sh-badge.ava  { background: var(--c-ava-bg);  color: var(--c-ava);  border: 1px solid var(--c-ava-border); }
+    .sh-badge.exp  { background: var(--c-exp-bg);  color: var(--c-exp);  border: 1px solid var(--c-exp-border); }
+    .sh-line { flex: 1; height: 1px; background: var(--border); }
+    .sh-count { font-size: 12px; color: var(--faint); }
+
+    /* ── GRID ── */
     .container {
       max-width: 1100px;
-      margin: auto;
-      padding: 30px 20px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 16px;
     }
 
+    /* ── CARD ── */
     .card {
-      background: white;
-      border-radius: 12px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
       padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: transform 0.2s;
+      display: flex;
+      flex-direction: column;
+      transition: border-color .2s, transform .2s, background .2s;
+      position: relative;
+      overflow: hidden;
     }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 14px 14px 0 0;
+    }
+    .card[data-level="iniciante"]::before    { background: var(--c-ini); }
+    .card[data-level="intermediario"]::before{ background: var(--c-int); }
+    .card[data-level="avancado"]::before     { background: var(--c-ava); }
+    .card[data-level="expert"]::before       { background: var(--c-exp); }
 
     .card:hover {
-      transform: translateY(-3px);
+      border-color: var(--border-hover);
+      background: var(--bg3);
+      transform: translateY(-2px);
     }
 
+    /* meta row */
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .badge-level { font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 0.03em; }
+    .badge.ini  { background: var(--c-ini-bg);  color: var(--c-ini);  border: 1px solid var(--c-ini-border); }
+    .badge.int  { background: var(--c-int-bg);  color: var(--c-int);  border: 1px solid var(--c-int-border); }
+    .badge.ava  { background: var(--c-ava-bg);  color: var(--c-ava);  border: 1px solid var(--c-ava-border); }
+    .badge.exp  { background: var(--c-exp-bg);  color: var(--c-exp);  border: 1px solid var(--c-exp-border); }
+    .badge.age  { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+
+    /* stars */
+    .stars { display: flex; gap: 3px; align-items: center; margin-left: 2px; }
+    .star  { width: 7px; height: 7px; border-radius: 1px; background: var(--border-hover); }
+    .star.on { }
+    .card[data-level="iniciante"]    .star.on { background: var(--c-ini); }
+    .card[data-level="intermediario"] .star.on { background: var(--c-int); }
+    .card[data-level="avancado"]     .star.on { background: var(--c-ava); }
+    .card[data-level="expert"]       .star.on { background: var(--c-exp); }
+
     .card h2 {
-      margin-top: 0;
-      color: #1e3a8a;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      /*color: #fff;*/
+      color: #1a1d27;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .card-concept {
+      font-size: 11.5px;
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 500;
+      margin-bottom: 12px;
     }
 
     .card p {
-      margin-bottom: 16px;
-      text-align: justify;
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 10px;
+    }
+    .card p:last-of-type { margin-bottom: 0; }
+
+    .card ul {
+      margin: 8px 0 10px 0;
+      padding-left: 18px;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+    .card ul li { margin-bottom: 3px; }
+
+    /* age tooltip note */
+    .age-note {
+      font-size: 12px;
+      color: var(--faint);
+      font-style: italic;
+      margin-top: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
     }
 
+    /* button */
+    .btn-wrap { margin-top: auto; padding-top: 20px; }
     .btn {
       display: inline-block;
-      background: #2563eb;
-      color: white;
-      padding: 10px 18px;
+      padding: 10px 20px;
       border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
       text-decoration: none;
-      font-weight: bold;
-      transition: background 0.2s;
+      transition: opacity .18s, transform .18s;
+      border: 1px solid;
     }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .card[data-level="iniciante"]    .btn { background: var(--c-ini-bg);  color: var(--c-ini);  border-color: var(--c-ini-border); }
+    .card[data-level="intermediario"] .btn { background: var(--c-int-bg);  color: var(--c-int);  border-color: var(--c-int-border); }
+    .card[data-level="avancado"]     .btn { background: var(--c-ava-bg);  color: var(--c-ava);  border-color: var(--c-ava-border); }
+    .card[data-level="expert"]       .btn { background: var(--c-exp-bg);  color: var(--c-exp);  border-color: var(--c-exp-border); }
 
-    .btn:hover {
-      background: #1d4ed8;
-    }
+    .card.hidden { display: none; }
 
+    /* ── FOOTER ── */
     footer {
       text-align: center;
-      padding: 20px;
-      background: #e5e7eb;
-      margin-top: 40px;
-      font-size: 0.9rem;
+      padding: 24px;
+      font-size: 12px;
+      color: var(--faint);
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 40px 20px 36px; }
+      .controls, .section-header { padding: 0 16px; }
+      .container { padding: 0 16px 48px; grid-template-columns: 1fr; }
     }
   </style>
 </head>
-
 <body>
 
 <header>
@@ -88,405 +311,298 @@
   <p>Explore desafios interativos de lógica, matemática, algoritmos e estratégia.</p>
 </header>
 
-<div class="container">
-
-  <div class="card">
-    <h2>Jogo: Encontre o Maior</h2>
-    <p>
-      Neste jogo, você irá exercitar o sequenciamento de comandos e desvios condicionais
-      para resolver um desafio de lógica de forma divertida e interativa.
-    </p>
-    <p>
-      Seu objetivo será descobrir o maior valor fazendo comparações estratégicas entre as cartas.
-    </p>
-    <a class="btn" href="https://wladimirtavares.github.io/maiorNumero/index.html" target="_blank">
-      Jogar
-    </a>
-  </div>
-
-  <div class="card">
-    <h2>Descubra o número</h2>
-	<p> 
-    Neste jogo, seu desafio é descobrir um número secreto entre 1 e 100 fazendo palpites estratégicos.
-    </p>
-    <p>
-    A cada tentativa com um número X, você receberá uma das seguintes pistas:
-    </p>
-   <ul>
-   <li> X é maior que o número secreto;
-   <li>X é menor que o número secreto.
-   </ul>
-   <p>
-   Use as respostas para reduzir as possibilidades e encontrar o número secreto o mais rápido possível.
-   </p>
-
-   <p>
-   Será que você consegue descobrir o número secreto usando menos de 7 palpites?    
-   </p>
-    <a class="btn" href="https://wladimirtavares.github.io/GuessingNumber/index.html" target="_blank">
-      Jogar
-    </a>
-  </div>	
-
-  <div class="card">
-    <h2>Experimento de Wason</h2>
-    <p>
-      O psicólogo Peter Wason propôs dois experimentos clássicos para investigar como as pessoas
-      raciocinam diante de regras condicionais do tipo “se... então...”.
-    </p>
-    <p>
-      No primeiro experimento, apresentado de forma abstrata, menos de 10% das pessoas conseguem
-      identificar corretamente a solução lógica. Já no segundo, formulado em um contexto mais concreto
-      e próximo do cotidiano, a taxa de acerto costuma ultrapassar 60%.
-    </p>
-    <p><strong>Tente você também!</strong></p>
-
-    <a class="btn" href="https://wladimirtavares.github.io/ExperimentoWason/index.html" target="_blank">
-      Jogar
-    </a>
-  </div>
-
-<div class="card">
-
-<h2>Jogo da 8 rainhas</h2>
-    
-
-<p>
-Neste jogo, você irá explorar um dos quebra-cabeças mais famosos da Matemática e da Computação.
-</p>
-
-<p>
-O desafio é posicionar 8 rainhas em um tabuleiro de xadrez de forma que nenhuma ataque outra.
-</p>
-
-<p>
-Uma rainha pode atacar:
-</p>
-
-<ul>
-<li> toda a sua linha;
-<li> toda a sua coluna;
-<li>e também as duas diagonais.
-</ul>
-
-
-<p>
-Sua missão é encontrar uma configuração válida colocando uma rainha por vez.
-</p>
-
-<p>
-Quando perceber que um caminho não leva à solução, será necessário voltar, desfazer jogadas e tentar novas possibilidades — exatamente como fazem muitos algoritmos utilizados na Computação para resolver problemas complexos.
-</p>
-
-<p>
-Durante a experiência, você irá exercitar habilidades como:
-</p>
-
-<ul>
-<li>raciocínio lógico;
-<li>planejamento de estratégias;
-<li>reconhecimento de padrões;
-<li>tentativa e erro inteligente;
-<li>resolução sistemática de problemas.
-</ul>
-
-<p>
-Depois de dominar o desafio clássico, experimente também:
-</p>
-
-<ul>
-<li> Versão com casas bloqueadas: algumas posições do tabuleiro não podem ser utilizadas;
-<li> Versão ponderada: cada casa possui um valor, e o objetivo passa a ser encontrar soluções de maior pontuação.
-</ul>
-
-<p>
-Será que você consegue encontrar todas as soluções possíveis?
-</p>
-    
-
-    <a class="btn" href="https://wladimirtavares.github.io/ProblemaOitoRainhas/index.html" target="_blank">
-      Jogar
-    </a>
+<!-- FILTER BAR -->
+<div class="controls">
+  <span class="controls-label">Filtrar:</span>
+  <button class="chip active" data-f="all" onclick="filterCards('all',this)">Todos os jogos</button>
+  <button class="chip" data-f="iniciante" onclick="filterCards('iniciante',this)">
+    <span class="chip-dot" style="background:var(--c-ini)"></span> Iniciante
+  </button>
+  <button class="chip" data-f="intermediario" onclick="filterCards('intermediario',this)">
+    <span class="chip-dot" style="background:var(--c-int)"></span> Intermediário
+  </button>
+  <button class="chip" data-f="avancado" onclick="filterCards('avancado',this)">
+    <span class="chip-dot" style="background:var(--c-ava)"></span> Avançado
+  </button>
+  <button class="chip" data-f="expert" onclick="filterCards('expert',this)">
+    <span class="chip-dot" style="background:var(--c-exp)"></span> Expert
+  </button>
 </div>
-	
-<div class="card">
-<h2>Coloração de Mapas</h2>
-<p>
-Neste jogo, seu desafio é colorir o mapa do Brasil utilizando o menor número possível de cores, garantindo que estados vizinhos nunca recebam a mesma cor.
-</p>
-<p>
-Embora pareça simples, esse desafio está ligado a um dos problemas mais famosos e importantes da Matemática e da Ciência da Computação: o Problema das Quatro Cores. Ele surgiu em 1852, quando o matemático Francis Guthrie percebeu, ao colorir mapas da Inglaterra, que parecia ser possível colorir qualquer mapa usando apenas quatro cores sem que regiões adjacentes compartilhassem a mesma cor.
-</p>
-<p>
-A partir dessa observação, surgiu uma grande pergunta:
-</p>
 
-<p>
-Será que quatro cores sempre são suficientes para colorir qualquer mapa?
-</p>
+<!-- SECTION: INICIANTE -->
+<div class="section-header" data-level="iniciante" id="sec-iniciante">
+  <span class="sh-badge ini">⭐ Iniciante</span>
+  <span class="sh-line"></span>
+  <span class="sh-count">2 jogos</span>
+</div>
+<div class="container" id="grid-iniciante">
 
-<p>
-Durante mais de 120 anos, matemáticos do mundo inteiro tentaram resolver esse problema. Diversas provas foram propostas, mas algumas continham erros que só foram descobertos anos depois. O problema se tornou tão famoso que ajudou a impulsionar o desenvolvimento da Teoria dos Grafos, área da matemática que estuda relações e conexões entre objetos.
-</p>
+  <div class="card" data-level="iniciante">
+    <div class="card-meta">
+      <span class="badge badge-level ini">⭐ Iniciante</span>
+      <span class="badge age">👤 8+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star"></span><span class="star"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Sequenciamento · Comparação</div>
+    <h2>Encontre o Maior</h2>
+    <p>Exercite sequenciamento de comandos e desvios condicionais para resolver um desafio de lógica de forma divertida e interativa.</p>
+    <p>Seu objetivo é descobrir o maior valor fazendo comparações estratégicas entre as cartas.</p>
+    <p class="age-note">Comparar dois valores é intuitivo — sem abstração além do cotidiano. Ideal para primeiros contatos com lógica computacional.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/maiorNumero/index.html" target="_blank">Jogar →</a>
+    </div>
+  </div>
 
-<p>
-Finalmente, em 1976, Kenneth Appel e Wolfgang Haken apresentaram uma demonstração utilizando computadores para analisar milhares de configurações possíveis de mapas. Foi a primeira grande prova matemática da história fortemente baseada em computação, gerando debates sobre o papel dos computadores na matemática. 
-</p>
+  <div class="card" data-level="iniciante">
+    <div class="card-meta">
+      <span class="badge badge-level ini">⭐ Iniciante</span>
+      <span class="badge age">👤 9+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star"></span><span class="star"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Busca Binária</div>
+    <h2>Descubra o Número</h2>
+    <p>Descubra um número secreto entre 1 e 100 fazendo palpites estratégicos. A cada tentativa você recebe uma pista: o segredo é maior ou menor?</p>
+    <p>Use as respostas para reduzir as possibilidades e encontrar o número com o menor número de palpites. Consegue descobrir em menos de 7?</p>
+    <p class="age-note">Requer noção de intervalo numérico e capacidade de reduzir possibilidades — raciocínio que surge naturalmente por volta dos 9 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/GuessingNumber/index.html" target="_blank">Jogar →</a>
+    </div>
+  </div>
 
+</div>
 
-<p>
-Neste jogo, utilizamos uma estratégia conhecida como algoritmo guloso: cada novo estado é colorido com a primeira cor disponível que não entre em conflito com seus vizinhos já coloridos.
-</p>
+<!-- SECTION: INTERMEDIÁRIO -->
+<div class="section-header" data-level="intermediario" id="sec-intermediario">
+  <span class="sh-badge int">⭐⭐ Intermediário</span>
+  <span class="sh-line"></span>
+  <span class="sh-count">5 jogos</span>
+</div>
+<div class="container" id="grid-intermediario">
 
-<p>
-Mas existe um detalhe importante: a ordem em que os estados são escolhidos pode alterar bastante o resultado. Em algumas ordens, poucas cores são necessárias; em outras, o algoritmo pode usar mais cores do que o necessário.
-</p>
+  <div class="card" data-level="intermediario">
+    <div class="card-meta">
+      <span class="badge badge-level int">⭐⭐ Intermediário</span>
+      <span class="badge age">👤 10+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Divisão e Conquista</div>
+    <h2>Bolinha Mais Pesada</h2>
+    <p>Uma das bolinhas é mais pesada que as demais. Descubra qual usando apenas uma balança de comparação — com o menor número possível de pesagens.</p>
+    <p>Ao longo do jogo você exercitará estratégias de divisão de casos e tomada de decisão para resolver o problema de forma eficiente.</p>
+    <p class="age-note">A estratégia de dividir em grupos exige raciocínio combinatório emergente — desafiador e acessível a partir dos 10 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/BolinhaMaisPesada/index.html" target="_blank">Jogar →</a>
+    </div>
+  </div>
 
-
-   <a class="btn" href="https://wladimirtavares.github.io/JogoColoracao/index.html" target="_blank">
-      Jogar
-    </a>
-  </div> 
-
-  <div class="card">
-<h2>Dominação Romana</h2>
-
-<p>
-  Neste jogo, seu desafio é defender o Brasil posicionando o menor número possível de tropas nos estados do mapa.
-</p>
-<p>
-Cada estado pode ficar em uma destas situações:
-
-<ul>
-<li> sem tropas;
-<li>com uma tropa;
-<li>ou com duas tropas.
-</ul>
-
-<p>
-Porém, existe uma regra importante: todo estado que estiver sem tropas deve ser vizinho de pelo menos um estado com duas tropas, garantindo que ele possa ser rapidamente protegido em caso de ataque.
-</p>
-
-<p>
-Esse desafio é inspirado no Problema da Dominação Romana, um famoso problema da Teoria dos Grafos. A ideia surgiu a partir da estratégia de defesa do Império Romano, que precisava distribuir suas legiões de forma eficiente para proteger territórios muito extensos sem desperdiçar soldados.
-</p>
-
-<p>
-Agora é a sua vez:
-</p>
-
-<p>
-Quantas tropas são necessárias para defender o Brasil?
-</p>
-
-<p>
-Teste estratégias, mova as tropas e descubra a melhor solução possível!
-</p>
-
-   <a class="btn" href="https://wladimirtavares.github.io/JogoDominacaoRomana/index3.html" target="_blank">
-      Jogar
-    </a>
-  </div> 
-
-
-
-  <div class="card">
+  <div class="card" data-level="intermediario">
+    <div class="card-meta">
+      <span class="badge badge-level int">⭐⭐ Intermediário</span>
+      <span class="badge age">👤 11+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Busca · Divisibilidade</div>
     <h2>Jogo da Fatoração</h2>
-    <p>
-      Neste jogo, sua missão é descobrir um número secreto entre 1 e 100.
-    </p>
-    <p>
-      Para isso, você pode fazer perguntas do tipo:
-      <em>“O número x divide o número secreto?”</em>
-    </p>
-    <p>
-      A partir das respostas, você deverá analisar possibilidades, eliminar números
-      e usar estratégias para encontrar o segredo com o menor número possível de perguntas.
-    </p>
-
-    <a class="btn" href="https://wladimirtavares.github.io/JogoFatoracao/index.html" target="_blank">
-      Jogar
-    </a>
+    <p>Sua missão é descobrir um número secreto entre 1 e 100. Para isso, você faz perguntas do tipo: <em>"O número x divide o número secreto?"</em></p>
+    <p>Analise as possibilidades, elimine candidatos e use estratégias para encontrar o segredo com o menor número possível de perguntas.</p>
+    <p class="age-note">Pressupõe noção de divisibilidade e números primos — tópicos do 6º ano. Ideal a partir dos 11 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/JogoFatoracao/index.html" target="_blank">Jogar →</a>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>Jogo da Bolinha Mais Pesada</h2>
-    <p>
-      Uma das bolinhas é mais pesada que as demais.
-      Seu desafio é descobrir qual delas é usando apenas uma balança de comparação.
-    </p>
-    <p>
-      Mas cuidado: cada pesagem é importante!
-      Tente encontrar a bolinha mais pesada utilizando o menor número possível de pesagens.
-    </p>
-    <p>
-      Ao longo do jogo, você irá exercitar estratégias de divisão de casos
-      e tomada de decisão para resolver o problema de forma eficiente.
-    </p>
-
-    <a class="btn" href="https://wladimirtavares.github.io/BolinhaMaisPesada/index.html" target="_blank">
-      Jogar
-    </a>
-  </div>
-
-  <div class="card">
-    <h2>Jogo da Celebridade</h2>
-    <p>
-      Neste jogo, seu desafio é descobrir se existe uma celebridade em uma festa.
-    </p>
-
-    <p>Uma celebridade é uma pessoa que:</p>
-
-    <ul>
-      <li>é conhecida por todos;</li>
-      <li>mas não conhece ninguém da festa.</li>
-    </ul>
-
-    <p>
-      Para investigar, você pode fazer perguntas do tipo:
-      <em>“A conhece B?”</em>
-    </p>
-
-    <p>
-      Seu objetivo é identificar a celebridade — ou concluir que ela não existe —
-      usando o menor número possível de perguntas.
-    </p>
-
-    <p>
-      Você possui no máximo <strong>3(n−1)</strong> perguntas para resolver o desafio com certeza.
-    </p>
-
-    <p>
-      Ao longo do jogo, você irá exercitar estratégias de eliminação,
-      divisão de problemas e tomada de decisão.
-    </p>
-
-    <a class="btn" href="https://wladimirtavares.github.io/JogoCelebridade/index.html" target="_blank">
-      Jogar
-    </a>
-  </div>
-
-  <div class="card">
-    <h2>Cobertura com Triminós</h2>
-
-    <p>
-      Um tabuleiro 2ⁿ×2ⁿ possui uma única célula removida.
-      Seu desafio é cobrir todo o restante do tabuleiro utilizando apenas peças
-      em formato de L, chamadas triminós.
-    </p>
-
-    <p>
-      Mas existe um detalhe importante:
-      você deve encontrar uma estratégia inteligente que resolva o problema
-      sem usar tentativa e erro.
-    </p>
-
-    <p>
-      Ao longo do jogo, você poderá exercitar a habilidade de decompor
-      um grande problema em problemas menores e semelhantes.
-    </p>
-
-    <p><strong>Será que você consegue completar o tabuleiro?</strong></p>
-
-    <a class="btn" href="https://wladimirtavares.github.io/JogoTrimino/index.html" target="_blank">
-      Jogar
-    </a>
-  </div>
-
-  <div class="card">
+  <div class="card" data-level="intermediario">
+    <div class="card-meta">
+      <span class="badge badge-level int">⭐⭐ Intermediário</span>
+      <span class="badge age">👤 11+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Grafos · Disseminação</div>
     <h2>Problema da Fofoca</h2>
-
-    <p>
-      Imagine um grupo com N pessoas.
-      Cada pessoa conhece inicialmente apenas um segredo diferente.
-    </p>
-
-    <p>
-      Sempre que duas pessoas conversam por telefone,
-      elas compartilham entre si todas as fofocas que conhecem naquele momento.
-    </p>
-
-    <p>
-      Assim, ao final da ligação, as duas passam a saber exatamente os mesmos segredos.
-    </p>
-
-    <p>
-      Por exemplo, com 5 pessoas é possível fazer com que todos descubram
-      todos os segredos usando apenas 6 ligações.
-    </p>
-
-    <p>
-      Seu desafio é descobrir estratégias eficientes para espalhar informações
-      o mais rápido possível.
-    </p>
-
-    <p><strong>Teste sua lógica e descubra se você é um verdadeiro mestre da fofoca!</strong></p>
-
-    <a class="btn" href="https://wladimirtavares.github.io/problemaFofoca/index.html" target="_blank">
-      Jogar
-    </a>
+    <p>Imagine N pessoas, cada uma com um segredo diferente. Quando duas conversam, compartilham tudo o que sabem. Com 5 pessoas, é possível espalhar todos os segredos em apenas 6 ligações.</p>
+    <p>Seu desafio é descobrir estratégias eficientes para espalhar informações o mais rápido possível.</p>
+    <p class="age-note">O contexto é familiar e lúdico; a estrutura de grafo emerge naturalmente. Acessível a partir dos 11 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/problemaFofoca/index.html" target="_blank">Jogar →</a>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>Jogo do Grafo Conexo</h2>
-
-    <p>
-      Um grafo secreto com 5 vértices foi gerado pelo computador.
-      Seu desafio é descobrir se esse grafo é conexo ou não.
-    </p>
-
-    <p>
-      Para investigar a estrutura do grafo, você pode fazer perguntas do tipo:
-      <em>“Existe uma aresta entre os vértices vi e vj?”</em>
-    </p>
-
-    <p>
-      A cada resposta, novas informações sobre o grafo são reveladas,
-      e você deverá usar raciocínio lógico para decidir se é possível
-      chegar de qualquer vértice a qualquer outro através de caminhos no grafo.
-    </p>
-
-    <p>
-      O objetivo é determinar corretamente se o grafo secreto é conexo
-      utilizando o menor número possível de perguntas.
-    </p>
-
-    <a class="btn" href="https://wladimirtavares.github.io/GrafoConexo/grafo_conexo.html" target="_blank">
-      Jogar
-    </a>
+  <div class="card" data-level="intermediario">
+    <div class="card-meta">
+      <span class="badge badge-level int">⭐⭐ Intermediário</span>
+      <span class="badge age">👤 12+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Lógica Condicional · Cognição</div>
+    <h2>Experimento de Wason</h2>
+    <p>O psicólogo Peter Wason propôs dois experimentos clássicos sobre como raciocinar diante de regras condicionais do tipo "se… então…".</p>
+    <p>Na versão abstrata, menos de 10% acertam. Na versão cotidiana, mais de 60%. Por quê? Tente você também e descubra.</p>
+    <p class="age-note">A surpresa do erro cognitivo exige maturidade para questionar a própria intuição — recomendado a partir dos 12 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/ExperimentoWason/index.html" target="_blank">Jogar →</a>
+    </div>
   </div>
 
-  <div class="card">
+  <div class="card" data-level="intermediario">
+    <div class="card-meta">
+      <span class="badge badge-level int">⭐⭐ Intermediário</span>
+      <span class="badge age">👤 12+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Grafos Dirigidos · Eliminação</div>
+    <h2>Jogo da Celebridade</h2>
+    <p>Descubra se existe uma celebridade em uma festa — alguém que todos conhecem, mas que não conhece ninguém. Você pode perguntar: <em>"A conhece B?"</em></p>
+    <p>Identifique a celebridade (ou prove que não existe) usando no máximo 3(n−1) perguntas.</p>
+    <p class="age-note">Requer raciocínio sistemático sobre relações assimétricas. A estrutura de grafo dirigido emerge naturalmente a partir dos 12 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/JogoCelebridade/index.html" target="_blank">Jogar →</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- SECTION: AVANÇADO -->
+<div class="section-header" data-level="avancado" id="sec-avancado">
+  <span class="sh-badge ava">⭐⭐⭐ Avançado</span>
+  <span class="sh-line"></span>
+  <span class="sh-count">5 jogos</span>
+</div>
+<div class="container" id="grid-avancado">
+
+  <div class="card" data-level="avancado">
+    <div class="card-meta">
+      <span class="badge badge-level ava">⭐⭐⭐ Avançado</span>
+      <span class="badge age">👤 13+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star on"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Espaço de Estados · Teoria da Informação</div>
     <h2>Jogo da Permutação</h2>
+    <p>O computador gera uma permutação secreta com 3 a 8 números distintos. Você propõe sequências e o oráculo responde quantos elementos estão na posição correta — mas não quais.</p>
+    <p>Use lógica e dedução para eliminar possibilidades e identificar a permutação correta com o menor número de perguntas.</p>
+    <p class="age-note">Trabalhar com espaço de estados grande e estratégia de eliminação não trivial. Conexão direta com Mastermind e teoria da informação — a partir dos 13 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/JogoPermutacao/index.html" target="_blank">Jogar →</a>
+    </div>
+  </div>
 
-    <p>
-      Neste jogo, o computador gera uma permutação secreta contendo
-      de 3 a 8 números distintos.
-    </p>
+  <div class="card" data-level="avancado">
+    <div class="card-meta">
+      <span class="badge badge-level ava">⭐⭐⭐ Avançado</span>
+      <span class="badge age">👤 13+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star on"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Backtracking · Busca Exaustiva</div>
+    <h2>Jogo das 8 Rainhas</h2>
+    <p>Posicione 8 rainhas em um tabuleiro de xadrez de forma que nenhuma ataque outra. Uma rainha ataca toda sua linha, coluna e diagonais.</p>
+    <p>Quando perceber que um caminho não leva à solução, volte, desfaça jogadas e tente novas possibilidades — exatamente como fazem algoritmos de busca em Computação.</p>
+    <ul>
+      <li>Versão com casas bloqueadas</li>
+      <li>Versão ponderada com pontuação</li>
+    </ul>
+    <p class="age-note">As regras do xadrez são conhecidas; o backtracking emerge naturalmente da tentativa e erro estruturada — a partir dos 13 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/ProblemaOitoRainhas/index.html" target="_blank">Jogar →</a>
+    </div>
+  </div>
 
-    <p>
-      Seu desafio é descobrir exatamente qual é essa permutação.
-    </p>
+  <div class="card" data-level="avancado">
+    <div class="card-meta">
+      <span class="badge badge-level ava">⭐⭐⭐ Avançado</span>
+      <span class="badge age">👤 13+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star on"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Recursão · Divisão e Conquista</div>
+    <h2>Cobertura com Triminós</h2>
+    <p>Um tabuleiro 2ⁿ×2ⁿ possui uma única célula removida. Cubra todo o restante usando apenas peças em L (triminós) — sem tentativa e erro.</p>
+    <p>O desafio é encontrar uma estratégia inteligente que decompõe o grande problema em problemas menores e semelhantes.</p>
+    <p class="age-note">A ideia recursiva de decompor o tabuleiro é não intuitiva mas visualizável — excelente introdução à recursão, a partir dos 13 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/JogoTrimino/index.html" target="_blank">Jogar →</a>
+    </div>
+  </div>
 
-    <p>
-      Para investigar a sequência secreta, você pode propor uma nova permutação ao oráculo.
-      Como resposta, o oráculo informa quantos elementos estão na posição correta,
-      mas não revela quais são eles.
-    </p>
+  <div class="card" data-level="avancado">
+    <div class="card-meta">
+      <span class="badge badge-level ava">⭐⭐⭐ Avançado</span>
+      <span class="badge age">👤 14+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star on"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Algoritmo Guloso · NP-difícil</div>
+    <h2>Coloração de Mapas</h2>
+    <p>Colora o mapa do Brasil usando o menor número possível de cores, garantindo que estados vizinhos nunca recebam a mesma cor.</p>
+    <p>Esse desafio está ligado ao Problema das Quatro Cores, proposto em 1852 e só provado em 1976 — a primeira grande prova matemática baseada em computação. A ordem de coloração altera bastante o resultado!</p>
+    <p class="age-note">A história do Teorema das 4 Cores e o conceito de NP exigem contexto matemático — recomendado a partir dos 14 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/JogoColoracao/index.html" target="_blank">Jogar →</a>
+    </div>
+  </div>
 
-    <p>
-      A partir dessas pistas, você deverá usar lógica, dedução e criação de estratégias
-      para eliminar possibilidades e identificar a permutação correta.
-    </p>
+  <div class="card" data-level="avancado">
+    <div class="card-meta">
+      <span class="badge badge-level ava">⭐⭐⭐ Avançado</span>
+      <span class="badge age">👤 14+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star on"></span><span class="star"></span>
+      </span>
+    </div>
+    <div class="card-concept">Conectividade · BFS/DFS</div>
+    <h2>Jogo do Grafo Conexo</h2>
+    <p>Um grafo secreto com 5 vértices foi gerado. Descubra se ele é conexo ou não fazendo perguntas do tipo: <em>"Existe uma aresta entre vi e vj?"</em></p>
+    <p>Use raciocínio lógico para determinar corretamente se é possível chegar de qualquer vértice a qualquer outro — com o menor número de perguntas.</p>
+    <p class="age-note">O conceito de conectividade em grafos é abstrato e sem análogo cotidiano óbvio — exige maturidade formal, a partir dos 14 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/GrafoConexo/grafo_conexo.html" target="_blank">Jogar →</a>
+    </div>
+  </div>
 
-    <p>
-      Experimente diferentes abordagens, teste suas estratégias e descubra
-      quantas perguntas são necessárias para resolver o desafio.
-    </p>
+</div>
 
-    <a class="btn" href="https://wladimirtavares.github.io/JogoPermutacao/index.html" target="_blank">
-      Jogar
-    </a>
+<!-- SECTION: EXPERT -->
+<div class="section-header" data-level="expert" id="sec-expert">
+  <span class="sh-badge exp">⭐⭐⭐⭐ Expert</span>
+  <span class="sh-line"></span>
+  <span class="sh-count">1 jogo</span>
+</div>
+<div class="container" id="grid-expert">
+
+  <div class="card" data-level="expert">
+    <div class="card-meta">
+      <span class="badge badge-level exp">⭐⭐⭐⭐ Expert</span>
+      <span class="badge age">👤 15+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star on"></span><span class="star on"></span>
+      </span>
+    </div>
+    <div class="card-concept">Otimização Combinatória · Conjunto Dominante</div>
+    <h2>Dominação Romana</h2>
+    <p>Defenda o Brasil posicionando o menor número possível de tropas. Cada estado pode ter 0, 1 ou 2 tropas — mas todo estado sem tropas deve ser vizinho de ao menos um estado com 2 tropas.</p>
+    <p>Inspirado na estratégia de defesa do Império Romano, este é um problema clássico de Teoria dos Grafos. Quantas tropas são necessárias para defender o Brasil?</p>
+    <p class="age-note">Otimização combinatória sem heurística óbvia: o jogador precisa criar estratégia do zero e suportar tentativas frustradas. A maturidade para não abandonar o problema é essencial — a partir dos 15 anos.</p>
+    <div class="btn-wrap">
+      <a class="btn" href="https://wladimirtavares.github.io/JogoDominacaoRomana/index3.html" target="_blank">Jogar →</a>
+    </div>
   </div>
 
 </div>
@@ -495,5 +611,32 @@ Teste estratégias, mova as tropas e descubra a melhor solução possível!
   Jogos educativos de lógica, matemática e pensamento computacional.
 </footer>
 
+<script>
+  const SECTIONS = ['iniciante','intermediario','avancado','expert'];
+
+  function filterCards(level, btn) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+
+    SECTIONS.forEach(sec => {
+      const secHeader = document.getElementById('sec-' + sec);
+      const grid = document.getElementById('grid-' + sec);
+      const cards = grid.querySelectorAll('.card');
+
+      if (level === 'all' || level === sec) {
+        secHeader.style.display = 'flex';
+        cards.forEach(c => c.classList.remove('hidden'));
+      } else {
+        secHeader.style.display = 'none';
+        cards.forEach(c => c.classList.add('hidden'));
+      }
+    });
+  }
+
+  // Show all section headers on load
+  SECTIONS.forEach(sec => {
+    document.getElementById('sec-' + sec).style.display = 'flex';
+  });
+</script>
 </body>
 </html>
