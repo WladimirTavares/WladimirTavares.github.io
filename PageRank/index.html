@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>PageRank Simulator: Caminhada Aleatória e Relevância na Web</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.3s, color 0.2s;
+        }
+
+        /* modo escuro automático baseado em preferência, mas com toggle */
+        body.dark {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin: 0 0 0.25rem 0;
+            background: linear-gradient(135deg, #1e3c72, #2b4b8c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .dark h1 {
+            background: linear-gradient(135deg, #90cdf4, #63b3ed);
+            background-clip: text;
+            -webkit-background-clip: text;
+        }
+
+        .sub {
+            color: #475569;
+            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 12px;
+        }
+        .dark .sub {
+            color: #94a3b8;
+        }
+
+        /* Layout principal */
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .graph-panel {
+            flex: 3;
+            min-width: 550px;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            padding: 16px;
+            transition: background 0.2s;
+        }
+        .dark .graph-panel {
+            background: #1e293b;
+            box-shadow: 0 20px 30px -12px black;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            background: #fefce8;
+            border-radius: 24px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .dark .canvas-wrapper {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            background: #ffffff;
+            cursor: pointer;
+            border-radius: 20px;
+        }
+        .dark canvas {
+            background: #111827;
+        }
+
+        .controls-panel {
+            flex: 2;
+            min-width: 320px;
+            background: white;
+            border-radius: 28px;
+            padding: 18px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .dark .controls-panel {
+            background: #1e293b;
+        }
+
+        /* cards e estatísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 12px;
+        }
+        .dark .stats-grid {
+            background: #0f172a;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 18px;
+            padding: 8px 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .dark .stat-card {
+            background: #334155;
+        }
+
+        button {
+            background: #3b82f6;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.85rem;
+        }
+        button:hover {
+            background: #2563eb;
+            transform: scale(0.98);
+        }
+        button.secondary {
+            background: #475569;
+        }
+        button.danger {
+            background: #ef4444;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        input, select {
+            padding: 8px;
+            border-radius: 28px;
+            border: 1px solid #cbd5e1;
+            background: white;
+        }
+        .dark input, .dark select {
+            background: #0f172a;
+            border-color: #475569;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            font-size: 0.8rem;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 6px 4px;
+            text-align: center;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .dark th, .dark td {
+            border-color: #334155;
+        }
+
+        .surfer-emoji {
+            font-size: 28px;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+            transition: all 0.2s;
+        }
+
+        .badge {
+            background: #3b82f6;
+            border-radius: 40px;
+            padding: 2px 10px;
+            font-size: 12px;
+            color: white;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+        @media (max-width: 900px) {
+            .graph-panel { min-width: 300px; }
+        }
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .rank-bar {
+            height: 100%;
+            background: #f97316;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>📊 PageRank Simulator • Caminhada Aleatória</h1>
+            <div class="sub">🔍 Como o Google mede importância? O "Surfista" teletransporta e segue links aleatórios.</div>
+        </div>
+        <button id="darkModeToggle" style="background:#334155;">🌙 Modo Escuro</button>
+    </div>
+
+    <div class="dashboard">
+        <!-- Área do grafo -->
+        <div class="graph-panel">
+            <div class="canvas-wrapper">
+                <canvas id="graphCanvas" width="800" height="500" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/500"></canvas>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 12px;">
+                <div>🤖 <strong id="surferStatus">Surfista parado</strong></div>
+                <div>🎲 Última ação: <span id="lastAction">—</span></div>
+            </div>
+        </div>
+
+        <!-- Controles e estatísticas -->
+        <div class="controls-panel">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button id="startBtn">▶ Iniciar</button>
+                <button id="pauseBtn">⏸️ Pausar</button>
+                <button id="resetBtn">🔄 Reiniciar</button>
+                <button id="stepBtn">⚡ 1 passo</button>
+                <button id="fast1000Btn">🚀 1000 passos</button>
+                <button id="randomGraphBtn">🎲 Rede Aleatória</button>
+                <button id="exampleBtn">📚 Carregar Exemplo (5 nós)</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">📌 Total passos: <strong id="totalSteps">0</strong></div>
+                <div class="stat-card">🏆 Mais visitada: <strong id="topPage">-</strong></div>
+                <div class="stat-card">🎯 Damping (α): <input type="range" id="dampingSlider" min="0.1" max="0.95" step="0.01" value="0.85"> <span id="dampingVal">0.85</span></div>
+                <div class="stat-card">⏩ Velocidade (ms): <input type="range" id="speedSlider" min="100" max="1200" step="50" value="500"> <span id="speedVal">500</span>ms</div>
+            </div>
+            <div><strong>📖 Tabela de visitas & PageRank simulado</strong>
+                <div style="max-height: 180px; overflow-y: auto;">
+                    <table id="rankTable">
+                        <thead><tr><th>ID</th><th>Nome</th><th>Visitas</th><th>Freq%</th><th>PR~</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div><strong>📊 PageRank (Barras dinâmicas)</strong>
+                <canvas id="barChart" height="90" style="width:100%; background:#f1f5f9; border-radius: 16px;"></canvas>
+            </div>
+            <details>
+                <summary>🎓 O que é PageRank? (Clique para explicação)</summary>
+                <p style="font-size:0.8rem; margin-top:8px;">✔ O PageRank avalia a importância de páginas web através da "caminhada aleatória": um navegador clica em links aleatórios ou teletransporta (damping factor). Páginas com muitos backlinks de páginas importantes têm maior rank. <br>✔ O fator de amortecimento (α) simula a probabilidade de seguir links (ex: 85%) e 15% de teletransporte. <br>✔ Visualmente, veja o robô surfista se mover e as barras crescerem!</p>
+            </details>
+        </div>
+    </div>
+    <footer>💡 Dica: Use "Rede Aleatória" ou arraste nós (se disponível) — o surfista executa passos. O PageRank converge para a distribuição estacionária.</footer>
+</div>
+
+<script>
+    (function(){
+        // ---------- GRAFO ----------
+        let nodes = [];
+        let edges = []; // {from, to}
+        let currentPos = 0;       // índice do nó atual
+        let visits = [];           // contagem de visitas
+        let stepCount = 0;
+        let animationTimer = null;
+        let isRunning = false;
+        let speedMs = 500;
+        let damping = 0.85;        // fator de amortecimento (teleporte com prob 1-damping)
+        
+        // elementos canvas
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        let canvasWidth = 800, canvasHeight = 500;
+        
+        // personagem surfista: coordenadas atuais para interpolação
+        let animOffset = 0; // 0 a 1, animação entre nodes
+        let animFromNode = -1, animToNode = -1;
+        let animStepActive = false;
+        let pendingMove = null; // {from, to}
+        
+        // configuração de posições dos nós (layout circular + ajuste)
+        function initLayout(numNodes){
+            const centerX = canvasWidth/2, centerY = canvasHeight/2;
+            const radius = Math.min(canvasWidth, canvasHeight)*0.35;
+            for(let i=0;i<numNodes;i++){
+                let angle = (i / numNodes) * Math.PI * 2 - Math.PI/2;
+                let x = centerX + radius * Math.cos(angle);
+                let y = centerY + radius * Math.sin(angle);
+                if(!nodes[i]) nodes[i] = {id:i, name:`P${i}`, x, y};
+                else { nodes[i].x = x; nodes[i].y = y; nodes[i].name = `P${i}`; }
+            }
+        }
+        
+        // geração aleatória (páginas e arestas)
+        function randomGraph(nodeCount=5, edgeProb=0.3){
+            nodes = [];
+            edges = [];
+            for(let i=0;i<nodeCount;i++){
+                nodes.push({ id:i, name:`P${i}`, x:0, y:0 });
+            }
+            initLayout(nodeCount);
+            for(let i=0;i<nodeCount;i++){
+                for(let j=0;j<nodeCount;j++){
+                    if(i!==j && Math.random()<edgeProb){
+                        edges.push({from:i, to:j});
+                    }
+                }
+            }
+            // garantir que não fique sem arestas em nenhum nó (conectividade mínima)
+            for(let i=0;i<nodeCount;i++){
+                let outEdges = edges.filter(e=>e.from===i);
+                if(outEdges.length===0){
+                    let target = (i+1)%nodeCount;
+                    edges.push({from:i, to:target});
+                }
+            }
+            resetSimulation();
+            drawGraph();
+            updateTableAndChart();
+        }
+        
+        // Exemplo famoso: 5 páginas estilo cadeia + hub
+        function loadExample(){
+            nodes = [
+                {id:0, name:"Google", x:0,y:0}, {id:1, name:"Wikipedia", x:0,y:0}, {id:2, name:"YouTube", x:0,y:0},
+                {id:3, name:"Facebook", x:0,y:0}, {id:4, name:"Twitter", x:0,y:0}
+            ];
+            edges = [
+                {from:0, to:1}, {from:0, to:2}, {from:1, to:0}, {from:1, to:2}, {from:2, to:3},
+                {from:3, to:0}, {from:3, to:4}, {from:4, to:0}, {from:4, to:2}
+            ];
+            initLayout(5);
+            resetSimulation();
+            drawGraph();
+        }
+        
+        // resetar visitas e posição inicial aleatória
+        function resetSimulation(){
+            if(animationTimer) clearInterval(animationTimer);
+            isRunning = false;
+            stepCount = 0;
+            visits = new Array(nodes.length).fill(0);
+            // página inicial aleatória ou primeira página
+            currentPos = Math.floor(Math.random() * nodes.length);
+            visits[currentPos]++;
+            stepCount = 1;  // visita inicial conta
+            updateTopPage();
+            animStepActive = false;
+            if(pendingMove) pendingMove = null;
+            drawGraph();
+            updateTableAndChart();
+            document.getElementById('totalSteps').innerText = stepCount;
+            document.getElementById('surferStatus').innerHTML = `🕹️ em nó ${nodes[currentPos].name}`;
+            document.getElementById('lastAction').innerHTML = 'início';
+        }
+        
+        // executar passo aleatório com damping (teleporte)
+        function performStep(){
+            if(nodes.length===0) return;
+            let from = currentPos;
+            let outLinks = edges.filter(e=>e.from === from).map(e=>e.to);
+            let r = Math.random();
+            let nextNode = null;
+            let teleported = false;
+            if(outLinks.length>0 && r < damping){
+                // segue link aleatório
+                let randomIndex = Math.floor(Math.random() * outLinks.length);
+                nextNode = outLinks[randomIndex];
+            } else {
+                // teletransporte: qualquer página aleatória
+                nextNode = Math.floor(Math.random() * nodes.length);
+                teleported = true;
+            }
+            if(nextNode===null && outLinks.length===0) { // sem saida -> teletransporte
+                nextNode = Math.floor(Math.random() * nodes.length);
+                teleported = true;
+            }
+            pendingMove = {from: currentPos, to: nextNode, teleport: teleported};
+            startAnimationToNode(pendingMove);
+        }
+        
+        // animação do surfista de um nó para outro
+        function startAnimationToMove(move){
+            if(!move) return;
+            animFromNode = move.from;
+            animToNode = move.to;
+            animOffset = 0;
+            animStepActive = true;
+            let startTime = performance.now();
+            let duration = Math.min(speedMs * 0.8, 400);
+            function animateFrame(now){
+                let elapsed = now - startTime;
+                let t = Math.min(1, elapsed/duration);
+                animOffset = t;
+                drawGraph();
+                if(t<1){
+                    requestAnimationFrame(animateFrame);
+                } else {
+                    // fim da animação, aplicar o passo real
+                    finalizeStep(move);
+                    animStepActive = false;
+                    animFromNode = -1;
+                    drawGraph();
+                    if(isRunning && !animationTimer){
+                        startTimer();
+                    }
+                }
+            }
+            requestAnimationFrame(animateFrame);
+        }
+        
+        function startAnimationToNode(move){
+            if(animStepActive){
+                // se já animando, aguarda (simples: não acumula)
+                return;
+            }
+            startAnimationToMove(move);
+        }
+        
+        function finalizeStep(move){
+            let next = move.to;
+            let tele = move.teleport;
+            currentPos = next;
+            visits[next]++;
+            stepCount++;
+            document.getElementById('totalSteps').innerText = stepCount;
+            let actionMsg = tele ? `✨ TELEPORTE para ${nodes[next].name}` : `🔗 segue link para ${nodes[next].name}`;
+            document.getElementById('lastAction').innerHTML = actionMsg;
+            document.getElementById('surferStatus').innerHTML = `🤖 em ${nodes[next].name} (${visits[next]} visitas)`;
+            updateTopPage();
+            updateTableAndChart();
+            drawGraph();  // atualiza destaque
+            if(pendingMove === move) pendingMove = null;
+        }
+        
+        // calcular PageRank teórico por iteração (para comparação)
+        function computeTheoreticalPR(iter=50){
+            let n = nodes.length;
+            if(n===0) return [];
+            let M = Array(n).fill().map(()=>Array(n).fill(0));
+            for(let e of edges){
+                let outCount = edges.filter(ee=>ee.from===e.from).length;
+                if(outCount>0) M[e.to][e.from] += 1/outCount;
+            }
+            let pr = Array(n).fill(1/n);
+            for(let it=0;it<iter;it++){
+                let newPR = Array(n).fill((1-damping)/n);
+                for(let i=0;i<n;i++){
+                    for(let j=0;j<n;j++){
+                        newPR[i] += damping * M[i][j] * pr[j];
+                    }
+                }
+                pr = newPR;
+            }
+            return pr;
+        }
+        
+        // atualizar tabela e gráfico de barras (frequência relativa simulada vs teórica)
+        function updateTableAndChart(){
+            const tbody = document.querySelector('#rankTable tbody');
+            tbody.innerHTML = '';
+            let total = stepCount || 1;
+            let freqRel = visits.map(v=> (v/total));
+            let theoretical = computeTheoreticalPR(40);
+            for(let i=0;i<nodes.length;i++){
+                let freqPercent = (freqRel[i]*100).toFixed(1);
+                let prSim = freqRel[i];
+                let prTheo = theoretical[i] || 0;
+                let row = tbody.insertRow();
+                row.insertCell(0).innerText = i;
+                row.insertCell(1).innerHTML = `<strong>${nodes[i].name}</strong>`;
+                row.insertCell(2).innerText = visits[i];
+                row.insertCell(3).innerText = `${freqPercent}%`;
+                row.insertCell(4).innerHTML = `<span style="background:#f97316; padding:2px 6px; border-radius:20px;">${prSim.toFixed(4)}</span> <span style="font-size:10px;">(teo:${prTheo.toFixed(3)})</span>`;
+            }
+            // desenhar gráfico de barras simples
+            drawBarChart(freqRel);
+        }
+        
+        function drawBarChart(probs){
+            let chartCanvas = document.getElementById('barChart');
+            if(!chartCanvas) return;
+            let w = chartCanvas.parentElement.clientWidth;
+            chartCanvas.width = w;
+            chartCanvas.height = 90;
+            let ctxBar = chartCanvas.getContext('2d');
+            ctxBar.clearRect(0,0,w,90);
+            if(nodes.length===0) return;
+            let barWidth = (w-30)/nodes.length;
+            ctxBar.fillStyle = '#3b82f6';
+            for(let i=0;i<nodes.length;i++){
+                let h = probs[i] * 70;
+                let x = 15 + i*barWidth;
+                let y = 85 - h;
+                ctxBar.fillRect(x, y, barWidth-4, h);
+                ctxBar.fillStyle = '#1e293b';
+                ctxBar.font = "10px sans-serif";
+                ctxBar.fillText(nodes[i].name, x+2, 82);
+                ctxBar.fillStyle = '#3b82f6';
+            }
+        }
+        
+        function updateTopPage(){
+            if(visits.length===0) return;
+            let maxVis = Math.max(...visits);
+            let idx = visits.indexOf(maxVis);
+            document.getElementById('topPage').innerText = nodes[idx]?.name || '-';
+        }
+        
+        // desenho do grafo + surfista animado
+        function drawGraph(){
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            ctx.clearRect(0,0,canvasWidth,canvasHeight);
+            if(nodes.length===0) return;
+            // desenhar arestas com setas
+            for(let edge of edges){
+                let fromNode = nodes[edge.from];
+                let toNode = nodes[edge.to];
+                if(!fromNode || !toNode) continue;
+                let fromX = fromNode.x, fromY = fromNode.y;
+                let toX = toNode.x, toY = toNode.y;
+                let angle = Math.atan2(toY - fromY, toX - fromX);
+                let arrowSize = 12;
+                let margin = 14;
+                let startX = fromX + Math.cos(angle)*margin;
+                let startY = fromY + Math.sin(angle)*margin;
+                let endX = toX - Math.cos(angle)*margin;
+                let endY = toY - Math.sin(angle)*margin;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = '#94a3b8';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                // seta
+                let arrowX = endX;
+                let arrowY = endY;
+                let angleArrow = angle;
+                let p1x = arrowX - arrowSize * 0.5 * Math.cos(angleArrow - Math.PI/6);
+                let p1y = arrowY - arrowSize * 0.5 * Math.sin(angleArrow - Math.PI/6);
+                let p2x = arrowX - arrowSize * 0.5 * Math.cos(angleArrow + Math.PI/6);
+                let p2y = arrowY - arrowSize * 0.5 * Math.sin(angleArrow + Math.PI/6);
+                ctx.fillStyle = '#475569';
+                ctx.beginPath();
+                ctx.moveTo(arrowX, arrowY);
+                ctx.lineTo(p1x, p1y);
+                ctx.lineTo(p2x, p2y);
+                ctx.fill();
+            }
+            // destaque caminho atual em animação: aresta destacada
+            if(animStepActive && animFromNode>=0 && animToNode>=0){
+                let fromN = nodes[animFromNode];
+                let toN = nodes[animToNode];
+                if(fromN && toN){
+                    ctx.beginPath();
+                    ctx.moveTo(fromN.x, fromN.y);
+                    ctx.lineTo(toN.x, toN.y);
+                    ctx.strokeStyle = '#f97316';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                }
+            }
+            // nós
+            let maxVisits = Math.max(1, ...visits);
+            for(let i=0;i<nodes.length;i++){
+                let n = nodes[i];
+                let radius = 20 + (visits[i]/ (maxVisits||1)) * 12;
+                radius = Math.min(38, radius);
+                let intensity = 0.5 + (visits[i]/(stepCount||1))*0.5;
+                let rColor = 59 + Math.floor(130 * (visits[i]/(stepCount+1)));
+                let gColor = 130;
+                let bColor = 246;
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, radius, 0, 2*Math.PI);
+                ctx.fillStyle = `rgba(59,130,246,${0.5+intensity*0.3})`;
+                ctx.fill();
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 14px "Segoe UI"';
+                ctx.fillText(n.name, n.x-15, n.y-12);
+                ctx.font = '11px monospace';
+                ctx.fillStyle = '#334155';
+                ctx.fillText(`v:${visits[i]}`, n.x-12, n.y+5);
+                if(currentPos === i && !animStepActive){
+                    ctx.beginPath();
+                    ctx.arc(n.x, n.y, radius+6, 0, 2*Math.PI);
+                    ctx.strokeStyle = '#facc15';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+            }
+            // desenhar surfista (robô/emoji)
+            let surfX, surfY;
+            if(animStepActive && animFromNode>=0 && animToNode>=0 && nodes[animFromNode] && nodes[animToNode]){
+                let fromP = nodes[animFromNode];
+                let toP = nodes[animToNode];
+                let t = animOffset;
+                surfX = fromP.x * (1-t) + toP.x * t;
+                surfY = fromP.y * (1-t) + toP.y * t;
+            } else {
+                let curNode = nodes[currentPos];
+                if(curNode){ surfX = curNode.x; surfY = curNode.y; }
+                else { surfX = canvasWidth/2; surfY = canvasHeight/2; }
+            }
+            ctx.font = '32px "Segoe UI Emoji"';
+            ctx.fillStyle = '#0f172a';
+            ctx.shadowBlur = 8;
+            ctx.fillText("🤖", surfX-15, surfY-12);
+            ctx.shadowBlur = 0;
+        }
+        
+        function startTimer(){
+            if(animationTimer) clearInterval(animationTimer);
+            if(!isRunning) return;
+            animationTimer = setInterval(()=>{
+                if(!isRunning) return;
+                if(!animStepActive){
+                    performStep();
+                }
+            }, speedMs);
+        }
+        
+        function stopTimer(){
+            if(animationTimer){
+                clearInterval(animationTimer);
+                animationTimer = null;
+            }
+        }
+        
+        // handlers UI
+        document.getElementById('startBtn').onclick = ()=>{
+            if(isRunning) return;
+            isRunning = true;
+            startTimer();
+        };
+        document.getElementById('pauseBtn').onclick = ()=>{
+            isRunning = false;
+            stopTimer();
+        };
+        document.getElementById('resetBtn').onclick = ()=>{
+            isRunning = false;
+            stopTimer();
+            resetSimulation();
+        };
+        document.getElementById('stepBtn').onclick = ()=>{
+            if(animStepActive) return;
+            if(isRunning) { isRunning=false; stopTimer(); }
+            performStep();
+        };
+        document.getElementById('fast1000Btn').onclick = ()=>{
+            if(isRunning) { isRunning=false; stopTimer(); }
+            for(let i=0;i<1000;i++){
+                if(animStepActive) break;
+                let out = edges.filter(e=>e.from===currentPos);
+                let r = Math.random();
+                let next;
+                if(out.length>0 && r<damping){
+                    let rand = Math.floor(Math.random()*out.length);
+                    next = out[rand].to;
+                } else {
+                    next = Math.floor(Math.random()*nodes.length);
+                }
+                visits[next]++;
+                currentPos = next;
+                stepCount++;
+            }
+            updateTableAndChart();
+            drawGraph();
+            document.getElementById('totalSteps').innerText = stepCount;
+            updateTopPage();
+            document.getElementById('surferStatus').innerHTML = `⚡ após 1000 passos em ${nodes[currentPos].name}`;
+        };
+        document.getElementById('randomGraphBtn').onclick = ()=>{
+            isRunning=false; stopTimer();
+            let num = Math.min(7, 4+Math.floor(Math.random()*5));
+            randomGraph(num, 0.35);
+        };
+        document.getElementById('exampleBtn').onclick = ()=>{
+            isRunning=false; stopTimer();
+            loadExample();
+        };
+        const dampingSlider = document.getElementById('dampingSlider');
+        const dampingVal = document.getElementById('dampingVal');
+        dampingSlider.oninput = (e)=>{
+            damping = parseFloat(e.target.value);
+            dampingVal.innerText = damping;
+            if(!isRunning) updateTableAndChart();
+        };
+        const speedSlider = document.getElementById('speedSlider');
+        const speedVal = document.getElementById('speedVal');
+        speedSlider.oninput = (e)=>{
+            speedMs = parseInt(e.target.value);
+            speedVal.innerText = speedMs;
+            if(isRunning){
+                stopTimer();
+                startTimer();
+            }
+        };
+        
+        // dark mode
+        const darkToggle = document.getElementById('darkModeToggle');
+        darkToggle.onclick = ()=>{
+            document.body.classList.toggle('dark');
+        };
+        
+        // resize canvas responsivo
+        function resizeCanvas(){
+            let container = canvas.parentElement;
+            let w = container.clientWidth;
+            canvasWidth = Math.min(800, w);
+            canvas.height = canvasWidth * 0.62;
+            canvasHeight = canvas.height;
+            if(nodes.length) initLayout(nodes.length);
+            drawGraph();
+        }
+        window.addEventListener('resize', ()=>{
+            resizeCanvas();
+            drawGraph();
+        });
+        // iniciar com rede padrão
+        randomGraph(5, 0.4);
+        resizeCanvas();
+        resetSimulation();
+    })();
+</script>
+</body>
+</html>

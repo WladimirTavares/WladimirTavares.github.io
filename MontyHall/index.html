@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monty Hall — O Paradoxo</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════════ */
+:root {
+  --bg: #0a0a12;
+  --bg2: #10101e;
+  --panel: #14142a;
+  --panel2: #1a1a35;
+  --border: rgba(120,100,255,0.2);
+  --border2: rgba(120,100,255,0.4);
+  --neon: #7b6fff;
+  --neon2: #a594ff;
+  --cyan: #00e5ff;
+  --gold: #ffd166;
+  --red: #ff4d6d;
+  --green: #06d6a0;
+  --text: #e8e6ff;
+  --muted: #6b6a9a;
+  --door-closed: #1e1e40;
+  --door-frame: #2d2d60;
+  --door-sel: #2a2050;
+  --door-rev: #111128;
+  --door-win: #1a3030;
+  --door-lose: #2a0f1a;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); }
+
+body {
+  font-family: 'Source Serif 4', serif;
+  color: var(--text);
+  min-height: 100vh;
+  background: var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px),
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(123,111,255,0.12) 0%, transparent 70%);
+  overflow-x: hidden;
+}
+
+/* scanline overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.015) 3px, rgba(0,229,255,0.015) 4px);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+h1, h2, h3, .oswald { font-family: 'Oswald', sans-serif; letter-spacing: 0.05em; }
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.25rem 6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ═══════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════ */
+.tv-header {
+  text-align: center;
+  padding: 2.5rem 1rem 1.5rem;
+}
+
+.show-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(2.2rem, 7vw, 5rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 0.95;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(255,209,102,0.5), 0 0 60px rgba(255,209,102,0.2);
+}
+
+.show-subtitle {
+  font-size: clamp(0.75rem, 2vw, 1rem);
+  color: var(--neon2);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 300;
+}
+
+.neon-line {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon), var(--cyan), var(--neon), transparent);
+  margin: 1.2rem 0;
+  box-shadow: 0 0 12px var(--neon), 0 0 24px rgba(123,111,255,0.3);
+  animation: lineFlicker 4s ease-in-out infinite;
+}
+
+@keyframes lineFlicker {
+  0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.4} 94%{opacity:1} 96%{opacity:0.6} 97%{opacity:1}
+}
+
+/* ═══════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════ */
+.config-section {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.section-title {
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  font-family: 'Oswald', sans-serif;
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 1.2rem;
+}
+
+.config-item label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.val-display {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.9rem;
+  color: var(--gold);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+  text-shadow: 0 0 12px rgba(255,209,102,0.4);
+}
+
+input[type=range] {
+  width: 100%;
+  height: 4px;
+  appearance: none;
+  background: var(--panel2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--neon2);
+  box-shadow: 0 0 8px var(--neon);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+.strategy-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0.3rem; }
+.strat-btn {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  padding: 6px 11px;
+  border-radius: 5px;
+  border: 1px solid var(--border2);
+  background: var(--panel2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.14s;
+  text-transform: uppercase;
+}
+.strat-btn:hover { border-color: var(--neon2); color: var(--neon2); }
+.strat-btn.active { background: rgba(123,111,255,0.18); border-color: var(--neon2); color: var(--neon2); box-shadow: 0 0 8px rgba(123,111,255,0.25); }
+
+/* ═══════════════════════════════════════════
+   STAGE
+═══════════════════════════════════════════ */
+.stage {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.stage::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(123,111,255,0.03) 0%, transparent 50%),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(123,111,255,0.018) 40px, rgba(123,111,255,0.018) 41px);
+  pointer-events: none;
+}
+
+.doors-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(6px, 2vw, 14px);
+  justify-content: center;
+  min-height: 140px;
+  align-items: flex-end;
+  padding-bottom: 30px; /* room for badges */
+}
+
+/* ── DOOR ── */
+.door {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s;
+  flex: 0 0 auto;
+}
+
+.door:hover:not(.revealed):not(.no-hover) { transform: translateY(-5px); }
+.door:hover:not(.revealed):not(.no-hover) .door-front {
+  border-color: var(--neon2);
+  box-shadow: 0 0 18px rgba(123,111,255,0.5);
+}
+
+.door-inner {
+  width: clamp(52px, 9.5vw, 86px);
+  height: clamp(82px, 14.5vw, 132px);
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+}
+
+.door.flip .door-inner { transform: rotateY(180deg); }
+
+.door-face {
+  position: absolute; inset: 0;
+  border-radius: 8px 8px 3px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.door-front {
+  background: linear-gradient(155deg, var(--door-frame) 0%, var(--door-closed) 100%);
+  border: 1.5px solid rgba(123,111,255,0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.door-back {
+  transform: rotateY(180deg);
+  background: var(--door-rev);
+  border: 1.5px solid rgba(123,111,255,0.18);
+}
+
+.door.selected .door-front {
+  border-color: var(--gold);
+  background: linear-gradient(155deg, var(--door-sel) 0%, #201840 100%);
+  box-shadow: 0 0 22px rgba(255,209,102,0.28), 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.door.switch-target .door-front {
+  border-color: var(--cyan);
+  box-shadow: 0 0 18px rgba(0,229,255,0.4);
+  animation: switchPulse 1s ease-in-out infinite;
+}
+@keyframes switchPulse {
+  0%,100%{ box-shadow: 0 0 12px rgba(0,229,255,0.3); }
+  50%{ box-shadow: 0 0 26px rgba(0,229,255,0.65); }
+}
+
+.door.win-door .door-back { background: var(--door-win); border-color: var(--green); box-shadow: 0 0 22px rgba(6,214,160,0.45); }
+.door.lose-door .door-back { background: var(--door-lose); border-color: var(--red); }
+
+.door-num {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(0.9rem, 2.4vw, 1.25rem);
+  font-weight: 700;
+  color: var(--neon2);
+  line-height: 1;
+}
+
+.door-knob {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 6px rgba(255,209,102,0.5);
+  margin-top: 2px;
+}
+
+.door-sel-star {
+  position: absolute; top: 4px; right: 5px;
+  font-size: 0.55rem;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.door.selected .door-sel-star { opacity: 1; }
+
+.door-emoji {
+  font-size: clamp(1.1rem, 3.8vw, 1.9rem);
+  animation: emojiPop 0.38s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes emojiPop { from { transform: scale(0) rotate(-20deg); } to { transform: scale(1); } }
+
+.door-content-label {
+  font-size: clamp(0.45rem, 1.2vw, 0.65rem);
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.door-badge {
+  position: absolute;
+  bottom: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.52rem;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 2px 7px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.3s 0.3s;
+}
+.door-badge.visible { opacity: 1; }
+.badge-sel    { background: rgba(255,209,102,0.13); color: var(--gold); border: 1px solid rgba(255,209,102,0.28); }
+.badge-rev    { background: rgba(255,77,109,0.1); color: var(--red); border: 1px solid rgba(255,77,109,0.22); }
+.badge-switch { background: rgba(0,229,255,0.1); color: var(--cyan); border: 1px solid rgba(0,229,255,0.28); }
+
+/* ── INSTRUCTION & ACTIONS ── */
+.instruction {
+  margin-top: 1.2rem;
+  text-align: center;
+  min-height: 36px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+  transition: color 0.3s;
+  position: relative; z-index: 1;
+}
+.instruction.active { color: var(--text); }
+.instruction.win  { color: var(--green); font-style: normal; font-family: 'Oswald', sans-serif; font-size: 1.05rem; letter-spacing: 0.04em; }
+.instruction.lose { color: var(--red);   font-style: normal; font-family: 'Oswald', sans-serif; font-size: 1.05rem; letter-spacing: 0.04em; }
+
+.action-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  position: relative; z-index: 1;
+}
+
+.btn {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--panel2);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.14s;
+}
+.btn:hover { border-color: var(--neon2); color: var(--neon2); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+.btn.primary { background: rgba(123,111,255,0.18); border-color: var(--neon2); color: var(--neon2); box-shadow: 0 0 10px rgba(123,111,255,0.18); }
+.btn.primary:hover { background: rgba(123,111,255,0.32); }
+.btn.success { border-color: var(--green); color: var(--green); background: rgba(6,214,160,0.07); }
+.btn.success:hover { background: rgba(6,214,160,0.15); }
+
+.history-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
+  justify-content: center;
+  position: relative; z-index: 1;
+}
+.history-chip {
+  font-size: 0.6rem;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.chip-win  { background: rgba(6,214,160,0.1); color: var(--green); border: 1px solid rgba(6,214,160,0.22); }
+.chip-lose { background: rgba(255,77,109,0.08); color: var(--red); border: 1px solid rgba(255,77,109,0.18); }
+
+/* ═══════════════════════════════════════════
+   RESULT FLASH
+═══════════════════════════════════════════ */
+.result-flash {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 4px;
+  z-index: 999;
+}
+.result-flash.win  { background: linear-gradient(90deg, var(--green), var(--cyan), var(--green)); animation: shimmer 1.5s linear infinite; }
+.result-flash.lose { background: var(--red); }
+@keyframes shimmer { from{background-position:-200px} to{background-position:200px} }
+
+/* ═══════════════════════════════════════════
+   STATS SECTION
+═══════════════════════════════════════════ */
+.stats-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dual-stat {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.stat-block {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+}
+.stat-block .lbl { font-size: 0.62rem; color: var(--muted); font-family: 'Oswald', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.25rem; }
+.stat-block .big { font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 700; line-height: 1; }
+.stat-block .sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; font-style: italic; }
+.stat-block.stay   .big { color: var(--gold); text-shadow: 0 0 12px rgba(255,209,102,0.3); }
+.stat-block.switch .big { color: var(--cyan); text-shadow: 0 0 12px rgba(0,229,255,0.3); }
+
+/* bar chart */
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 12px; }
+.bar-label-txt {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  width: 76px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.bar-label-txt.stay   { color: var(--gold); }
+.bar-label-txt.switch { color: var(--cyan); }
+.bar-track {
+  flex: 1; height: 26px;
+  background: var(--panel2);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: relative;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.9s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  padding-left: 9px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(0,0,0,0.75);
+  white-space: nowrap;
+  min-width: 0;
+  width: 0%;
+  overflow: hidden;
+}
+.bar-row.stay   .bar-fill { background: linear-gradient(90deg, var(--gold), #ffb800); box-shadow: 0 0 10px rgba(255,209,102,0.3); }
+.bar-row.switch .bar-fill { background: linear-gradient(90deg, var(--cyan), #00b8d4); box-shadow: 0 0 10px rgba(0,229,255,0.3); }
+.bar-pct {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  width: 50px;
+  flex-shrink: 0;
+}
+.bar-row.stay   .bar-pct { color: var(--gold); }
+.bar-row.switch .bar-pct { color: var(--cyan); }
+
+/* sim table */
+.sim-trigger { display: flex; align-items: center; gap: 12px; margin: 1rem 0 0.8rem; flex-wrap: wrap; }
+.sim-status-txt { font-size: 0.72rem; color: var(--muted); font-family: 'Oswald', sans-serif; letter-spacing: 0.06em; }
+
+.sim-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 1rem; }
+.sim-table th {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.sim-table td { padding: 7px 10px; border-bottom: 1px solid rgba(120,100,255,0.07); }
+.sim-table tr:last-child td { border-bottom: none; }
+.td-stay   { color: var(--gold);  font-family: 'Oswald', sans-serif; font-weight: 700; }
+.td-switch { color: var(--cyan);  font-family: 'Oswald', sans-serif; font-weight: 700; }
+
+/* ═══════════════════════════════════════════
+   EDUCATION
+═══════════════════════════════════════════ */
+.edu-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.edu-header {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.05rem;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(255,209,102,0.28);
+  margin-bottom: 1rem;
+}
+
+.edu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.edu-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 3px solid var(--neon);
+}
+.edu-card h4 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.8rem;
+  color: var(--neon2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.edu-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.75; }
+.edu-card p strong { color: var(--text); }
+
+.prob-formula {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  color: var(--gold);
+  background: rgba(255,209,102,0.06);
+  border: 1px solid rgba(255,209,102,0.18);
+  border-radius: 6px;
+  padding: 7px 12px;
+  margin-top: 0.5rem;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .dual-stat { grid-template-columns: 1fr; }
+  .edu-grid  { grid-template-columns: 1fr; }
+  .config-grid { grid-template-columns: 1fr; }
+  .bar-label-txt { width: 56px; font-size: 0.65rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="result-flash" id="resultFlash"></div>
+
+<div class="app">
+
+  <!-- ══════ HEADER ══════ -->
+  <div class="tv-header">
+    <div class="show-title">MONTY HALL</div>
+    <div class="show-subtitle">O Paradoxo — Exploração Interativa</div>
+  </div>
+  <div class="neon-line"></div>
+
+  <!-- ══════ CONFIG ══════ -->
+  <div class="config-section">
+    <div class="section-title">⚙ Configurações</div>
+    <div class="config-grid">
+
+      <div class="config-item">
+        <label for="numDoors">Número de portas (n)</label>
+        <div class="val-display" id="doorsDisp">3</div>
+        <input type="range" id="numDoors" min="3" max="12" value="3" oninput="cfgChanged()">
+      </div>
+
+      <div class="config-item">
+        <label for="numReveal">Portas reveladas (k)</label>
+        <div class="val-display" id="revealDisp">1</div>
+        <input type="range" id="numReveal" min="1" max="10" value="1" oninput="cfgChanged()">
+      </div>
+
+      <div class="config-item">
+        <label>Estratégia</label>
+        <div class="strategy-btns">
+          <button class="strat-btn active" onclick="setStrat('manual',this)">Manual</button>
+          <button class="strat-btn" onclick="setStrat('stay',this)">Ficar sempre</button>
+          <button class="strat-btn" onclick="setStrat('switch',this)">Trocar sempre</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════ STAGE ══════ -->
+  <div class="stage">
+    <div class="section-title" style="position:relative;z-index:1">◉ Ao Vivo — Palco Principal</div>
+    <div class="doors-wrap" id="doorsWrap"></div>
+    <div class="instruction" id="instruction">Configure acima e clique em uma porta para começar.</div>
+    <div class="action-bar">
+      <button class="btn primary" id="btnStay"   onclick="decide('stay')"   disabled>★ Ficar na porta</button>
+      <button class="btn success" id="btnSwitch" onclick="decide('switch')" disabled>↔ Trocar de porta</button>
+      <button class="btn"         id="btnNew"    onclick="newGame()">↺ Nova rodada</button>
+    </div>
+    <div class="history-row" id="histRow"></div>
+  </div>
+
+  <!-- ══════ STATS ══════ -->
+  <div class="stats-section">
+    <div class="section-title">📊 Estatísticas da sessão</div>
+
+    <div class="dual-stat">
+      <div class="stat-block stay">
+        <div class="lbl">Ficou e ganhou</div>
+        <div class="big" id="stayWins">0</div>
+        <div class="sub" id="stayRate">— de —</div>
+      </div>
+      <div class="stat-block switch">
+        <div class="lbl">Trocou e ganhou</div>
+        <div class="big" id="switchWins">0</div>
+        <div class="sub" id="switchRate">— de —</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:1rem">🤖 Simulação automática (1000 rodadas)</div>
+    <div class="sim-trigger">
+      <button class="btn primary" onclick="runSim()">▶ Rodar simulação</button>
+      <span class="sim-status-txt" id="simStatus">Aguardando...</span>
+    </div>
+
+    <div class="bar-chart">
+      <div class="bar-row stay">
+        <div class="bar-label-txt stay">Ficar</div>
+        <div class="bar-track"><div class="bar-fill" id="barStay">0%</div></div>
+        <div class="bar-pct" id="pctStay">—</div>
+      </div>
+      <div class="bar-row switch">
+        <div class="bar-label-txt switch">Trocar</div>
+        <div class="bar-track"><div class="bar-fill" id="barSwitch">0%</div></div>
+        <div class="bar-pct" id="pctSwitch">—</div>
+      </div>
+    </div>
+
+    <table class="sim-table" id="simTable" style="display:none">
+      <thead>
+        <tr>
+          <th>Config</th>
+          <th>Ficar (sim)</th>
+          <th>Trocar (sim)</th>
+          <th>P(ficar) teórico</th>
+          <th>P(trocar) teórico</th>
+        </tr>
+      </thead>
+      <tbody id="simBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ══════ EDUCATION ══════ -->
+  <div class="edu-section">
+    <div class="edu-header">🎓 Por que trocar funciona?</div>
+    <div class="edu-grid">
+
+      <div class="edu-card">
+        <h4>O Paradoxo Clássico</h4>
+        <p>Com <strong>3 portas e 1 revelada</strong>, a maioria intui 50/50. Mas ao escolher, você "captura" <strong>1/3</strong>. As outras 2 portas têm <strong>2/3</strong> — e após revelar uma cabra, essa probabilidade toda vai para a porta restante.</p>
+      </div>
+
+      <div class="edu-card">
+        <h4>Raciocínio Bayesiano</h4>
+        <p>O apresentador <strong>nunca revela o prêmio</strong>: ele usa informação que você não tem. Isso <em>atualiza</em> as probabilidades. A sua porta inicial mantém <strong>1/n</strong>; a probabilidade restante redistribui entre as fechadas que você não escolheu.</p>
+      </div>
+
+      <div class="edu-card">
+        <h4>Generalizando (n portas, k reveladas)</h4>
+        <p>A porta inicial vale sempre <strong>1/n</strong>. Ao trocar para uma das n−k−1 fechadas, a probabilidade é <strong>(n−1) / (n·(n−k−1))</strong>. Quanto mais reveladas, mais a troca compensa.</p>
+        <div class="prob-formula" id="formulaDisp">P(trocar) = (n−1)/(n·(n−k−1))</div>
+      </div>
+
+      <div class="edu-card">
+        <h4>Exemplo extremo: 100 portas</h4>
+        <p>Com <strong>100 portas</strong> e <strong>98 reveladas</strong>: sua porta tem <strong>1%</strong>. O apresentador eliminou 98 cabras — a porta restante tem <strong>99%</strong> de chance de ter o prêmio. Trocar é quase certeza!</p>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+/* ═══════════════════════════════════
+   ESTADO
+═══════════════════════════════════ */
+const G = {
+  n: 3, k: 1, strategy: 'manual',
+  prize: -1, chosen: -1, revealed: [],
+  phase: 'idle',            // idle | chosen | revealed | done
+  sess: { stayT:0, stayW:0, switchT:0, switchW:0 },
+};
+
+/* ═══════════════════════════════════
+   CONFIG
+═══════════════════════════════════ */
+function cfgChanged() {
+  const nEl = document.getElementById('numDoors');
+  const kEl = document.getElementById('numReveal');
+  G.n = +nEl.value;
+  const maxK = G.n - 2;
+  kEl.max = maxK;
+  if (+kEl.value > maxK) kEl.value = maxK;
+  G.k = +kEl.value;
+  document.getElementById('doorsDisp').textContent  = G.n;
+  document.getElementById('revealDisp').textContent = G.k;
+  updateFormula();
+  if (G.phase === 'idle') buildDoors();
+}
+
+function updateFormula() {
+  const {n, k} = G;
+  const rem = n - k - 1;
+  if (rem <= 0) { document.getElementById('formulaDisp').textContent='P(trocar) = n.a.'; return; }
+  const ps = (1/n).toFixed(3);
+  const pw = ((n-1)/(n*rem)).toFixed(3);
+  document.getElementById('formulaDisp').textContent =
+    `P(ficar) = 1/${n} ≈ ${ps}   ·   P(trocar) = (${n}−1)/(${n}·${rem}) ≈ ${pw}`;
+}
+
+function setStrat(s, el) {
+  G.strategy = s;
+  document.querySelectorAll('.strat-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ═══════════════════════════════════
+   BUILD DOORS
+═══════════════════════════════════ */
+function buildDoors() {
+  const wrap = document.getElementById('doorsWrap');
+  wrap.innerHTML = '';
+
+  for (let i = 0; i < G.n; i++) {
+    const door = document.createElement('div');
+    door.className = 'door';
+    door.id = `d${i}`;
+
+    const inner = document.createElement('div');
+    inner.className = 'door-inner';
+
+    // Front face
+    const front = document.createElement('div');
+    front.className = 'door-face door-front';
+
+    const star = document.createElement('span');
+    star.className = 'door-sel-star'; star.textContent = '★';
+
+    const num = document.createElement('div');
+    num.className = 'door-num'; num.textContent = i + 1;
+
+    const knob = document.createElement('div');
+    knob.className = 'door-knob';
+
+    front.append(star, num, knob);
+
+    // Back face
+    const back = document.createElement('div');
+    back.className = 'door-face door-back';
+    back.id = `db${i}`;
+
+    inner.append(front, back);
+    door.appendChild(inner);
+
+    // Badge
+    const badge = document.createElement('div');
+    badge.className = 'door-badge'; badge.id = `badge${i}`;
+    door.appendChild(badge);
+
+    wrap.appendChild(door);
+  }
+
+  applyDoorStates();
+}
+
+/* ═══════════════════════════════════
+   APPLY VISUAL STATES
+═══════════════════════════════════ */
+function applyDoorStates() {
+  const {n, chosen, revealed, phase, prize} = G;
+  const done = phase === 'done';
+
+  for (let i = 0; i < n; i++) {
+    const door  = document.getElementById(`d${i}`);
+    const back  = document.getElementById(`db${i}`);
+    const badge = document.getElementById(`badge${i}`);
+    if (!door) continue;
+
+    const isSel  = i === chosen;
+    const isRev  = revealed.includes(i);
+    const isPrize= i === prize;
+
+    // Reset classes
+    door.className = 'door';
+    badge.className = 'door-badge';
+    badge.textContent = '';
+    back.innerHTML = '';
+
+    if (isSel && !done)   door.classList.add('selected');
+    if (done && isPrize)  door.classList.add('win-door');
+    if (done && !isPrize) door.classList.add('lose-door');
+
+    // Switch targets (manual, revealed phase)
+    if (phase === 'revealed' && !isRev && !isSel && G.strategy === 'manual')
+      door.classList.add('switch-target');
+
+    // Flip if revealed or done
+    if (isRev || done) {
+      door.classList.add('flip');
+      // back content
+      const em = document.createElement('div'); em.className = 'door-emoji';
+      const lb = document.createElement('div'); lb.className = 'door-content-label';
+      if (done) {
+        em.textContent = isPrize ? '🏆' : '🐐';
+        lb.textContent = isPrize ? 'PRÊMIO!' : 'Cabra';
+        lb.style.color = isPrize ? 'var(--green)' : 'var(--red)';
+      } else {
+        em.textContent = '🐐'; lb.textContent = 'Cabra'; lb.style.color = 'var(--red)';
+      }
+      back.append(em, lb);
+    }
+
+    // Badge
+    if (isSel && !done) {
+      badge.classList.add('visible','badge-sel'); badge.textContent = 'Sua escolha';
+    } else if (isRev && !done) {
+      badge.classList.add('visible','badge-rev'); badge.textContent = 'Revelada';
+    } else if (done && isSel) {
+      badge.classList.add('visible', won_last ? 'badge-sel' : 'badge-rev');
+      badge.textContent = 'Porta final';
+    }
+
+    // Click handlers
+    door.onclick = null;
+    if (phase === 'idle') {
+      door.onclick = () => playerChoose(i);
+    } else if (phase === 'revealed' && !isRev && !isSel && G.strategy === 'manual') {
+      door.onclick = () => decide('switch', i);
+    } else {
+      door.classList.add('no-hover');
+    }
+  }
+}
+
+let won_last = false;
+
+/* ═══════════════════════════════════
+   GAME FLOW
+═══════════════════════════════════ */
+function newGame() {
+  G.phase  = 'idle';
+  G.prize  = rnd(G.n);
+  G.chosen = -1;
+  G.revealed = [];
+  won_last = false;
+  document.getElementById('btnStay').disabled   = true;
+  document.getElementById('btnSwitch').disabled = true;
+  document.getElementById('resultFlash').className = 'result-flash';
+  setMsg('Clique em uma porta para fazer sua escolha inicial.', 'active');
+  buildDoors();
+}
+
+function playerChoose(i) {
+  if (G.phase !== 'idle') return;
+  G.chosen = i;
+  G.phase  = 'chosen';
+  setMsg(`Você escolheu a porta ${i+1}. O apresentador vai revelar ${G.k} porta(s)...`, 'active');
+  applyDoorStates();
+  setTimeout(revealDoors, 850);
+}
+
+function revealDoors() {
+  // Pool: not chosen, not prize
+  const pool = [];
+  for (let i = 0; i < G.n; i++) if (i !== G.chosen && i !== G.prize) pool.push(i);
+  shuffle(pool);
+  G.revealed = pool.slice(0, G.k);
+  G.phase = 'revealed';
+
+  applyDoorStates();
+
+  const rem = G.n - G.k - 1;
+  if (G.strategy === 'manual') {
+    setMsg(`${G.k} porta(s) revelada(s)! Clique em outra porta para trocar, ou use os botões.`, 'active');
+    document.getElementById('btnStay').disabled   = false;
+    document.getElementById('btnSwitch').disabled = rem === 0;
+  } else if (G.strategy === 'stay') {
+    setTimeout(() => decide('stay'), 700);
+  } else {
+    setTimeout(() => decide('switch'), 700);
+  }
+}
+
+function decide(action, specific = -1) {
+  if (G.phase !== 'revealed') return;
+  G.phase = 'done';
+  document.getElementById('btnStay').disabled   = true;
+  document.getElementById('btnSwitch').disabled = true;
+
+  let finalDoor;
+  if (action === 'stay') {
+    finalDoor = G.chosen;
+  } else {
+    if (specific >= 0) {
+      finalDoor = specific;
+    } else {
+      const opts = [];
+      for (let i = 0; i < G.n; i++) if (i !== G.chosen && !G.revealed.includes(i)) opts.push(i);
+      finalDoor = opts.length ? opts[rnd(opts.length)] : G.chosen;
+    }
+    G.chosen = finalDoor;
+  }
+
+  const won = finalDoor === G.prize;
+  won_last = won;
+
+  // Session stats
+  if (action === 'stay')   { G.sess.stayT++;   if (won) G.sess.stayW++; }
+  else                     { G.sess.switchT++;  if (won) G.sess.switchW++; }
+
+  applyDoorStates();
+
+  document.getElementById('resultFlash').className = 'result-flash ' + (won ? 'win' : 'lose');
+
+  if (won) setMsg(`🏆 VOCÊ GANHOU! Porta ${finalDoor+1} tinha o prêmio. (${action==='stay'?'Ficou':'Trocou'})`, 'win');
+  else     setMsg(`🐐 Você perdeu. Prêmio estava na porta ${G.prize+1}. (${action==='stay'?'Ficou':'Trocou'})`, 'lose');
+
+  // History chip
+  const chip = document.createElement('span');
+  chip.className = `history-chip ${won?'chip-win':'chip-lose'}`;
+  chip.textContent = `${won?'✓':'✗'} ${action==='stay'?'ficou':'trocou'}`;
+  document.getElementById('histRow').prepend(chip);
+
+  updateSessDisplay();
+}
+
+/* ═══════════════════════════════════
+   SIMULATION
+═══════════════════════════════════ */
+function sim1000(n, k, action) {
+  let wins = 0;
+  for (let r = 0; r < 1000; r++) {
+    const prize  = rnd(n);
+    const chosen = rnd(n);
+    const pool = [];
+    for (let i = 0; i < n; i++) if (i !== chosen && i !== prize) pool.push(i);
+    shuffle(pool);
+    const revealed = pool.slice(0, k);
+    let final;
+    if (action === 'stay') {
+      final = chosen;
+    } else {
+      const opts = [];
+      for (let i = 0; i < n; i++) if (i !== chosen && !revealed.includes(i)) opts.push(i);
+      final = opts.length ? opts[rnd(opts.length)] : chosen;
+    }
+    if (final === prize) wins++;
+  }
+  return wins;
+}
+
+function runSim() {
+  const {n, k} = G;
+  document.getElementById('simStatus').textContent = 'Simulando...';
+  setTimeout(() => {
+    const sw = sim1000(n, k, 'stay');
+    const ew = sim1000(n, k, 'switch');
+    const ps = (sw/10).toFixed(1);
+    const pe = (ew/10).toFixed(1);
+
+    document.getElementById('barStay').style.width   = ps + '%';
+    document.getElementById('barSwitch').style.width = pe + '%';
+    document.getElementById('barStay').textContent   = ps + '%';
+    document.getElementById('barSwitch').textContent = pe + '%';
+    document.getElementById('pctStay').textContent   = ps + '%';
+    document.getElementById('pctSwitch').textContent = pe + '%';
+
+    const rem = n - k - 1;
+    const thS = (100/n).toFixed(1) + '%';
+    const thE = rem > 0 ? ((n-1)/(n*rem)*100).toFixed(1) + '%' : 'n.a.';
+
+    document.getElementById('simStatus').textContent = `1000 rodadas com n=${n}, k=${k}`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>n=${n}, k=${k}</td>
+      <td class="td-stay">${sw}/1000 (${ps}%)</td>
+      <td class="td-switch">${ew}/1000 (${pe}%)</td>
+      <td class="td-stay">${thS}</td>
+      <td class="td-switch">${thE}</td>
+    `;
+    document.getElementById('simBody').prepend(tr);
+    document.getElementById('simTable').style.display = 'table';
+  }, 50);
+}
+
+/* ═══════════════════════════════════
+   HELPERS
+═══════════════════════════════════ */
+function setMsg(t, cls) {
+  const el = document.getElementById('instruction');
+  el.textContent = t; el.className = 'instruction ' + cls;
+}
+
+function updateSessDisplay() {
+  const s = G.sess;
+  document.getElementById('stayWins').textContent   = s.stayW;
+  document.getElementById('switchWins').textContent = s.switchW;
+  document.getElementById('stayRate').textContent   = s.stayT
+    ? `${s.stayW} de ${s.stayT} (${(s.stayW/s.stayT*100).toFixed(0)}%)`
+    : '— de —';
+  document.getElementById('switchRate').textContent = s.switchT
+    ? `${s.switchW} de ${s.switchT} (${(s.switchW/s.switchT*100).toFixed(0)}%)`
+    : '— de —';
+}
+
+function rnd(n)   { return Math.floor(Math.random() * n); }
+function shuffle(a) { for (let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+/* ═══════════════════════════════════
+   BOOT
+═══════════════════════════════════ */
+cfgChanged();
+newGame();
+</script>
+</body>
+</html>
