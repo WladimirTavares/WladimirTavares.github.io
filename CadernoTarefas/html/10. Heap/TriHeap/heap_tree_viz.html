@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Heap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-min {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-min:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .btn-max {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-max:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-dot {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-dot:hover {
+            background: #0b7dda;
+            transform: translateY(-2px);
+        }
+        
+        .info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .array-display {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #tree-canvas {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-top: 20px;
+            background: #fafafa;
+        }
+        
+        .dot-output {
+            margin-top: 20px;
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        
+        .dot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌳 Visualizador de Heap</h1>
+        <p class="subtitle">Array: [20, 10, 15, 8, 7, 12, 11, 5, 4, 3]</p>
+        
+        <div class="controls">
+            <button class="btn-min" onclick="buildMinHeap()">Construir MinHeap</button>
+            <button class="btn-max" onclick="buildMaxHeap()">Construir MaxHeap</button>
+            <button class="btn-dot" onclick="toggleDotOutput()">Mostrar/Ocultar Código DOT</button>
+        </div>
+        
+        <div class="info">
+            <div class="array-display" id="heap-array">Clique em um botão para construir a heap</div>
+        </div>
+        
+        <canvas id="tree-canvas"></canvas>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4CAF50;"></div>
+                <span>Raiz da árvore</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #2196F3;"></div>
+                <span>Nós internos</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FF9800;"></div>
+                <span>Folhas</span>
+            </div>
+        </div>
+        
+        <div id="dot-container" style="display: none;">
+            <div class="dot-header">
+                <h3>Código DOT (Graphviz)</h3>
+                <button class="copy-btn" onclick="copyDotCode()">Copiar Código</button>
+            </div>
+            <div class="dot-output" id="dot-output"></div>
+            <p style="margin-top: 10px; color: #666;">
+                Cole este código em <a href="https://dreampuf.github.io/GraphvizOnline/" target="_blank" style="color: #667eea;">Graphviz Online</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const originalArray = [20, 10, 15, 8, 7, 12, 11, 5, 4, 3];
+        let currentHeap = [];
+        let heapType = '';
+
+        function minHeapify(arr) {
+            const heap = [...arr];
+            const n = heap.length;
+            
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                heapifyDown(heap, n, i, true);
+            }
+            return heap;
+        }
+
+        function maxHeapify(arr) {
+            const heap = [...arr];
+            const n = heap.length;
+            
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                heapifyDown(heap, n, i, false);
+            }
+            return heap;
+        }
+
+        function heapifyDown(arr, n, i, isMin) {
+            let extreme = i;
+            const left = 2 * i + 1;
+            const right = 2 * i + 2;
+
+            if (isMin) {
+                if (left < n && arr[left] < arr[extreme]) extreme = left;
+                if (right < n && arr[right] < arr[extreme]) extreme = right;
+            } else {
+                if (left < n && arr[left] > arr[extreme]) extreme = left;
+                if (right < n && arr[right] > arr[extreme]) extreme = right;
+            }
+
+            if (extreme !== i) {
+                [arr[i], arr[extreme]] = [arr[extreme], arr[i]];
+                heapifyDown(arr, n, extreme, isMin);
+            }
+        }
+
+        function buildMinHeap() {
+            currentHeap = minHeapify(originalArray);
+            heapType = 'min';
+            updateDisplay();
+            drawTree();
+        }
+
+        function buildMaxHeap() {
+            currentHeap = maxHeapify(originalArray);
+            heapType = 'max';
+            updateDisplay();
+            drawTree();
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('heap-array');
+            const typeLabel = heapType === 'min' ? 'MinHeap' : 'MaxHeap';
+            display.innerHTML = `<strong>${typeLabel}:</strong> [${currentHeap.join(', ')}]`;
+        }
+
+        function drawTree() {
+            const canvas = document.getElementById('tree-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (currentHeap.length === 0) return;
+
+            const levels = Math.ceil(Math.log2(currentHeap.length + 1));
+            const nodeRadius = 25;
+            const levelHeight = canvas.height / (levels + 1);
+
+            function drawNode(index, x, y, level) {
+                if (index >= currentHeap.length) return;
+
+                const value = currentHeap[index];
+                const left = 2 * index + 1;
+                const right = 2 * index + 2;
+
+                // Desenhar linhas para filhos
+                const nextY = y + levelHeight;
+                const spread = canvas.width / Math.pow(2, level + 2);
+
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+
+                if (left < currentHeap.length) {
+                    const leftX = x - spread;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + nodeRadius);
+                    ctx.lineTo(leftX, nextY - nodeRadius);
+                    ctx.stroke();
+                    drawNode(left, leftX, nextY, level + 1);
+                }
+
+                if (right < currentHeap.length) {
+                    const rightX = x + spread;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + nodeRadius);
+                    ctx.lineTo(rightX, nextY - nodeRadius);
+                    ctx.stroke();
+                    drawNode(right, rightX, nextY, level + 1);
+                }
+
+                // Cor do nó
+                let color;
+                if (index === 0) {
+                    color = '#4CAF50'; // Raiz
+                } else if (left >= currentHeap.length && right >= currentHeap.length) {
+                    color = '#FF9800'; // Folha
+                } else {
+                    color = '#2196F3'; // Interno
+                }
+
+                // Desenhar círculo
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Desenhar valor
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(value, x, y);
+
+                // Desenhar índice ao lado do nó
+                ctx.fillStyle = '#666';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`[${index}]`, x + nodeRadius + 5, y - 8);
+            }
+
+            drawNode(0, canvas.width / 2, levelHeight, 0);
+        }
+
+        function generateDotCode() {
+            if (currentHeap.length === 0) return '';
+
+            let dot = 'digraph Heap {\n';
+            dot += '    node [shape=circle, style=filled, fillcolor=lightblue, fontsize=14];\n';
+            dot += '    edge [color=black, penwidth=2];\n\n';
+
+            for (let i = 0; i < currentHeap.length; i++) {
+                dot += `    node${i} [label="${currentHeap[i]}\\n[${i}]"];\n`;
+            }
+
+            dot += '\n';
+
+            for (let i = 0; i < currentHeap.length; i++) {
+                const left = 2 * i + 1;
+                const right = 2 * i + 2;
+
+                if (left < currentHeap.length) {
+                    dot += `    node${i} -> node${left} [label="E"];\n`;
+                }
+                if (right < currentHeap.length) {
+                    dot += `    node${i} -> node${right} [label="D"];\n`;
+                }
+            }
+
+            dot += '}';
+            return dot;
+        }
+
+        function toggleDotOutput() {
+            const container = document.getElementById('dot-container');
+            const output = document.getElementById('dot-output');
+            
+            if (container.style.display === 'none') {
+                output.textContent = generateDotCode();
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function copyDotCode() {
+            const code = document.getElementById('dot-output').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Código DOT copiado!');
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            if (currentHeap.length > 0) {
+                drawTree();
+            }
+        });
+    </script>
+</body>
+</html>

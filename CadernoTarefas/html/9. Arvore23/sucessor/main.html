@@ -1,0 +1,48 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 48 --><p class='noindent'><span class='cmbx-12'>Sucessor</span>
+</p><!-- l. 51 --><p class='noindent'>Imagine que você tem uma árvore de busca 2–3 apontada pelo ponteiro <span class='cmmi-12'>p </span>com a seguinte estrutura:
+                                                                                                            
+                                                                                                            
+</p>
+<pre class='verbatim' id='verbatim-1'>
+typedef struct No23 {
+    int key[2];                 // usamos APENAS key[0] e key[1]
+    struct No23 *child[3];      // usamos APENAS child[0..2]
+    int nkeys;                  // SEMPRE 1 ou 2
+    int leaf;
+} No23;
+</pre>
+<!-- l. 60 --><p class='nopar'>
+</p><!-- l. 63 --><p class='noindent'>Por exemplo,
+</p>
+<div class='center'>
+<!-- l. 65 --><p class='noindent'>
+</p><!-- l. 66 --><p class='noindent'><img alt='PIC' height='43' src='arvore23.png' width='43' /></p></div>
+<!-- l. 70 --><p class='noindent'>A tarefa consiste em
+   </p><dl class='list1'><dt class='list'>
+   </dt><dd class='list'>
+   <!-- l. 72 --><p class='noindent'>
+       </p><dl class='list2'><dt class='list'>
+   <span class='cmsy-10x-x-120'>→</span>  </dt><dd class='list'>
+       <!-- l. 73 --><p class='noindent'><span class='cmti-12'>encontre o sucessor de um valor </span><span class='cmmi-12'>k </span><span class='cmti-12'>na árvore de busca 2–3 apontada por </span><span class='cmmi-12'>p </span><span class='cmti-12'>e armazene em resp.</span>
+                                                                                                            
+                                                                                                            
+       </p></dd><dt class='list'>
+       </dt><dd class='list'>
+       <!-- l. 75 --><p class='noindent'><span class='cmti-12'>Caso o sucessor não exista armazene -1 em resp.</span> </p></dd></dl>
+   </dd></dl>
+<!-- l. 78 --><p class='noindent'>No exemplo acima, para <span class='cmmi-12'>k </span>= 13, isso nos daria
+   </p><dl class='list1'><dt class='list'>
+   </dt><dd class='list'>
+   <!-- l. 82 --><p class='noindent'>      <span class='cmtt-12'>resp =&gt;  15</span> </p></dd></dl>
+ 
+</body> 
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 48 --><p class='noindent'><span class='cmbx-12x-x-144'>Balanceamento</span>
+</p><!-- l. 52 --><p class='noindent'>Considere um ponteiro <span class='cmmi-12'>p </span>para uma árvore binária cujos nós armazenam chaves inteiras, conforme ilustrado na
+Figura abaixo.
+</p><!-- l. 55 --><p class='noindent'>Por exemplo,
+</p>
+<div class='center'>
+<!-- l. 57 --><p class='noindent'>
+</p><!-- l. 57 --><p class='noindent'><img alt='p−→2∙∙17∙∙9∙∙5∙∙10∙∙8∙∙4∙∙
+' src='main0x.svg' /></p></div>
+<!-- l. 139 --><p class='noindent'>A menor altura possível dentre todas as árvores binárias com <img alt='N  ' class='math' src='main1x.svg' /> nós, denotada por <img alt='hmin(N )  ' class='math' src='main2x.svg' />, é dada
+por:
+</p>
+<div class='math-display'>
+<img alt='hmin(N ) = ⌈log2(N + 1)⌉ − 1.
+' class='math-display' src='main3x.svg' /></div>
+<!-- l. 144 --><p class='noindent'>Essa expressão pode ser calculada da seguinte maneira:
+                                                                                                            
+                                                                                                            
+</p>
+<pre class='verbatim' id='verbatim-1'>
+int hmin(int N){
+int h = 0;
+N++;
+while(N&gt;0){
+N = N/2;
+h++;
+}
+return h-1;
+}
+</pre>
+<!-- l. 156 --><p class='nopar'>
+</p><!-- l. 161 --><p class='noindent'>Com base nessa definição, classificamos o balanceamento de uma árvore binária da seguinte forma:
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'>
+      <!-- l. 164 --><p class='noindent'>A árvore binária <img alt='T  ' class='math' src='main4x.svg' /> é dita <span class='cmbx-12'>fortemente balanceada </span>se sua altura satisfaz
+      </p>
+<div class='math-display'>
+<img alt='h(T ) = hmin(N ).
+' class='math-display' src='main5x.svg' /></div>
+      </li>
+      <li class='itemize'>
+      <!-- l. 171 --><p class='noindent'>A árvore binária <img alt='T  ' class='math' src='main6x.svg' /> é dita <span class='cmbx-12'>fracamente balanceada </span>se
+      </p>
+<div class='math-display'>
+<img alt='h(T ) ≤ h   (N ) + c,
+         min
+' class='math-display' src='main7x.svg' /></div>
+      <!-- l. 175 --><p class='noindent'>onde  <img alt='c  ' class='math' src='main8x.svg' />  é  uma  constante  pequena,  usualmente  <img alt='c = 1  ' class='math' src='main9x.svg' />.  Essa  definição  admite  uma  pequena
+      tolerância em relação à altura mínima, mantendo ainda um bom desempenho assintótico.
+      </p></li>
+      <li class='itemize'>
+      <!-- l. 179 --><p class='noindent'>A árvore binária <img alt='T  ' class='math' src='main10x.svg' /> é dita <span class='cmbx-12'>super fracamente balanceada </span>se
+      </p>
+<div class='math-display'>
+<img alt='h(T ) ≤ 2hmin(N ).
+' class='math-display' src='main11x.svg' /></div>
+      <!-- l. 183 --><p class='noindent'>Essa condição impõe apenas um limite superior global para a altura da árvore, garantindo que ela
+      não seja excessivamente degenerada.</p></li></ul>
+<!-- l. 188 --><p class='noindent'>Caso a árvore não satisfaça nenhuma das condições acima, ela é considerada <span class='cmbx-12'>não balanceada</span>.
+</p><!-- l. 191 --><p class='noindent'><span class='cmbx-12'>Tarefa.</span>
+</p><!-- l. 194 --><p class='noindent'>Implemente um algoritmo que classifique o balanceamento da árvore binária apontada por <span class='cmmi-12'>p </span>e armazene em <span class='cmmi-12'>resp </span>um
+dos seguintes valores:
+</p>
+                                                                                                            
+                                                                                                            
+      <ul class='itemize1'>
+      <li class='itemize'>1, se a árvore for fortemente balanceada;
+      </li>
+      <li class='itemize'>2, se a árvore for fracamente balanceada;
+      </li>
+      <li class='itemize'>3, se a árvore for super fracamente balanceada;
+      </li>
+      <li class='itemize'>4, se a árvore não for balanceada.</li></ul>
+<!-- l. 205 --><p class='noindent'>No exemplo apresentado, o valor armazenado em <span class='cmmi-12'>resp </span>deve ser:
+</p>
+<div class='math-display'>
+<img alt='resp  ⇒   1.
+' class='math-display' src='main12x.svg' /></div>
+ 
+</body> 
+</html>

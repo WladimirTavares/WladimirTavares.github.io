@@ -1,0 +1,47 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 52 --><p class='noindent'><span class='cmss-17'>Vacas Agressivas</span>
+</p><!-- l. 56 --><p class='noindent'>Imagine que temos uma lista ordenada contendo <span class='cmmi-12'>N </span>números inteiros. Esses números representam as posições das
+baias dispostas ao longo de uma linha reta.
+</p>
+<div class='center'>
+<!-- l. 60 --><p class='noindent'>
+</p><!-- l. 61 --><p class='noindent'><img alt='L1248904
+' src='main0x.svg' /></p></div>
+<!-- l. 91 --><p class='noindent'>Você possui <span class='cmmi-12'>C </span>vacas (2 <span class='cmsy-10x-x-120'>≤ </span><span class='cmmi-12'>C </span><span class='cmsy-10x-x-120'>≤ </span><span class='cmmi-12'>N</span>), mas elas são muito agressivas entre si quando colocadas em baias próximas. Sua
+tarefa é <span class='cmbx-12'>distribuir as vacas nas baias de modo que a menor distância entre quaisquer duas vacas seja a
+</span><span class='cmbx-12'>maior possível</span>.
+</p><!-- l. 94 --><p class='noindent'>Qual é a maior distância mínima possível? Armazene o maior distância encontrada na variável
+resp.
+</p><!-- l. 98 --><p class='noindent'>Por exemplo, para <span class='cmmi-12'>C </span>= 3, podemos colocar as vacas nas baias 1, 4 e 9. Nesse caso, a menor distância entre as vacas
+será igual a 3.
+</p>
+<div class='center'>
+<!-- l. 102 --><p class='noindent'>
+                                                                                                            
+                                                                                                            
+</p><!-- l. 103 --><p class='noindent'><img alt='L1248901234
+' src='main1x.svg' /></p></div>
+<!-- l. 144 --><p class='noindent'>Se quisermos aumentar a distância mínima entre as vacas para pelo menos 4, não é possível distribuir as 3 vacas
+de forma viável.
+   </p><dl class='list1'><dt class='list'>
+<span class='cmbx-12'>Dica:</span> </dt><dd class='list'>
+   <!-- l. 149 --><p class='noindent'>Defina uma função <span class='cmmi-12'>F</span>(<span class='cmmi-12'>x</span>) tal que:
+   </p>
+<div class='math-display'>
+<img alt='        (
+        { 1,  se for poss´ıvel colocar todas as vacas de modo que a distˆancia entre quaisquer duas seja pelo menos x,
+F (x) = (
+          0,  caso contr´ario.
+' class='math-display' src='main2x.svg' /></div>
+   <!-- l. 160 --><p class='noindent'>Note que a resposta procurada é o <span class='cmbx-12'>maior valor de </span><span class='cmmi-12'>x </span><span class='cmbx-12'>para o qual </span><span class='cmmi-12'>F</span>(<span class='cmmi-12'>x</span>) = 1. </p></dd></dl>
+ 
+</body> 
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 49 --><p class='noindent'><span class='cmbx-12x-x-144'>Encontrando o menor</span>
+</p><!-- l. 53 --><p class='noindent'><span class='cmbx-12'>Descrição do Problema:</span>
+</p><!-- l. 55 --><p class='noindent'>Imagine que você possui um vetor <span class='cmbx-12'>desconhecido</span> <img alt='L  ' class='math' src='main0x.svg' /> de tamanho <img alt='N  ' class='math' src='main1x.svg' />. A única forma de comparar os
+elementos desse vetor é por meio de uma função chamada <span class='cmtt-12'>maior3(a, b, c)</span>, que recebe <span class='cmbx-12'>três índices</span>
+<img alt='a,b,c  ' class='math' src='main2x.svg' /> (cada um entre <img alt='0  ' class='math' src='main3x.svg' /> e <img alt='N  − 1  ' class='math' src='main4x.svg' />) e devolve o <span class='cmbx-12'>índice do maior elemento </span>entre <img alt='L [a]  ' class='math' src='main5x.svg' />, <img alt='L [b]  ' class='math' src='main6x.svg' /> e
+<img alt='L [c]  ' class='math' src='main7x.svg' />.
+</p><!-- l. 57 --><p class='noindent'>A sua tarefa é <span class='cmbx-12'>descobrir o índice do menor elemento </span>do vetor <img alt='L  ' class='math' src='main8x.svg' />.
+</p><!-- l. 59 --><p class='noindent'>Observe que, a cada chamada da função <span class='cmtt-12'>maior3</span>, é possível <span class='cmbx-12'>eliminar pelo menos um índice </span>da lista de
+candidatos ao menor elemento, já que sabemos qual deles é o maior entre os três comparados.
+</p><!-- l. 61 --><p class='noindent'>Para ilustrar, considere um vetor desconhecido de tamanho <img alt='N  = 5  ' class='math' src='main9x.svg' /> e a seguinte sequência de chamadas à
+função:
+      </p><dl class='enumerate'><dt class='enumerate'>
+   1. </dt><dd class='enumerate'>
+      <!-- l. 64 --><p class='noindent'>Se <span class='cmtt-12'>maior3(0, 1, 2) = 0</span>, então o índice do menor elemento só pode ser <span class='cmbx-12'>1 </span>ou <span class='cmbx-12'>2</span>.
+      </p></dd><dt class='enumerate'>
+   2. </dt><dd class='enumerate'>
+      <!-- l. 65 --><p class='noindent'>Se <span class='cmtt-12'>maior3(1, 2, 4) = 2</span>, então o índice do menor elemento só pode ser <span class='cmbx-12'>1 </span>ou <span class='cmbx-12'>4</span>.
+      </p></dd><dt class='enumerate'>
+   3. </dt><dd class='enumerate'>
+      <!-- l. 66 --><p class='noindent'>Se <span class='cmtt-12'>maior3(1, 4, 3) = 4</span>, então o índice do menor elemento só pode ser <span class='cmbx-12'>1 </span>ou <span class='cmbx-12'>3</span>.
+                                                                                                            
+                                                                                                            
+      </p></dd><dt class='enumerate'>
+   4. </dt><dd class='enumerate'>
+      <!-- l. 67 --><p class='noindent'>Se <span class='cmtt-12'>maior3(1, 1, 3) = 1</span>, concluímos que o índice do menor elemento é <span class='cmbx-12'>3</span>.</p></dd></dl>
+<!-- l. 70 --><p class='noindent'><span class='cmbx-12'>Dica: </span>Mantenha um vetor <img alt='I  ' class='math' src='main10x.svg' /> com os possíveis índices que ainda podem corresponder ao menor elemento. A cada
+chamada de <span class='cmtt-12'>maior3</span>, atualize esse conjunto, eliminando pelo menos um índice com base no resultado
+obtido.
+</p>
+ 
+</body> 
+</html>

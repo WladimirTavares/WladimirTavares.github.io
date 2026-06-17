@@ -1,0 +1,68 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 47 --><p class='noindent'><span class='cmbx-12x-x-144'>Comedores de Pipoca 2</span>
+</p><!-- l. 51 --><p class='noindent'>Imagine que temos uma lista de <span class='cmmi-12'>N </span>inteiros representando a quantidade de pipocas em <span class='cmmi-12'>N </span>sacos dispostos lado a lado.
+Esses sacos serão consumidos por uma equipe composta por <span class='cmmi-12'>C </span>competidores, em uma competição onde cada
+competidor pode consumir, no máximo, <span class='cmmi-12'>K </span>pipocas.
+</p><!-- l. 54 --><p class='noindent'>Cada competidor deve comer uma sequência contígua de sacos, e cada saco deve ser consumido integralmente por
+um único competidor.
+</p><!-- l. 58 --><p class='noindent'><span class='cmbx-12'>Regras da competição:</span>
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'>Os sacos devem ser consumidos na ordem, da esquerda para a direita, sem deixar nenhum para trás;
+      </li>
+      <li class='itemize'>Cada competidor deve consumir uma <span class='cmbx-12'>sequência contígua </span>de sacos;
+      </li>
+      <li class='itemize'>Nenhum saco pode ser dividido entre dois competidores;
+      </li>
+      <li class='itemize'>Cada competidor pode consumir no máximo <span class='cmmi-12'>K </span>pipocas no total.</li></ul>
+<!-- l. 68 --><p class='noindent'>Por exemplo,
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'>Se <span class='cmmi-12'>N </span>= 5, <span class='cmmi-12'>C </span>= 3, <span class='cmmi-12'>K </span>= 13</li></ul>
+<div class='center'>
+<!-- l. 75 --><p class='noindent'>
+</p><!-- l. 76 --><p class='noindent'><img alt='L01234  5    8     3    10    7
+' src='main0x.svg' /></p></div>
+<!-- l. 99 --><p class='noindent'><span class='cmbx-12'>Distribuição entre os competidores:</span>
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'>Competidor 1: sacos 0 e 1 (5 + 8 = 13 pipocas)
+      </li>
+      <li class='itemize'>Competidor 2: sacos 2 e 3 (3 + 10 = 13 pipocas)
+      </li>
+      <li class='itemize'>Competidor 3: saco 4 (7 pipocas)</li></ul>
+<!-- l. 108 --><p class='noindent'>Os três competidores conseguem comer as pipocas de todos os sacos.
+</p>
+                                                                                                            
+                                                                                                            
+      <ul class='itemize1'>
+      <li class='itemize'>Se <span class='cmmi-12'>N </span>= 5, <span class='cmmi-12'>C </span>= 3, <span class='cmmi-12'>K </span>= 12</li></ul>
+<div class='center'>
+<!-- l. 116 --><p class='noindent'>
+</p><!-- l. 117 --><p class='noindent'><img alt='L01234  5    8     3    10    7
+' src='main1x.svg' /></p></div>
+<!-- l. 146 --><p class='noindent'><span class='cmbx-12'>Distribuição entre os competidores:</span>
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'>Competidor 1: sacos 0 (5 = 5 pipocas)
+      </li>
+      <li class='itemize'>Competidor 2: sacos 1 e 2 (8 + 3 = 11 pipocas)
+      </li>
+      <li class='itemize'>Competidor 3: saco 3 (10 pipocas)</li></ul>
+<!-- l. 154 --><p class='noindent'>O último saco de pipoca não consegue ser distribuído.
+</p><!-- l. 156 --><p class='noindent'>Dado o vetor de inteiros positivos <span class='cmmi-12'>L </span>de tamanho <span class='cmmi-12'>N </span>e o número de competidores <span class='cmmi-12'>C</span>, encontre o menor valor <span class='cmmi-12'>K </span>para que
+os <span class='cmmi-12'>C </span>competidores comam todas as pipocas de todos os sacos.
+</p><!-- l. 158 --><p class='noindent'>Encontre um intervalo de valor mínimo de K e um valor máximo K faça uma busca binária nesse
+intervalo.
+</p>
+ 
+</body> 
+</html>

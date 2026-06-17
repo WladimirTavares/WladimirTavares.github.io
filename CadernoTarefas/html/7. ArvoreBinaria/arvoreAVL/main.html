@@ -1,0 +1,66 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 48 --><p class='noindent'><span class='cmbx-12x-x-144'>Árvore AVL</span>
+</p><!-- l. 53 --><p class='noindent'>Uma <span class='cmbx-12'>árvore AVL </span>é uma <span class='cmbx-12'>árvore binária de busca (ABB) </span>que satisfaz uma condição adicional de
+balanceamento: para <span class='cmti-12'>todo nó </span><span class='cmti-12'>da árvore</span>, a diferença entre as alturas de suas subárvores esquerda e direita não
+pode exceder uma unidade.
+</p><!-- l. 56 --><p class='noindent'>Formalmente, para cada nó <span class='cmmi-12'>p</span>, define-se o <span class='cmbx-12'>fator de balanceamento </span>como:
+                                                                                                            
+                                                                                                            
+</p>
+<pre class='verbatim' id='verbatim-1'>
+FB(p) = altura(p-&gt;esq) - altura(p-&gt;dir)
+</pre>
+<!-- l. 60 --><p class='nopar'>
+</p><!-- l. 62 --><p class='noindent'>Uma árvore é considerada AVL se, para todo nó <span class='cmmi-12'>p</span>, vale:
+</p>
+<div class='math-display'>
+<img alt='FB (p) ∈ {− 1,0,+1 }.
+' class='math-display' src='main0x.svg' /></div>
+<!-- l. 68 --><p class='noindent'>A seguir, apresenta-se um exemplo de uma árvore que satisfaz tanto a propriedade de árvore binária de busca
+quanto a condição de balanceamento AVL.
+</p>
+<div class='center'>
+<!-- l. 70 --><p class='noindent'>
+</p><!-- l. 71 --><p class='noindent'><img alt='5321⊥47655⊥68⊥9000000052500
+' src='main1x.svg' /></p></div>
+<!-- l. 126 --><p class='noindent'>Como exemplo de verificação do balanceamento, analisemos o fator de balanceamento do nó raiz
+50:
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'><span class='cmbx-12'>Subárvore esquerda de 50: </span>o caminho mais longo é 50 <span class='cmsy-10x-x-120'>→ </span>30 <span class='cmsy-10x-x-120'>→ </span>20 <span class='cmsy-10x-x-120'>→ </span>10, com altura igual a 3.
+      </li>
+      <li class='itemize'><span class='cmbx-12'>Subárvore direita de 50: </span>o caminho mais longo é 50 <span class='cmsy-10x-x-120'>→ </span>70 <span class='cmsy-10x-x-120'>→ </span>60 <span class='cmsy-10x-x-120'>→ </span>55 <span class='cmsy-10x-x-120'>→ </span>52, com altura igual a 4.</li></ul>
+<!-- l. 135 --><p class='noindent'>Assim, o fator de balanceamento do nó 50 é:
+</p>
+                                                                                                            
+                                                                                                            
+<div class='math-display'>
+<img alt='F B (50 ) = 3 − 4 = − 1,
+' class='math-display' src='main2x.svg' /></div>
+<!-- l. 139 --><p class='noindent'>valor que está dentro do intervalo permitido, mantendo a árvore balanceada nesse nó.
+</p><!-- l. 142 --><p class='noindent'>Entretanto, se adicionarmos um novo nó de valor 8 como filho esquerdo do nó 10, a altura da subárvore esquerda do
+nó 20 aumentará, fazendo com que: </p>
+      <ul class='itemize1'>
+      <li class='itemize'><span class='cmmi-12'>FB</span>(20) = 2,
+      </li>
+      <li class='itemize'><span class='cmmi-12'>FB</span>(30) = 2,</li></ul>
+<!-- l. 147 --><p class='noindent'>o que viola a condição de balanceamento. Nesse caso, a árvore deixaria de ser uma árvore AVL.
+</p><!-- l. 150 --><p class='noindent'><span class='cmbx-12'>Tarefa.</span>
+</p><!-- l. 153 --><p class='noindent'>Implemente um algoritmo que verifique se uma árvore binária de busca apontada por <span class='cmtt-12'>p</span> é uma árvore AVL. O
+algoritmo deve armazenar o valor 1 em <span class='cmtt-12'>resp</span> caso a árvore seja AVL e 0 caso contrário.
+</p><!-- l. 157 --><p class='noindent'>No exemplo apresentado acima, o valor armazenado em <span class='cmtt-12'>resp</span> deve ser:
+</p>
+<div class='math-display'>
+<img alt='resp  ⇒   1.
+' class='math-display' src='main3x.svg' /></div>
+ 
+</body> 
+</html>

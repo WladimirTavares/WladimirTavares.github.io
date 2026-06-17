@@ -1,0 +1,51 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 48 --><p class='noindent'><span class='cmbx-12x-x-144'>Lista Encadeada com Descritores</span>
+</p><!-- l. 52 --><p class='noindent'>Considere uma lista encadeada simples cuja estrutura inclui, além dos ponteiros para o nó cabeça e para o último
+nó, informações adicionais sobre o <span class='cmti-12'>tamanho </span>da lista e a <span class='cmti-12'>soma </span>dos valores armazenados. As estruturas utilizadas
+são as seguintes:
+                                                                                                            
+                                                                                                            
+</p>
+<pre class='verbatim' id='verbatim-1'>
+typedef struct no {
+    int chave;
+    struct no* prox;
+} no;
+
+typedef struct lista { // Lista Encadeada Simples
+    no* cabeca;
+    no* ultimo;
+    int tamanho;
+    int soma;
+} lista;
+</pre>
+<!-- l. 66 --><p class='nopar'>
+</p><!-- l. 68 --><p class='noindent'>O ponteiro <span class='cmtt-12'>l-&gt;cabeca </span>referencia o primeiro nó da lista, cujos elementos são números inteiros. Um exemplo de
+configuração possível é mostrado a seguir:
+</p>
+<div class='center'>
+<!-- l. 71 --><p class='noindent'>
+</p><!-- l. 72 --><p class='noindent'><img alt='l5∙8∙1∙2∙7∙↑lll-5---&gt;&gt;&gt;&gt;cutsalaobtmmeiaacmnaoho =  −3=7→ 5
+' src='main0x.svg' /></p></div>
+<!-- l. 105 --><p class='noindent'><span class='cmbx-12'>Tarefa</span>
+</p><!-- l. 109 --><p class='noindent'>Deseja-se inserir um novo valor <span class='cmmi-12'>k </span>ao <span class='cmti-12'>final </span>da lista em tempo constante, atualizando corretamente os campos <span class='cmtt-12'>tamanho </span>e
+<span class='cmtt-12'>soma </span>do descritor da lista.
+</p><!-- l. 111 --><p class='noindent'>A figura abaixo mostra o resultado da inserção de <span class='cmmi-12'>k </span>= 10 na lista acima.
+</p>
+                                                                                                            
+                                                                                                            
+<div class='center'>
+<!-- l. 114 --><p class='noindent'>
+</p><!-- l. 115 --><p class='noindent'><img alt='l5∙8∙1∙2∙7∙1∙↑lll-50---&gt;&gt;&gt;&gt;cutsalaobtmmeiaacmnaoho =  −4=7→ 6
+' src='main1x.svg' /></p></div>
+ 
+</body> 
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 47 --><p class='noindent'><span class='cmbx-12x-x-144'>Pão a metro</span>
+</p><!-- l. 51 --><p class='noindent'>A equipe organizadora da festa de aniversário de 50 anos do Departamento de Computação decidiu
+preparar um evento para <span class='cmmi-12'>N </span>pessoas. Para isso, contrataram <span class='cmmi-12'>M </span>empresas diferentes, cada uma fornecendo
+sanduíches de metragens variadas. Esses pães seriam cortados em fatias de tamanho uniforme, escolhidas
+pela equipe, para distribuir entre os convidados. Fatias menores do que o tamanho definido não seriam
+aproveitadas.
+</p><!-- l. 53 --><p class='noindent'>Por exemplo, considere <span class='cmmi-12'>N </span>= 10 convidados e <span class='cmmi-12'>M </span>= 4 empresas, com os tamanhos dos pães (em centímetros)
+sendo
+</p>
+<div class='math-display'>
+<img alt='M1 =  120,  M2  = 89,   M3 =  230,  M4  =  177.
+' class='math-display' src='main0x.svg' /></div>
+<!-- l. 58 --><p class='noindent'>Se decidirmos cortar as fatias com tamanho de 50 centímetros, o número de fatias obtidas de cada pão será dado
+por
+</p>
+<div class='math-display'>
+<img alt='⌊ M  ⌋
+  --i
+  50
+' class='math-display' src='main1x.svg' /></div>
+<!-- l. 62 --><p class='noindent'>para cada <span class='cmmi-12'>i </span>= 1<span class='cmmi-12'>, </span>2<span class='cmmi-12'>, </span>3<span class='cmmi-12'>, </span>4. Assim, temos:
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'><img align='middle' alt='⌊    ⌋
+  120-
+  50' class='left' src='main2x.svg' /> = 2 fatias
+      </li>
+      <li class='itemize'><img align='middle' alt='⌊   ⌋
+  89
+  ---
+  50' class='left' src='main3x.svg' /> = 1 fatia
+      </li>
+      <li class='itemize'><img align='middle' alt='⌊ 230⌋
+  ----
+  50' class='left' src='main4x.svg' /> = 4 fatias
+                                                                                                            
+                                                                                                            
+      </li>
+      <li class='itemize'><img align='middle' alt='⌊ 15707⌋' class='left' src='main5x.svg' /> = 3 fatias</li></ul>
+<!-- l. 71 --><p class='noindent'>Dessa forma, obtemos exatamente 10 fatias de 50 centímetros, suficientes para atender todos os convidados.
+</p><!-- l. 73 --><p class='noindent'>Se decidirmos cortar as fatias com 55 centímetros, o número de fatias obtidas será:
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'><img align='middle' alt='⌊    ⌋
+  120-
+  55' class='left' src='main6x.svg' /> = 2 fatias
+      </li>
+      <li class='itemize'><img align='middle' alt='⌊   ⌋
+  89-
+  55' class='left' src='main7x.svg' /> = 1 fatia
+      </li>
+      <li class='itemize'><img align='middle' alt='⌊ 230⌋
+  ----
+  55' class='left' src='main8x.svg' /> = 4 fatias
+      </li>
+      <li class='itemize'><img align='middle' alt='⌊ 177⌋
+  ----
+  55' class='left' src='main9x.svg' /> = 3 fatias</li></ul>
+<!-- l. 82 --><p class='noindent'>Novamente, conseguimos atender todos os 10 convidados, mas agora com fatias ligeiramente maiores.
+</p><!-- l. 84 --><p class='noindent'>Sua tarefa é escreva um programa que, dados uma lista <span class='cmmi-12'>L </span>de tamanho M contendo os tamanhos de pão disponíveis
+(em centímetros) e um inteiro N representando a quantidade de pessoas a serem atendidas , retorne o
+tamanho inteiro máximo (em centímetros) da fatia que pode ser cortada de maneira a atender todas as
+pessoas.
+</p><!-- l. 87 --><p class='noindent'>Use a busca binária para encontrar o tamanho máximo da fatia que deve ser cortada de maneira a atender todas as
+pessoas.
+</p>
+ 
+</body> 
+</html>

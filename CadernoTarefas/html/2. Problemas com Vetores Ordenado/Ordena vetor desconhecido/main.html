@@ -1,0 +1,40 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 47 --><p class='noindent'><span class='cmbx-12x-x-144'>Ordenando um vetor desconhecido</span>
+</p><!-- l. 52 --><p class='noindent'>Imagine que você possui um vetor <span class='cmbx-12'>desconhecido</span> <img alt='L  ' class='math' src='main0x.svg' /> de tamanho <img alt='N  ' class='math' src='main1x.svg' /> com elementos distintos. A única forma de
+comparar os elementos desse vetor é por meio de uma função chamada <span class='cmtt-12'>maior3(a, b, c)</span>, que recebe <span class='cmbx-12'>três
+</span><span class='cmbx-12'>índices</span> <img alt='a,b,c  ' class='math' src='main2x.svg' /> (cada um entre <img alt='0  ' class='math' src='main3x.svg' /> e <img alt='N  − 1  ' class='math' src='main4x.svg' />) e devolve o <span class='cmbx-12'>índice do maior elemento </span>entre <img alt='L[a]  ' class='math' src='main5x.svg' />, <img alt='     L [b]  ' class='math' src='main6x.svg' /> e
+<img alt='L [c]  ' class='math' src='main7x.svg' />.
+</p><!-- l. 57 --><p class='noindent'>A sua tarefa é <span class='cmbx-12'>encontrar um vetor de índices</span> <img alt='I  ' class='math' src='main8x.svg' /> tal que:
+</p>
+<div class='math-display'>
+<img alt='L [I[0]] &lt; L [I [1]] &lt; ...&lt; L [I [N − 1]].
+' class='math-display' src='main9x.svg' /></div>
+<!-- l. 61 --><p class='noindent'>Em outras palavras, o vetor <img alt='I  ' class='math' src='main10x.svg' /> deve indicar a ordem crescente dos elementos de <img alt='L  ' class='math' src='main11x.svg' />.
+</p><!-- l. 65 --><p class='noindent'>Para ilustrar, considere um vetor desconhecido de tamanho <img alt='N  = 3  ' class='math' src='main12x.svg' /> e a seguinte sequência de chamadas à
+função:
+      </p><dl class='enumerate'><dt class='enumerate'>
+   1. </dt><dd class='enumerate'>
+                                                                                                            
+                                                                                                            
+      <!-- l. 68 --><p class='noindent'>Se <span class='cmtt-12'>maior3(0, 1, 2) = 0</span>, então o índice do maior elemento é <img alt='0  ' class='math' src='main13x.svg' />.
+      </p></dd><dt class='enumerate'>
+   2. </dt><dd class='enumerate'>
+      <!-- l. 69 --><p class='noindent'>Se <span class='cmtt-12'>maior3(1, 1, 2) = 2</span>, então o índice do segundo maior elemento é <img alt='2  ' class='math' src='main14x.svg' />.
+      </p></dd><dt class='enumerate'>
+   3. </dt><dd class='enumerate'>
+      <!-- l. 70 --><p class='noindent'>Concluímos que a ordem crescente dos índices é <img alt='I = [1,2,0]  ' class='math' src='main15x.svg' />.</p></dd></dl>
+<!-- l. 73 --><p class='noindent'><span class='cmbx-12'>Dica: </span>Mantenha um vetor <img alt='I  ' class='math' src='main16x.svg' /> com os índices <span class='cmbx-12'>parcialmente ordenados </span>de acordo com as comparações já
+realizadas. A cada chamada de <span class='cmtt-12'>maior3</span>, atualize esse vetor, inserindo os novos índices nas posições corretas
+conforme o resultado da função.
+</p>
+ 
+</body> 
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 52 --><p class='noindent'><span class='cmss-17'>Contando Inversões</span>
+</p><!-- l. 55 --><p class='noindent'>Imagine que nós temos uma lista de <span class='cmmi-12'>N </span>inteiros <span class='cmmi-12'>L </span>e um inteiro <span class='cmmi-12'>meio </span>tal que <span class='cmmi-12'>L</span>[0<span class='cmmi-12'>..meio</span><span class='cmsy-10x-x-120'>− </span>1] e <span class='cmmi-12'>L</span>[<span class='cmmi-12'>meio..N </span><span class='cmsy-10x-x-120'>− </span>1] que estão
+ordenadas.
+</p><!-- l. 57 --><p class='noindent'>Note que a lista <span class='cmmi-12'>L </span>pode não está ordenada.
+</p>
+<div class='center'>
+<!-- l. 60 --><p class='noindent'>
+</p><!-- l. 60 --><p class='noindent'><img alt='L235713581102
+' src='main0x.svg' /></p></div>
+<!-- l. 81 --><p class='noindent'>Se a lista não estiver desordenada, nós sempre podemos encontrar dois elementos fora de ordem  —  (<span class='cmti-12'>i.e., o elemento
+</span><span class='cmti-12'>da esquerda é </span><span class='cmti-12'>maior do que o elemento da direita</span>)
+</p><!-- l. 85 --><p class='noindent'>Por exemplo,
+</p>
+<div class='center'>
+<!-- l. 88 --><p class='noindent'>
+</p><!-- l. 88 --><p class='noindent'><img alt='L2357135811↑↑02
+' src='main1x.svg' /></p></div>
+<!-- l. 111 --><p class='noindent'>Nós dizemos que um par desse tipo corresponde a uma <span class='cmti-12'>inversão</span>. Note que não existe inversões na lista
+<span class='cmmi-12'>L</span>[0<span class='cmmi-12'>..meio </span><span class='cmsy-10x-x-120'>− </span>1] e <span class='cmmi-12'>L</span>[<span class='cmmi-12'>meio..N </span><span class='cmsy-10x-x-120'>− </span>1].
+</p><!-- l. 113 --><p class='noindent'>A tarefa desse problema consiste em
+   </p><dl class='list1'><dt class='list'>
+   </dt><dd class='list'>
+   <!-- l. 115 --><p class='noindent'>
+       </p><dl class='list2'><dt class='list'>
+   <span class='cmsy-10x-x-120'>→</span>  </dt><dd class='list'>
+       <!-- l. 116 --><p class='noindent'><span class='cmti-12'>Contar o número total de inversões na lista </span><span class='cmmi-12'>L</span> </p></dd></dl>
+   </dd></dl>
+<!-- l. 120 --><p class='noindent'>No exemplo acima, isso nos daria
+   </p><dl class='list1'><dt class='list'>
+   </dt><dd class='list'>
+   <!-- l. 122 --><p class='noindent'>
+       </p><dl class='list2'><dt class='list'>
+       </dt><dd class='list'>
+       <!-- l. 123 --><p class='noindent'>   <span class='cmtt-12'>=&gt;  7 inversões no total</span>
+</p>
+       </dd></dl>
+                                                                                                            
+                                                                                                            
+   </dd></dl>
+<!-- l. 128 --><p class='noindent'>Elabore um programa que resolve esse problema com complexidade O(N)
+</p>
+ 
+</body> 
+</html>

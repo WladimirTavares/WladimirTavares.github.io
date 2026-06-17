@@ -1,0 +1,70 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 70 --><p class='noindent'><span class='cmbx-12'>Checa Árvore 2–3</span>
+</p><!-- l. 72 --><p class='noindent'>Uma <span class='cmbx-12'>árvore 2–3 </span>é uma árvore de busca na qual cada nó interno pode conter uma ou duas chaves, obedecendo às
+seguintes definições:
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'><span class='cmbx-12'>Nó–2: </span>contém exatamente uma chave e possui dois filhos;
+      </li>
+      <li class='itemize'><span class='cmbx-12'>Nó–3: </span>contém exatamente duas chaves e possui três filhos.</li></ul>
+<!-- l. 79 --><p class='noindent'>No caso de um <span class='cmbx-12'>nó–3</span>, sejam <span class='cmmi-12'>k</span><sub><span class='cmr-8'>1</span></sub> <span class='cmmi-12'>&lt; k</span><sub><span class='cmr-8'>2</span></sub> as chaves armazenadas no nó. As subárvores associadas a esse nó devem
+satisfazer as seguintes propriedades: </p>
+      <ul class='itemize1'>
+      <li class='itemize'>a subárvore <span class='cmmi-12'>T</span><sub><span class='cmr-8'>1</span></sub> armazena apenas valores menores que <span class='cmmi-12'>k</span><sub><span class='cmr-8'>1</span></sub>;
+      </li>
+      <li class='itemize'>a subárvore <span class='cmmi-12'>T</span><sub><span class='cmr-8'>2</span></sub> armazena apenas valores estritamente entre <span class='cmmi-12'>k</span><sub><span class='cmr-8'>1</span></sub> e <span class='cmmi-12'>k</span><sub><span class='cmr-8'>2</span></sub>;
+      </li>
+      <li class='itemize'>a subárvore <span class='cmmi-12'>T</span><sub><span class='cmr-8'>3</span></sub> armazena apenas valores maiores que <span class='cmmi-12'>k</span><sub><span class='cmr-8'>2</span></sub>.</li></ul>
+<div class='center'>
+<!-- l. 86 --><p class='noindent'>
+</p><!-- l. 87 --><p class='noindent'><img alt='kTTT1123  k2
+' src='main0x.svg' /></p></div>
+<!-- l. 112 --><p class='noindent'>A Figura <a href='#-arvore-'>1<!-- tex4ht:ref: fig:arvore23_exemplo  --></a> ilustra um exemplo de árvore 2–3.
+</p>
+<div class='center'>
+<!-- l. 114 --><p class='noindent'>
+</p>
+<figure class='figure' id='-arvore-'> 
+<a id='x1-21'></a> <img alt='PIC' height='36' src='arvore23_01.png' width='36' />
+<figcaption class='caption'><span class='id'>Figura 1: </span><span class='content'>Árvore 2-3</span></figcaption><!-- tex4ht:label?: x1-21  -->
+</figure>
+</div>
+<!-- l. 129 --><p class='noindent'>Uma árvore 2–3 é dita <span class='cmbx-12'>balanceada </span>se, e somente se, todas as seguintes propriedades forem satisfeitas:
+      </p><dl class='enumerate'><dt class='enumerate'>
+   1. </dt><dd class='enumerate'>
+      <!-- l. 132 --><p class='noindent'>Todo nó interno é um nó–2 (uma chave e dois filhos) ou um nó–3 (duas chaves e três filhos);
+      </p></dd><dt class='enumerate'>
+   2. </dt><dd class='enumerate'>
+      <!-- l. 133 --><p class='noindent'>A árvore satisfaz a propriedade de busca, isto é, as chaves em cada nó estão em ordem crescente e
+      as subárvores respeitam os intervalos definidos por essas chaves;
+                                                                                                            
+                                                                                                            
+      </p></dd><dt class='enumerate'>
+   3. </dt><dd class='enumerate'>
+      <!-- l. 134 --><p class='noindent'>Todas as folhas da árvore estão no mesmo nível (mesma profundidade).</p></dd></dl>
+<!-- l. 137 --><p class='noindent'>A Figura <a href='#-arvore-balanceada'>2<!-- tex4ht:ref: fig:arvore23_balanceada  --></a> apresenta um exemplo de árvore 2–3 balanceada.
+</p>
+<div class='center'>
+<!-- l. 139 --><p class='noindent'>
+</p>
+<figure class='figure' id='-arvore-balanceada'> 
+<a id='x1-62'></a> <img alt='PIC' height='36' src='arvore23_02.png' width='36' />
+<figcaption class='caption'><span class='id'>Figura 2: </span><span class='content'>Árvore 2-3 balanceada</span></figcaption><!-- tex4ht:label?: x1-62  -->
+</figure>
+</div>
+<!-- l. 151 --><p class='noindent'><span class='cmbx-12'>Tarefa:</span>
+</p><!-- l. 154 --><p class='noindent'>Implemente um algoritmo que verifique se uma árvore 2–3 é balanceada. Caso a árvore satisfaça todas as
+propriedades descritas acima, armazene o valor <span class='cmtt-12'>1 </span>na variável <span class='cmtt-12'>resp</span>; caso contrário, armazene o valor
+<span class='cmtt-12'>0</span>.
+</p>
+ 
+</body> 
+</html>

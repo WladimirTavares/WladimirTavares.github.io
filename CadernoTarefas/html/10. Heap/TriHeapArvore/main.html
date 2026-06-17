@@ -1,0 +1,55 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 50 --><p class='noindent'><span class='cmbx-12x-x-144'>TriHeapArvore</span>
+</p><!-- l. 54 --><p class='noindent'>Considere a seguinte estrutura de dados que representa um nó de uma <span class='cmbx-12'>árvore ternária</span>, na qual cada nó pode
+possuir até três filhos:
+                                                                                                            
+                                                                                                            
+</p>
+<pre class='verbatim' id='verbatim-1'>
+struct NoArv{
+    int valor;
+    NoArv *child[3];
+};
+</pre>
+<!-- l. 61 --><p class='nopar'>
+</p><!-- l. 63 --><p class='noindent'>Cada posição do vetor <span class='cmtt-12'>child </span>aponta, respectivamente, para um dos filhos do nó, ou contém <span class='cmtt-12'>NULL </span>caso o respectivo
+filho não exista.
+</p><!-- l. 66 --><p class='noindent'>A figura a seguir ilustra um exemplo de árvore ternária:
+</p>
+<div class='center'>
+<!-- l. 68 --><p class='noindent'>
+</p><!-- l. 69 --><p class='noindent'><img alt='PIC' height='36' src='heap1.png' width='36' /></p></div>
+<!-- l. 72 --><p class='noindent'>Dizemos que uma árvore ternária satisfaz a propriedade de <span class='cmbx-12'>TriHeap Máximo </span>se, para todo nó da árvore, o
+valor armazenado nesse nó é <span class='cmbx-12'>maior ou igual </span>ao valor armazenado em cada um de seus filhos (quando
+existirem).
+</p><!-- l. 75 --><p class='noindent'>Em outras palavras, para todo nó <span class='cmmi-12'>p </span>da árvore, deve valer:
+</p>
+<div class='math-display'>
+<img alt='p-&gt;valor   ≥  p-&gt;child [i]-&gt;valor,    para todo i ∈ {0, 1,2} tal que p- &gt;child [i] ⁄= NULL.
+' class='math-display' src='main0x.svg' /></div>
+<!-- l. 81 --><p class='noindent'><span class='cmbx-12'>Tarefa:</span>
+</p><!-- l. 84 --><p class='noindent'>Implemente um algoritmo que, dado um ponteiro <span class='cmtt-12'>p</span> para a raiz de uma árvore ternária, verifique se a árvore satisfaz
+a propriedade de <span class='cmbx-12'>TriHeap Máximo</span>.
+</p><!-- l. 86 --><p class='noindent'>O algoritmo deve armazenar o valor: </p>
+      <ul class='itemize1'>
+      <li class='itemize'><span class='cmtt-12'>resp</span> = 1, caso a árvore possua a propriedade TriHeap Máximo;
+                                                                                                            
+                                                                                                            
+      </li>
+      <li class='itemize'><span class='cmtt-12'>resp</span> = 0, caso contrário.</li></ul>
+<!-- l. 93 --><p class='noindent'>No exemplo apresentado na figura acima, a árvore satisfaz a propriedade TriHeap Máximo e, portanto, o valor
+armazenado em <span class='cmtt-12'>resp</span> deve ser:
+   </p><dl class='list1'><dt class='list'>
+   </dt><dd class='list'>
+   <!-- l. 97 --><p class='noindent'>      <span class='cmtt-12'>resp =&gt;  1</span> </p></dd></dl>
+ 
+</body> 
+</html>

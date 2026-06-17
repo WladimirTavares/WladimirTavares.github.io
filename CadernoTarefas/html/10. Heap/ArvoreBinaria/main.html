@@ -1,0 +1,50 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 51 --><p class='noindent'><span class='cmbx-12x-x-144'>Arvore Binária</span>
+</p><!-- l. 55 --><p class='noindent'>Imagine um vetor <span class='cmmi-12'>L </span>de tamanho <span class='cmmi-12'>N</span>, contendo <span class='cmmi-12'>N </span>números inteiros. Os elementos de <span class='cmmi-12'>L </span>são indexados de 0 a
+<span class='cmmi-12'>N </span><span class='cmsy-10x-x-120'>− </span>1.
+</p><!-- l. 58 --><p class='noindent'>Como exemplo, suponha que <span class='cmmi-12'>N </span>= 10 e que o vetor <span class='cmmi-12'>L </span>contenha os seguintes valores, indexados de 0 a 9, conforme
+ilustrado na Figura <a href='#x1-1doc'><!-- tex4ht:ref: fig:vetor  --></a>.
+</p>
+<div class='center'>
+<!-- l. 61 --><p class='noindent'>
+</p><!-- l. 62 --><p class='noindent'><img alt='L0123456789  20   10   15    13   12    11   8     15   4    3  ' src='main0x.svg' />
+<a id='x1-1doc'></a></p></div>
+<!-- l. 82 --><p class='noindent'>Nosso objetivo é transformar esse vetor em uma árvore binária, utilizando o mesmo mapeamento implícito
+empregado na representação de <span class='cmti-12'>heaps </span>binários.
+</p><!-- l. 86 --><p class='noindent'>Nesse mapeamento: </p>
+      <ul class='itemize1'>
+      <li class='itemize'>o elemento na posição 0 corresponde à raiz da árvore;
+      </li>
+      <li class='itemize'>o elemento na posição <span class='cmmi-12'>i </span>possui como filho esquerdo o elemento na posição 2<span class='cmmi-12'>i </span>+ 1;
+      </li>
+      <li class='itemize'>o elemento na posição <span class='cmmi-12'>i </span>possui como filho direito o elemento na posição 2<span class='cmmi-12'>i </span>+ 2, sempre que essas
+      posições existirem no vetor.</li></ul>
+<!-- l. 94 --><p class='noindent'><span class='cmbx-12'>Tarefa:</span>
+</p><!-- l. 96 --><p class='noindent'>Dado um vetor <span class='cmmi-12'>L</span>, construa a árvore binária correspondente, seguindo o mapeamento utilizado na representação de
+heaps binários.
+</p><!-- l. 99 --><p class='noindent'>Para o vetor do exemplo acima, a árvore resultante é apresentada na Figura <a href='#x1-2r1'>1<!-- tex4ht:ref: fig:arvore-heap  --></a>.
+</p>
+<figure class='figure'> 
+
+                                                                                                            
+                                                                                                            
+                                                                                                            
+                                                                                                            
+<!-- l. 104 --><p class='noindent' id='-arvore-binaria-obtida-a-partir-do-vetor-l-usando-o-mapeamento-de-heap-'><img alt='PIC' height='36' src='heap1.png' width='36' /> <a id='x1-2r1'></a>
+<a id='x1-3'></a>
+</p>
+<figcaption class='caption'><span class='id'>Figura 1: </span><span class='content'>Árvore binária obtida a partir do vetor <span class='cmmi-12'>L </span>usando o mapeamento de heap.                        </span></figcaption><!-- tex4ht:label?: x1-2r  -->
+                                                                                                            
+                                                                                                            
+</figure>
+ 
+</body> 
+</html>

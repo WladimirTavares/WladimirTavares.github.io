@@ -1,0 +1,52 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 50 --><p class='noindent'><span class='cmbx-12x-x-144'>Celebridade</span>
+</p><!-- l. 54 --><p class='noindent'>Considere um conjunto <span class='cmmi-12'>S </span>de <span class='cmmi-12'>N </span>pessoas, rotuladas de 0 até <span class='cmmi-12'>N </span><span class='cmsy-10x-x-120'>− </span>1. Dizemos que uma <span class='cmbx-12'>celebridade </span>é uma pessoa
+que:
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'>é conhecida por todas as pessoas de <span class='cmmi-12'>S</span>;
+      </li>
+      <li class='itemize'>não conhece nenhuma das outras pessoas de <span class='cmmi-12'>S</span>.</li></ul>
+<!-- l. 62 --><p class='noindent'>Note que pode existir <span class='cmti-12'>no máximo uma </span>celebridade em <span class='cmmi-12'>S</span>. De fato, se <span class='cmmi-12'>i </span>e <span class='cmmi-12'>j </span>fossem ambas celebridades, então <span class='cmmi-12'>i</span>
+conheceria <span class='cmmi-12'>j </span>e <span class='cmmi-12'>j </span>conheceria <span class='cmmi-12'>i</span>, o que é um absurdo, pois uma celebridade não conhece ninguém.
+</p><!-- l. 67 --><p class='noindent'>Você tem acesso a uma função:
+</p>
+<div class='math-display'>
+<img alt='int  conhece (int  i,  int j )
+' class='math-display' src='main0x.svg' /></div>
+<!-- l. 71 --><p class='noindent'>que devolve <span class='cmtt-12'>1 </span>se a pessoa <span class='cmmi-12'>i </span>conhece <span class='cmmi-12'>j</span>, e <span class='cmtt-12'>0 </span>caso contrário.
+</p><!-- l. 75 --><p class='noindent'>Sua tarefa é determinar se existe uma celebridade em <span class='cmmi-12'>S</span>. Caso exista, o rótulo da pessoa deve ser armazenado na
+variável <span class='cmtt-12'>resp</span>; caso contrário, <span class='cmtt-12'>resp </span>deve receber o valor <span class='cmtt-12'>-1</span>.
+</p><!-- l. 81 --><p class='noindent'><span class='cmbx-12'>Exemplo: </span>Considere <span class='cmmi-12'>N </span>= 3.
+                                                                                                            
+                                                                                                            
+</p>
+<pre class='verbatim' id='verbatim-1'>
+if (conhece(0,1) == 1) { // 0 não é celebridade
+    if (conhece(1,2)) {  // 1 não é celebridade
+        if (conhece(0,2) &amp;&amp; !conhece(2,0) &amp;&amp;
+            conhece(1,2) &amp;&amp; !conhece(2,1))
+            return 2;
+        else
+            return -1;
+    } else {
+        (...)
+    }
+} else { // 1 não é celebridade
+    (...)
+}
+</pre>
+<!-- l. 97 --><p class='nopar'>
+</p><!-- l. 99 --><p class='noindent'>Encontre se existe uma celebridade utilizando, no máximo, 3<span class='cmmi-12'>N </span><span class='cmsy-10x-x-120'>− </span>3 chamadas à função <span class='cmtt-12'>conhece</span>.
+</p>
+ 
+</body> 
+</html>

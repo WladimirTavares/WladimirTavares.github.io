@@ -1,0 +1,79 @@
+<!DOCTYPE html> 
+<html lang='pt' xml:lang='pt'> 
+<head><title></title> 
+<meta charset='utf-8' /> 
+<meta content='TeX4ht (https://tug.org/tex4ht/)' name='generator' /> 
+<meta content='width=device-width,initial-scale=1' name='viewport' /> 
+<link href='main.css' rel='stylesheet' type='text/css' /> 
+<meta content='main.tex' name='src' /> 
+</head><body>
+<!-- l. 51 --><p class='noindent'><span class='cmbx-12x-x-144'>Heap Min–Max</span>
+</p><!-- l. 55 --><p class='noindent'>Considere um vetor <span class='cmmi-12'>L </span>de tamanho <span class='cmmi-12'>N</span>, contendo <span class='cmmi-12'>N </span>números inteiros. Os elementos de <span class='cmmi-12'>L </span>são indexados de 0 a <span class='cmmi-12'>N </span><span class='cmsy-10x-x-120'>− </span>1.
+Como exemplo, suponha que <span class='cmmi-12'>N </span>= 12 e que o vetor <span class='cmmi-12'>L </span>contenha os seguintes valores:
+</p>
+<div class='center'>
+<!-- l. 59 --><p class='noindent'>
+</p><!-- l. 60 --><p class='noindent'><img alt='L01234567891101 8    71    41   31    10   11    16   46    51   31    21   13
+' src='main0x.svg' /></p></div>
+<!-- l. 75 --><p class='noindent'>Esse vetor pode ser mapeado para uma <span class='cmbx-12'>árvore binária completa</span>, conforme ilustrado na figura a
+seguir:
+</p>
+<div class='center'>
+<!-- l. 77 --><p class='noindent'>
+</p><!-- l. 78 --><p class='noindent'><img alt='PIC' height='57' src='Min-max_heap.jpg' width='57' /></p></div>
+<!-- l. 81 --><p class='noindent'>Um vetor <span class='cmmi-12'>L </span>satisfaz a propriedade de um <span class='cmbx-12'>heap Min–Max </span>se, e somente se, as seguintes condições forem
+atendidas:
+</p>
+      <ul class='itemize1'>
+      <li class='itemize'>
+      <!-- l. 84 --><p class='noindent'>Para todo índice <span class='cmmi-12'>i </span>válido do vetor: </p>
+           <ul class='itemize2'>
+           <li class='itemize'>
+           <!-- l. 86 --><p class='noindent'>Se <span class='cmmi-12'>i </span>está em um nível <span class='cmbx-12'>par </span>(nível <span class='cmti-12'>min</span>), então o elemento <span class='cmmi-12'>L</span>[<span class='cmmi-12'>i</span>] é menor ou igual a todos os seus
+           filhos e netos, isto é,
+           </p>
+<div class='math-display'>
+<img alt='L [i] ≤ L[2i + 1], L [i] ≤ L[2i + 2],
+' class='math-display' src='main1x.svg' /></div>
+           <!-- l. 90 --><p class='noindent'>e, sempre que existirem,
+                                                                                                            
+                                                                                                            
+           </p>
+<div class='math-display'>
+<img alt='L [i] ≤ L[4i + j],   para j ∈ {3, 4,5,6}.
+' class='math-display' src='main2x.svg' /></div>
+           </li>
+           <li class='itemize'>
+           <!-- l. 95 --><p class='noindent'>Se <span class='cmmi-12'>i </span>está em um nível <span class='cmbx-12'>ímpar </span>(nível <span class='cmti-12'>max</span>), então o elemento <span class='cmmi-12'>L</span>[<span class='cmmi-12'>i</span>] é maior ou igual a todos
+           os seus filhos e netos, isto é,
+           </p>
+<div class='math-display'>
+<img alt='L [i] ≥ L[2i + 1], L [i] ≥ L[2i + 2],
+' class='math-display' src='main3x.svg' /></div>
+           <!-- l. 99 --><p class='noindent'>e, sempre que existirem,
+           </p>
+<div class='math-display'>
+<img alt='L [i] ≥ L[4i + j],   para j ∈ {3, 4,5,6}.
+' class='math-display' src='main4x.svg' /></div>
+           </li></ul>
+      </li></ul>
+<!-- l. 106 --><p class='noindent'>O nível de um nó pode ser determinado diretamente a partir do seu índice no vetor. Em particular, para um nó de
+índice <span class='cmmi-12'>i</span>, seu nível é dado por
+</p>
+<div class='math-display'>
+<img alt='⌊log2(i + 1)⌋,
+' class='math-display' src='main5x.svg' /></div>
+                                                                                                            
+                                                                                                            
+<!-- l. 110 --><p class='noindent'>ou, de forma equivalente, pelo número de bits necessários para representar o valor (<span class='cmmi-12'>i </span>+ 1), menos um.
+</p><!-- l. 113 --><p class='noindent'><span class='cmbx-12'>Tarefa:</span>
+</p><!-- l. 116 --><p class='noindent'>Dado um vetor <span class='cmmi-12'>L</span>, determine se ele representa um heap Min–Max. Caso represente, armazene o valor 1 na variável
+<span class='cmtt-12'>resp</span>; caso contrário, armazene o valor 0.
+</p><!-- l. 121 --><p class='noindent'>No exemplo apresentado, o vetor satisfaz as propriedades de um heap Min–Max e, portanto, temos:
+</p>
+<div class='center'>
+<!-- l. 124 --><p class='noindent'>
+</p><!-- l. 125 --><p class='noindent'><span class='cmtt-12'>resp = 1</span></p></div>
+ 
+</body> 
+</html>
