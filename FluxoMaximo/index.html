@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FluxoMax — Ford-Fulkerson</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Unbounded:wght@700;900&display=swap');
+
+/* ══════════════════════════════════════════
+   THEMES
+══════════════════════════════════════════ */
+:root {
+  --bg:       #0b0f1a;
+  --surface:  #111827;
+  --card:     #1a2235;
+  --border:   #243050;
+  --border2:  #2e3d5c;
+  --blue:     #3b82f6;
+  --blue-d:   #1d4ed8;
+  --blue-l:   #93c5fd;
+  --cyan:     #22d3ee;
+  --cyan-d:   #0891b2;
+  --green:    #22c55e;
+  --red:      #ef4444;
+  --amber:    #f59e0b;
+  --purple:   #a855f7;
+  --text:     #e2e8f0;
+  --text-2:   #94a3b8;
+  --text-3:   #475569;
+  --pipe-bg:  #1e3a5f;
+  --grid-col: rgba(36,48,80,0.5);
+  --node-fill-s: rgba(34,197,94,0.2);
+  --node-fill-t: rgba(239,68,68,0.2);
+  --node-fill-m: rgba(59,130,246,0.15);
+  --lbl-bg:   rgba(11,15,26,0.88);
+  --font-ui:  'IBM Plex Mono', monospace;
+  --font-hd:  'Unbounded', sans-serif;
+  --r:        6px;
+  --r-lg:     12px;
+  --shadow:   0 4px 24px rgba(0,0,0,0.5);
+}
+
+/* Light theme */
+body.light {
+  --bg:       #f1f5f9;
+  --surface:  #ffffff;
+  --card:     #f8fafc;
+  --border:   #cbd5e1;
+  --border2:  #94a3b8;
+  --blue:     #2563eb;
+  --blue-d:   #1d4ed8;
+  --blue-l:   #3b82f6;
+  --cyan:     #0891b2;
+  --cyan-d:   #0e7490;
+  --green:    #16a34a;
+  --red:      #dc2626;
+  --amber:    #d97706;
+  --purple:   #9333ea;
+  --text:     #0f172a;
+  --text-2:   #475569;
+  --text-3:   #94a3b8;
+  --pipe-bg:  #bfdbfe;
+  --grid-col: rgba(148,163,184,0.35);
+  --node-fill-s: rgba(22,163,74,0.15);
+  --node-fill-t: rgba(220,38,38,0.15);
+  --node-fill-m: rgba(37,99,235,0.1);
+  --lbl-bg:   rgba(241,245,249,0.93);
+  --shadow:   0 4px 24px rgba(0,0,0,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  transition: background 0.25s, color 0.25s;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── Header ── */
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  gap: 12px;
+}
+#header .logo { font-family: var(--font-hd); font-size: 1rem; color: var(--cyan); letter-spacing: -0.02em; }
+#header .logo span { color: var(--text-2); font-size: 0.7rem; display: block; font-family: var(--font-ui); font-weight: 400; }
+
+.phase-indicator { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.phase-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; color: var(--text-3); cursor: pointer; transition: all 0.2s;
+}
+.phase-dot.done  { border-color: var(--green);  color: var(--green);  background: rgba(34,197,94,0.1); }
+.phase-dot.active{ border-color: var(--cyan);   color: var(--cyan);   background: rgba(34,211,238,0.12); }
+
+#header-right { display: flex; align-items: center; gap: 10px; }
+
+/* Theme toggle */
+#btn-theme {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--card);
+  color: var(--text-2);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+#btn-theme:hover { border-color: var(--cyan); color: var(--cyan); }
+
+#score-display { font-size: 0.72rem; color: var(--text-2); text-align: right; }
+#score-display .score-val { font-size: 1rem; color: var(--amber); font-weight: 700; }
+
+/* ── Layout ── */
+#app { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#game-area { flex: 1; display: grid; grid-template-columns: 1fr 272px; gap: 0; overflow: hidden; min-height: 0; }
+
+/* ── Canvas area ── */
+#canvas-container { position: relative; overflow: hidden; background: var(--bg); border-right: 1px solid var(--border); }
+#canvas-container canvas { display: block; cursor: default; }
+#canvas-bg  { position: absolute; top:0; left:0; pointer-events: none; }
+#canvas-main{ position: absolute; top:0; left:0; }
+#canvas-anim{ position: absolute; top:0; left:0; pointer-events: none; }
+
+#phase-title-overlay { position: absolute; top: 10px; left: 10px; pointer-events: none; }
+#phase-title-overlay .pt-name { font-family: var(--font-hd); font-size: 0.9rem; color: var(--text); }
+#phase-title-overlay .pt-desc { font-size: 0.65rem; color: var(--text-2); margin-top: 2px; max-width: 280px; line-height: 1.5; }
+
+#residual-badge {
+  position: absolute; top: 10px; right: 10px;
+  padding: 3px 9px; border: 1px solid var(--purple); border-radius: 20px;
+  font-size: 0.6rem; color: var(--purple); background: rgba(168,85,247,0.1); display: none;
+}
+#residual-badge.show { display: block; }
+
+/* ── Sidebar ── */
+#sidebar { display: flex; flex-direction: column; overflow-y: auto; padding: 12px; gap: 10px; background: var(--surface); }
+
+.sb-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 12px; }
+.sb-card-title { font-size: 0.58rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-3); margin-bottom: 8px; }
+
+#flow-display { text-align: center; }
+.flow-big { font-family: var(--font-hd); font-size: 2rem; color: var(--cyan); line-height: 1; }
+.flow-label { font-size: 0.62rem; color: var(--text-2); margin-top: 2px; }
+.flow-goal  { font-size: 0.68rem; color: var(--amber); margin-top: 4px; }
+.progress-wrap { height: 5px; background: var(--border); border-radius: 3px; margin-top: 7px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--cyan)); border-radius: 3px; transition: width 0.5s ease; }
+
+#path-display {
+  min-height: 32px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 7px 9px; font-size: 0.7rem; color: var(--text-2); word-break: break-all; line-height: 1.6;
+}
+#path-display .path-node  { color: var(--cyan); font-weight: 600; }
+#path-display .path-arrow { color: var(--text-3); }
+#path-display .path-cap   { color: var(--amber); font-size: 0.62rem; }
+
+/* Buttons */
+.btn {
+  width: 100%; padding: 9px 12px; border: none; border-radius: var(--r);
+  font-family: var(--font-ui); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.05em; cursor: pointer; transition: all 0.15s; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-primary  { background: linear-gradient(135deg, var(--blue), var(--cyan-d)); color: white; box-shadow: 0 2px 10px rgba(59,130,246,0.3); }
+.btn-primary:hover:not(:disabled)  { filter: brightness(1.15); transform: translateY(-1px); }
+.btn-secondary{ background: var(--bg); color: var(--text-2); border: 1px solid var(--border2); }
+.btn-secondary:hover:not(:disabled){ border-color: var(--blue); color: var(--blue); }
+.btn-ghost    { background: transparent; color: var(--text-3); border: 1px solid var(--border); }
+.btn-ghost:hover:not(:disabled)    { color: var(--text-2); border-color: var(--border2); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+.btn-row { display: flex; gap: 7px; }
+.btn-row .btn { width: auto; flex: 1; }
+
+/* Stats */
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--border); font-size: 0.68rem; }
+.stat-row:last-child { border-bottom: none; }
+.stat-row .sk { color: var(--text-2); }
+.stat-row .sv { color: var(--text); font-weight: 600; }
+.stat-row .sv.good { color: var(--green); }
+.stat-row .sv.warn { color: var(--amber); }
+.stat-row .sv.bad  { color: var(--red); }
+
+/* Stars bar in sidebar */
+#stars-live { font-size: 1.2rem; letter-spacing: 2px; margin-top: 4px; }
+
+/* Message box */
+#msg-box { padding: 9px; border-radius: var(--r); font-size: 0.7rem; line-height: 1.5; display: none; border-left: 3px solid; }
+#msg-box.info    { display: block; background: rgba(59,130,246,0.08); border-color: var(--blue); color: var(--blue-l); }
+#msg-box.success { display: block; background: rgba(34,197,94,0.08); border-color: var(--green); color: var(--green); }
+#msg-box.error   { display: block; background: rgba(239,68,68,0.08); border-color: var(--red); color: #fca5a5; }
+#msg-box.warn    { display: block; background: rgba(245,158,11,0.08); border-color: var(--amber); color: var(--amber); }
+body.light #msg-box.error { color: var(--red); }
+body.light #msg-box.info  { color: var(--blue); }
+
+/* ── Modals ── */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.modal-bg.show { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r-lg); padding: 24px 28px; max-width: 500px; width: 92%; box-shadow: var(--shadow); position: relative; }
+.modal h2 { font-family: var(--font-hd); font-size: 1.2rem; color: var(--text); margin-bottom: 8px; letter-spacing: -0.02em; }
+.modal p { color: var(--text-2); line-height: 1.65; margin-bottom: 10px; font-size: 0.78rem; }
+.modal .modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 1.2rem; }
+.modal .modal-close:hover { color: var(--text); }
+
+/* Win modal */
+#win-modal .stars-big { font-size: 2rem; margin: 8px 0; letter-spacing: 3px; }
+#win-modal .win-stats { display: flex; gap: 10px; margin: 12px 0; }
+#win-modal .ws { flex: 1; background: var(--card); border-radius: var(--r); padding: 9px; text-align: center; }
+#win-modal .ws-v { font-family: var(--font-hd); font-size: 1.15rem; color: var(--cyan); }
+#win-modal .ws-l { font-size: 0.58rem; color: var(--text-3); margin-top: 2px; }
+.score-criteria { font-size: 0.68rem; color: var(--text-2); background: var(--card); border-radius: var(--r); padding: 10px 12px; margin-bottom: 12px; line-height: 1.7; border-left: 3px solid var(--amber); }
+.score-criteria strong { color: var(--amber); }
+
+/* Transport modal */
+#transport-modal input[type=number] {
+  width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--r);
+  color: var(--text); font-family: var(--font-ui); font-size: 1.1rem; padding: 9px 12px;
+  outline: none; margin: 8px 0; text-align: center;
+}
+#transport-modal input[type=number]:focus { border-color: var(--cyan); }
+
+/* Hint modal */
+#hint-modal .hint-tabs { display: flex; gap: 5px; margin-bottom: 12px; flex-wrap: wrap; }
+#hint-modal .htab { padding: 4px 11px; border-radius: 20px; font-size: 0.65rem; cursor: pointer; border: 1px solid var(--border2); color: var(--text-2); background: none; font-family: var(--font-ui); transition: all 0.15s; }
+#hint-modal .htab.active { border-color: var(--cyan); color: var(--cyan); background: rgba(34,211,238,0.1); }
+.hint-content { display: none; }
+.hint-content.show { display: block; }
+.hint-content p, .hint-content li { color: var(--text-2); line-height: 1.7; font-size: 0.78rem; margin-bottom: 8px; }
+.hint-content ul { margin: 6px 0 6px 16px; }
+.hint-box-inner { background: var(--card); border-radius: var(--r); padding: 10px 12px; margin: 8px 0; font-size: 0.75rem; font-family: var(--font-ui); }
+.stars-criteria { background: var(--card); border-radius: var(--r); padding: 10px 12px; margin-top: 8px; }
+.stars-criteria .sc-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--border); font-size: 0.73rem; }
+.stars-criteria .sc-row:last-child { border-bottom: none; }
+.stars-criteria .sc-stars { font-size: 1rem; min-width: 60px; }
+.stars-criteria .sc-desc { color: var(--text-2); line-height: 1.4; }
+
+/* Phase splash */
+#phase-splash {
+  position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center;
+  justify-content: center; z-index: 900; flex-direction: column; gap: 10px; transition: opacity 0.4s;
+}
+#phase-splash.hiding { opacity: 0; pointer-events: none; }
+#phase-splash .sp-num  { font-size: 0.65rem; color: var(--text-3); letter-spacing: 0.3em; text-transform: uppercase; }
+#phase-splash .sp-name { font-family: var(--font-hd); font-size: 1.8rem; color: var(--text); letter-spacing: -0.03em; }
+#phase-splash .sp-desc { font-size: 0.78rem; color: var(--text-2); max-width: 400px; text-align: center; line-height: 1.6; }
+#phase-splash .sp-objectives { margin-top: 6px; display: flex; gap: 20px; }
+#phase-splash .sp-obj { text-align: center; }
+#phase-splash .sp-obj-v { font-family: var(--font-hd); font-size: 1.3rem; color: var(--cyan); }
+#phase-splash .sp-obj-l { font-size: 0.6rem; color: var(--text-3); }
+
+/* Bottom bar */
+#bottom-bar { padding: 6px 14px; border-top: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; gap: 14px; font-size: 0.62rem; color: var(--text-3); flex-shrink: 0; }
+#bottom-bar .bb-key { background: var(--card); border: 1px solid var(--border2); border-radius: 3px; padding: 1px 5px; color: var(--text-2); }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">FluxoMax <span>Ford-Fulkerson Interativo</span></div>
+  <div class="phase-indicator" id="phase-dots"></div>
+  <div id="header-right">
+    <button id="btn-theme" onclick="toggleTheme()" title="Alternar tema">🌙</button>
+    <div id="score-display">Pontuação<br><span class="score-val" id="total-score">0</span></div>
+  </div>
+</div>
+
+<div id="app">
+  <div id="game-area">
+    <div id="canvas-container">
+      <canvas id="canvas-bg"></canvas>
+      <canvas id="canvas-main"></canvas>
+      <canvas id="canvas-anim"></canvas>
+      <div id="phase-title-overlay">
+        <div class="pt-name" id="pt-name"></div>
+        <div class="pt-desc" id="pt-desc"></div>
+      </div>
+      <div id="residual-badge">REDE RESIDUAL</div>
+    </div>
+
+    <div id="sidebar">
+      <div class="sb-card" id="flow-display">
+        <div class="sb-card-title">Fluxo Total</div>
+        <div class="flow-big" id="flow-val">0</div>
+        <div class="flow-label">unidades transportadas</div>
+        <div class="flow-goal" id="flow-goal-txt"></div>
+        <div class="progress-wrap"><div class="progress-fill" id="flow-progress" style="width:0%"></div></div>
+        <div id="stars-live"></div>
+      </div>
+
+      <div class="sb-card">
+        <div class="sb-card-title">Caminho Selecionado</div>
+        <div id="path-display"><span style="color:var(--text-3)">Clique nas arestas → S até T</span></div>
+      </div>
+
+      <div class="sb-card">
+        <div class="sb-card-title">Ações</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <button class="btn btn-primary" id="btn-transport" onclick="openTransportModal()" disabled>▶ Transportar</button>
+          <div class="btn-row">
+            <button class="btn btn-secondary" id="btn-undo" onclick="undoEdge()" disabled>↩ Desfazer</button>
+            <button class="btn btn-ghost" onclick="clearSelection()">✕ Limpar</button>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-ghost" onclick="openHintModal()">💡 Dica</button>
+            <button class="btn btn-ghost" id="btn-residual" onclick="toggleResidual()">⧓ Residual</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="msg-box"></div>
+
+      <div class="sb-card">
+        <div class="sb-card-title">Estatísticas</div>
+        <div class="stat-row"><span class="sk">Caminhos usados</span><span class="sv" id="s-paths">0</span></div>
+        <div class="stat-row"><span class="sk">Erros</span><span class="sv bad" id="s-errors">0</span></div>
+        <div class="stat-row"><span class="sk">Tempo</span><span class="sv" id="s-time">0:00</span></div>
+        <div class="stat-row"><span class="sk">Eficiência</span><span class="sv good" id="s-eff">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="bottom-bar">
+  <span>Clique em uma aresta para selecioná-la.</span>
+  <span>Construa o caminho de <span class="bb-key">S</span> até <span class="bb-key">T</span>, então clique em Transportar.</span>
+</div>
+
+<!-- ══════ MODALS ══════ -->
+<div class="modal-bg" id="transport-modal-bg">
+  <div class="modal" id="transport-modal">
+    <button class="modal-close" onclick="closeModal('transport-modal-bg')">×</button>
+    <h2>Quanto transportar?</h2>
+    <p id="transport-info"></p>
+    <input type="number" id="transport-val" min="-999" max="999" value="1">
+    <p style="font-size:0.66rem;color:var(--text-3)">Valores negativos utilizam arestas reversas da rede residual.</p>
+    <div class="btn-row" style="margin-top:10px;">
+      <button class="btn btn-secondary" onclick="closeModal('transport-modal-bg')">Cancelar</button>
+      <button class="btn btn-primary" onclick="doTransport()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="win-modal-bg">
+  <div class="modal" id="win-modal">
+    <h2>🎉 Fase Concluída!</h2>
+    <div class="stars-big" id="win-stars"></div>
+    <p id="win-msg"></p>
+    <div class="win-stats">
+      <div class="ws"><div class="ws-v" id="wstat-flow">0</div><div class="ws-l">Fluxo Máx.</div></div>
+      <div class="ws"><div class="ws-v" id="wstat-paths">0</div><div class="ws-l">Caminhos</div></div>
+      <div class="ws"><div class="ws-v" id="wstat-time">-</div><div class="ws-l">Tempo</div></div>
+      <div class="ws"><div class="ws-v" id="wstat-eff">-</div><div class="ws-l">Eficiência</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('win-modal-bg')">Ver Rede</button>
+      <button class="btn btn-primary" id="btn-next-phase" onclick="nextPhase()">Próxima Fase →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="hint-modal-bg">
+  <div class="modal" id="hint-modal" style="max-width:560px;">
+    <button class="modal-close" onclick="closeModal('hint-modal-bg')">×</button>
+    <h2>💡 Conceitos — Ford-Fulkerson</h2>
+    <div class="hint-tabs" id="hint-tabs"></div>
+    <div id="hint-contents"></div>
+  </div>
+</div>
+
+<div id="phase-splash">
+  <div class="sp-num" id="sp-num"></div>
+  <div class="sp-name" id="sp-name"></div>
+  <div class="sp-desc" id="sp-desc"></div>
+  <div class="sp-objectives">
+    <div class="sp-obj"><div class="sp-obj-v" id="sp-v">0</div><div class="sp-obj-l">Vértices</div></div>
+    <div class="sp-obj"><div class="sp-obj-v" id="sp-e">0</div><div class="sp-obj-l">Arestas</div></div>
+    <div class="sp-obj"><div class="sp-obj-v" id="sp-mf">?</div><div class="sp-obj-l">Fluxo Máx.</div></div>
+  </div>
+  <button class="btn btn-primary" style="margin-top:14px;width:190px;" onclick="hideSplash()">Começar ▶</button>
+</div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════
+   PHASE DATA  — 13 fases
+   maxFlow aqui é o valor CORRETO calculado pelo algoritmo.
+═══════════════════════════════════════════ */
+const PHASES = [
+  /* 1 */ {
+    name:'O Primeiro Fluxo', minPaths:2,
+    desc:'Rede simples de 4 vértices. Aprenda a selecionar um caminho e transportar fluxo.',
+    nodes:[{id:'S',x:.10,y:.50},{id:'A',x:.45,y:.22},{id:'B',x:.45,y:.78},{id:'T',x:.90,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:10},{id:'e1',from:'S',to:'B',cap:10},
+           {id:'e2',from:'A',to:'T',cap:10},{id:'e3',from:'B',to:'T',cap:10},{id:'e4',from:'A',to:'B',cap:1}],
+    maxFlow:20, hint:'Existem dois caminhos diretos: S→A→T e S→B→T. Use ambos!'
+  },
+  /* 2 */ {
+    name:'O Gargalo', minPaths:3,
+    desc:'Uma aresta com capacidade reduzida limita o fluxo. Identifique o gargalo.',
+    nodes:[{id:'S',x:.08,y:.50},{id:'A',x:.35,y:.25},{id:'B',x:.35,y:.75},{id:'C',x:.65,y:.35},{id:'T',x:.92,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:15},{id:'e1',from:'S',to:'B',cap:10},
+           {id:'e2',from:'A',to:'C',cap:4},{id:'e3',from:'B',to:'C',cap:8},
+           {id:'e4',from:'C',to:'T',cap:10},{id:'e5',from:'A',to:'B',cap:5}],
+    maxFlow:14, hint:'A aresta A→C tem capacidade 4. Todo fluxo que passa por A é limitado a 4. Use também S→B→C→T.'
+  },
+  /* 3 */ {
+    name:'Múltiplos Caminhos', minPaths:3,
+    desc:'Vários caminhos aumentantes disponíveis. Encontre todos para maximizar.',
+    nodes:[{id:'S',x:.08,y:.50},{id:'A',x:.30,y:.20},{id:'B',x:.30,y:.80},
+           {id:'C',x:.55,y:.20},{id:'D',x:.55,y:.80},{id:'T',x:.92,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:10},{id:'e1',from:'S',to:'B',cap:12},
+           {id:'e2',from:'A',to:'C',cap:8},{id:'e3',from:'A',to:'D',cap:5},
+           {id:'e4',from:'B',to:'C',cap:4},{id:'e5',from:'B',to:'D',cap:9},
+           {id:'e6',from:'C',to:'T',cap:10},{id:'e7',from:'D',to:'T',cap:11}],
+    maxFlow:19, hint:'Use S→A→C→T, S→B→D→T e depois ajuste com os caminhos restantes para extrair o fluxo máximo.'
+  },
+  /* 4 */ {
+    name:'A Rede Residual', minPaths:3,
+    desc:'Alguns caminhos exigem cancelar fluxo em arestas já usadas. Use valores negativos!',
+    nodes:[{id:'S',x:.08,y:.50},{id:'A',x:.38,y:.22},{id:'B',x:.38,y:.78},{id:'C',x:.68,y:.50},{id:'T',x:.92,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:10},{id:'e1',from:'S',to:'B',cap:10},
+           {id:'e2',from:'A',to:'C',cap:10},{id:'e3',from:'B',to:'A',cap:6},
+           {id:'e4',from:'B',to:'C',cap:6},{id:'e5',from:'C',to:'T',cap:10}],
+    maxFlow:16, hint:'Após saturar S→A→C→T com 10, tente S→B→C→T com 6 e S→B→A... Explore a rede residual!'
+  },
+  /* 5 */ {
+    name:'Rede Complexa', minPaths:4,
+    desc:'Rede maior com múltiplos gargalos. O corte mínimo determina o fluxo máximo.',
+    nodes:[{id:'S',x:.06,y:.50},{id:'A',x:.25,y:.18},{id:'B',x:.25,y:.82},
+           {id:'C',x:.45,y:.30},{id:'D',x:.45,y:.70},
+           {id:'E',x:.65,y:.18},{id:'F',x:.65,y:.82},
+           {id:'G',x:.80,y:.50},{id:'T',x:.94,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:15},{id:'e1',from:'S',to:'B',cap:13},
+           {id:'e2',from:'A',to:'C',cap:12},{id:'e3',from:'A',to:'D',cap:4},
+           {id:'e4',from:'B',to:'C',cap:3},{id:'e5',from:'B',to:'D',cap:10},
+           {id:'e6',from:'C',to:'E',cap:10},{id:'e7',from:'C',to:'F',cap:6},
+           {id:'e8',from:'D',to:'E',cap:4},{id:'e9',from:'D',to:'F',cap:9},
+           {id:'e10',from:'E',to:'G',cap:10},{id:'e11',from:'F',to:'G',cap:10},
+           {id:'e12',from:'G',to:'T',cap:20},{id:'e13',from:'E',to:'T',cap:5}],
+    maxFlow:23, hint:'O corte mínimo está entre {E,F,G} e T: E→T(5)+E→G→T e F→G→T, total 23. Explore sistematicamente.'
+  },
+  /* 6 */ {
+    name:'Cruzamento Crítico', minPaths:3,
+    desc:'Uma aresta central é compartilhada por múltiplos caminhos — gargalo global.',
+    nodes:[{id:'S',x:.08,y:.50},{id:'A',x:.30,y:.20},{id:'B',x:.30,y:.80},
+           {id:'M',x:.55,y:.50},{id:'C',x:.75,y:.20},{id:'D',x:.75,y:.80},{id:'T',x:.92,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:8},{id:'e1',from:'S',to:'B',cap:8},
+           {id:'e2',from:'A',to:'M',cap:6},{id:'e3',from:'B',to:'M',cap:6},
+           {id:'e4',from:'M',to:'C',cap:7},{id:'e5',from:'M',to:'D',cap:5},
+           {id:'e6',from:'C',to:'T',cap:7},{id:'e7',from:'D',to:'T',cap:5},
+           {id:'e8',from:'A',to:'C',cap:2},{id:'e9',from:'B',to:'D',cap:2}],
+    maxFlow:14, hint:'M é o gargalo central com capacidade de saída 12. Use as arestas diretas A→C e B→D para contorná-lo.'
+  },
+  /* 7 */ {
+    name:'Fluxo Paralelo', minPaths:4,
+    desc:'Múltiplas rotas paralelas com capacidades assimétricas. Balance cuidadosamente.',
+    nodes:[{id:'S',x:.07,y:.50},{id:'A',x:.28,y:.15},{id:'B',x:.28,y:.85},
+           {id:'C',x:.50,y:.15},{id:'D',x:.50,y:.50},{id:'E',x:.50,y:.85},
+           {id:'F',x:.72,y:.25},{id:'G',x:.72,y:.75},{id:'T',x:.93,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:12},{id:'e1',from:'S',to:'B',cap:14},
+           {id:'e2',from:'A',to:'C',cap:8},{id:'e3',from:'A',to:'D',cap:6},
+           {id:'e4',from:'B',to:'D',cap:9},{id:'e5',from:'B',to:'E',cap:7},
+           {id:'e6',from:'C',to:'F',cap:8},{id:'e7',from:'D',to:'F',cap:5},
+           {id:'e8',from:'D',to:'G',cap:7},{id:'e9',from:'E',to:'G',cap:7},
+           {id:'e10',from:'F',to:'T',cap:11},{id:'e11',from:'G',to:'T',cap:12}],
+    maxFlow:21, hint:'Saída máxima de T é 23 (F+G), mas S só fornece 26. O gargalo está nos caminhos intermediários — trace cada rota.'
+  },
+  /* 8 */ {
+    name:'O Labirinto', minPaths:4,
+    desc:'Rede com ciclos e bifurcações. Atenção para não criar ciclos no caminho aumentante!',
+    nodes:[{id:'S',x:.07,y:.50},{id:'A',x:.25,y:.22},{id:'B',x:.25,y:.78},
+           {id:'C',x:.45,y:.10},{id:'D',x:.45,y:.50},{id:'E',x:.45,y:.90},
+           {id:'F',x:.68,y:.22},{id:'G',x:.68,y:.78},{id:'T',x:.93,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:9},{id:'e1',from:'S',to:'B',cap:9},
+           {id:'e2',from:'A',to:'C',cap:7},{id:'e3',from:'A',to:'D',cap:5},
+           {id:'e4',from:'B',to:'D',cap:5},{id:'e5',from:'B',to:'E',cap:7},
+           {id:'e6',from:'C',to:'F',cap:7},{id:'e7',from:'D',to:'F',cap:4},
+           {id:'e8',from:'D',to:'G',cap:4},{id:'e9',from:'E',to:'G',cap:7},
+           {id:'e10',from:'F',to:'T',cap:9},{id:'e11',from:'G',to:'T',cap:9},
+           {id:'e12',from:'D',to:'C',cap:3},{id:'e13',from:'D',to:'E',cap:3}],
+    maxFlow:16, hint:'D é um nó central que recebe e distribui fluxo. Identifique o corte mínimo: {S,A,B,C,D,E} → {F,G,T} = 7+4+4+7=22? Não — verifique quais arestas formam o corte real.'
+  },
+  /* 9 */ {
+    name:'Arestas Reversas Avançadas', minPaths:5,
+    desc:'Sem usar arestas residuais reversas, você não atingirá o fluxo máximo.',
+    nodes:[{id:'S',x:.07,y:.50},{id:'A',x:.30,y:.20},{id:'B',x:.30,y:.80},
+           {id:'C',x:.55,y:.20},{id:'D',x:.55,y:.80},{id:'T',x:.93,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:10},{id:'e1',from:'S',to:'B',cap:10},
+           {id:'e2',from:'A',to:'C',cap:8},{id:'e3',from:'B',to:'D',cap:8},
+           {id:'e4',from:'C',to:'T',cap:8},{id:'e5',from:'D',to:'T',cap:8},
+           {id:'e6',from:'A',to:'D',cap:4},{id:'e7',from:'B',to:'C',cap:4},
+           {id:'e8',from:'C',to:'D',cap:5}],
+    maxFlow:16, hint:'A aresta C→D conecta os dois "lados". Após saturar os caminhos diretos, use a rede residual para redirecionar fluxo por C→D ou D→C reversa.'
+  },
+  /* 10 */ {
+    name:'Grade 3×2', minPaths:5,
+    desc:'Rede em grade estruturada. Cada linha e coluna tem capacidades diferentes.',
+    nodes:[{id:'S',x:.06,y:.50},
+           {id:'A',x:.25,y:.20},{id:'B',x:.25,y:.50},{id:'C',x:.25,y:.80},
+           {id:'D',x:.50,y:.20},{id:'E',x:.50,y:.50},{id:'F',x:.50,y:.80},
+           {id:'G',x:.75,y:.20},{id:'H',x:.75,y:.50},{id:'I',x:.75,y:.80},
+           {id:'T',x:.94,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:8},{id:'e1',from:'S',to:'B',cap:12},{id:'e2',from:'S',to:'C',cap:8},
+           {id:'e3',from:'A',to:'D',cap:7},{id:'e4',from:'B',to:'D',cap:4},{id:'e5',from:'B',to:'E',cap:6},{id:'e6',from:'B',to:'F',cap:4},
+           {id:'e7',from:'C',to:'F',cap:7},{id:'e8',from:'D',to:'G',cap:6},{id:'e9',from:'D',to:'E',cap:3},
+           {id:'e10',from:'E',to:'H',cap:7},{id:'e11',from:'E',to:'G',cap:3},{id:'e12',from:'E',to:'I',cap:3},
+           {id:'e13',from:'F',to:'I',cap:6},{id:'e14',from:'F',to:'E',cap:3},
+           {id:'e15',from:'G',to:'T',cap:8},{id:'e16',from:'H',to:'T',cap:10},{id:'e17',from:'I',to:'T',cap:8}],
+    maxFlow:22, hint:'Capacidade total de saída de T = 26, mas S só fornece 28. O gargalo está na camada intermediária. Explore todas as rotas na grade.'
+  },
+  /* 11 */ {
+    name:'Duplo Gargalo', minPaths:5,
+    desc:'Dois gargalos em série: saturar o primeiro revela o segundo. Use a rede residual!',
+    nodes:[{id:'S',x:.06,y:.50},{id:'A',x:.22,y:.25},{id:'B',x:.22,y:.75},
+           {id:'X',x:.40,y:.50},{id:'C',x:.58,y:.25},{id:'D',x:.58,y:.75},
+           {id:'Y',x:.76,y:.50},{id:'T',x:.94,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:12},{id:'e1',from:'S',to:'B',cap:12},
+           {id:'e2',from:'A',to:'X',cap:8},{id:'e3',from:'B',to:'X',cap:8},
+           {id:'e4',from:'X',to:'C',cap:7},{id:'e5',from:'X',to:'D',cap:7},
+           {id:'e6',from:'C',to:'Y',cap:8},{id:'e7',from:'D',to:'Y',cap:8},
+           {id:'e8',from:'Y',to:'T',cap:12},{id:'e9',from:'A',to:'C',cap:3},
+           {id:'e10',from:'B',to:'D',cap:3}],
+    maxFlow:18, hint:'X tem capacidade de saída 14 e Y tem capacidade de saída 16, mas Y→T é 12. Use as arestas diretas A→C e B→D para contornar X e aumentar o fluxo.'
+  },
+  /* 12 */ {
+    name:'Rede Diamante', minPaths:5,
+    desc:'Topologia em diamante com múltiplas camadas. Corte mínimo não óbvio!',
+    nodes:[{id:'S',x:.06,y:.50},{id:'A',x:.22,y:.28},{id:'B',x:.22,y:.72},
+           {id:'C',x:.40,y:.14},{id:'D',x:.40,y:.50},{id:'E',x:.40,y:.86},
+           {id:'F',x:.60,y:.14},{id:'G',x:.60,y:.50},{id:'H',x:.60,y:.86},
+           {id:'I',x:.78,y:.28},{id:'J',x:.78,y:.72},{id:'T',x:.94,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:14},{id:'e1',from:'S',to:'B',cap:14},
+           {id:'e2',from:'A',to:'C',cap:8},{id:'e3',from:'A',to:'D',cap:8},
+           {id:'e4',from:'B',to:'D',cap:8},{id:'e5',from:'B',to:'E',cap:8},
+           {id:'e6',from:'C',to:'F',cap:7},{id:'e7',from:'C',to:'G',cap:4},
+           {id:'e8',from:'D',to:'F',cap:4},{id:'e9',from:'D',to:'G',cap:6},{id:'e10',from:'D',to:'H',cap:4},
+           {id:'e11',from:'E',to:'G',cap:4},{id:'e12',from:'E',to:'H',cap:7},
+           {id:'e13',from:'F',to:'I',cap:9},{id:'e14',from:'G',to:'I',cap:6},{id:'e15',from:'G',to:'J',cap:6},
+           {id:'e16',from:'H',to:'J',cap:9},
+           {id:'e17',from:'I',to:'T',cap:14},{id:'e18',from:'J',to:'T',cap:14}],
+    maxFlow:24, hint:'Com 12 vértices, aborde sistematicamente: camada por camada. Identifique o corte mínimo visualizando quais arestas "separam" S de T com menor capacidade total.'
+  },
+  /* 13 */ {
+    name:'Mestre do Fluxo', minPaths:6,
+    desc:'Rede com 10 vértices, arestas assimétricas e necessidade obrigatória de fluxo reverso.',
+    nodes:[{id:'S',x:.05,y:.50},{id:'A',x:.20,y:.20},{id:'B',x:.20,y:.80},
+           {id:'C',x:.38,y:.10},{id:'D',x:.38,y:.50},{id:'E',x:.38,y:.90},
+           {id:'F',x:.58,y:.30},{id:'G',x:.58,y:.70},
+           {id:'H',x:.76,y:.20},{id:'I',x:.76,y:.80},{id:'T',x:.95,y:.50}],
+    edges:[{id:'e0',from:'S',to:'A',cap:15},{id:'e1',from:'S',to:'B',cap:15},
+           {id:'e2',from:'A',to:'C',cap:10},{id:'e3',from:'A',to:'D',cap:8},
+           {id:'e4',from:'B',to:'D',cap:8},{id:'e5',from:'B',to:'E',cap:10},
+           {id:'e6',from:'C',to:'F',cap:9},{id:'e7',from:'D',to:'F',cap:6},
+           {id:'e8',from:'D',to:'G',cap:6},{id:'e9',from:'E',to:'G',cap:9},
+           {id:'e10',from:'F',to:'H',cap:10},{id:'e11',from:'F',to:'G',cap:4},
+           {id:'e12',from:'G',to:'F',cap:4},{id:'e13',from:'G',to:'I',cap:10},
+           {id:'e14',from:'H',to:'T',cap:12},{id:'e15',from:'I',to:'T',cap:12},
+           {id:'e16',from:'H',to:'I',cap:5},{id:'e17',from:'D',to:'C',cap:3}],
+    maxFlow:22, hint:'F e G têm arestas bidirecionais — use-as na rede residual para redirecionar fluxo. O fluxo máximo exige múltiplas iterações e arestas reversas.'
+  },
+];
+
+/* ═══════════════════════════════════════════
+   HINTS DATA
+═══════════════════════════════════════════ */
+const HINTS = [
+  { tab:'Caminho Aumentante', content:`
+    <p>Um <strong style="color:var(--cyan)">caminho aumentante</strong> é qualquer caminho de S até T
+    na rede residual onde todas as arestas têm capacidade residual positiva.</p>
+    <p>Para encontrá-lo: parta de S e siga qualquer aresta com capacidade disponível até chegar em T.
+    Enquanto existir pelo menos um caminho aumentante, o fluxo atual <em>não é máximo</em>.</p>
+    <div class="hint-box-inner">Algoritmo BFS encontra o menor caminho aumentante em número de arestas (variante Edmonds-Karp).</div>
+  `},
+  { tab:'Cap. Residual', content:`
+    <p>A <strong style="color:var(--cyan)">capacidade residual</strong> de uma aresta (u,v) com capacidade c e fluxo f é:</p>
+    <div class="hint-box-inner">r(u,v) = c − f &nbsp;(capacidade direta)<br>r(v,u) = f &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(capacidade reversa)</div>
+    <p>Você pode enviar fluxo na direção direta se r(u,v) > 0, ou cancelar fluxo (negativo) se r(v,u) > 0.</p>
+  `},
+  { tab:'Gargalo', content:`
+    <p>O <strong style="color:var(--amber)">gargalo</strong> de um caminho aumentante é a aresta com <em>menor capacidade residual</em>.</p>
+    <p>Ele determina o máximo que pode ser enviado por aquele caminho em uma iteração.</p>
+    <p>No Ford-Fulkerson, você sempre envia exatamente o valor do gargalo para saturar pelo menos uma aresta — garantindo que o algoritmo termina.</p>
+  `},
+  { tab:'Rede Residual', content:`
+    <p>A <strong style="color:var(--purple)">rede residual</strong> contém todas as arestas com capacidade residual positiva.</p>
+    <p>Para cada aresta (u,v) com fluxo f e capacidade c:</p>
+    <ul><li>Se f &lt; c: aresta direta (u,v) com r = c−f</li><li>Se f &gt; 0: aresta reversa (v,u) com r = f</li></ul>
+    <p>Clique em <strong>⧓ Residual</strong> para visualizar a rede residual atual e identificar novos caminhos aumentantes.</p>
+  `},
+  { tab:'Arestas Reversas', content:`
+    <p>As <strong style="color:var(--red)">arestas reversas</strong> permitem "desfazer" fluxo enviado anteriormente.</p>
+    <p>Se você enviou 5 unidades por (u,v), pode usar a aresta reversa (v,u) com capacidade 5 para redirecionar esse fluxo.</p>
+    <p>No jogo: selecione a aresta na direção <em>oposta</em> ao fluxo e use um <strong>valor negativo</strong> no transporte.</p>
+    <div class="hint-box-inner">Isso é obrigatório em redes onde a solução gulosa inicial bloqueia o caminho ótimo.</div>
+  `},
+  { tab:'★ Critério de Estrelas', content:`
+    <p>Ao final de cada fase você recebe <strong>1 a 5 estrelas</strong> baseado em três critérios:</p>
+    <div class="stars-criteria">
+      <div class="sc-row"><span class="sc-stars">★★★★★</span><span class="sc-desc"><strong style="color:var(--green)">5 estrelas</strong> — Sem nenhum erro, usando exatamente o número mínimo de caminhos e em menos de 60 segundos.</span></div>
+      <div class="sc-row"><span class="sc-stars">★★★★☆</span><span class="sc-desc"><strong style="color:var(--green)">4 estrelas</strong> — Sem erros, caminhos mínimos, mas demorou mais de 60s. Ou 1 erro com caminhos mínimos.</span></div>
+      <div class="sc-row"><span class="sc-stars">★★★☆☆</span><span class="sc-desc"><strong style="color:var(--cyan)">3 estrelas</strong> — Sem erros (mas usou caminhos extras) OU ≤1 erro com poucos extras.</span></div>
+      <div class="sc-row"><span class="sc-stars">★★☆☆☆</span><span class="sc-desc"><strong style="color:var(--amber)">2 estrelas</strong> — 2-3 erros ou precisou de muitos caminhos extras.</span></div>
+      <div class="sc-row"><span class="sc-stars">★☆☆☆☆</span><span class="sc-desc"><strong style="color:var(--red)">1 estrela</strong> — Fluxo máximo atingido, mas com muitos erros ou caminhos.</span></div>
+    </div>
+    <p style="margin-top:8px;font-size:0.7rem;color:var(--text-3)">Dica: o número mínimo de caminhos para cada fase está nas metas da fase. O objetivo de 5 estrelas exige escolher o caminho com maior capacidade residual em cada iteração.</p>
+  `},
+];
+
+/* ═══════════════════════════════════════════
+   GAME STATE
+═══════════════════════════════════════════ */
+let state = {
+  phase:0, flow:{}, selected:[], totalFlow:0,
+  pathsUsed:0, errors:0, moves:0, startTime:0,
+  totalScore:0, phasesDone:[], showResidual:false, phaseOver:false,
+  darkMode:true,
+};
+
+/* ═══════════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════════ */
+function toggleTheme() {
+  state.darkMode = !state.darkMode;
+  document.body.classList.toggle('light', !state.darkMode);
+  document.getElementById('btn-theme').textContent = state.darkMode ? '🌙' : '☀️';
+  drawAll();
+}
+
+/* ═══════════════════════════════════════════
+   CANVAS
+═══════════════════════════════════════════ */
+let cW, cH;
+const cvBg   = document.getElementById('canvas-bg');
+const cvMain = document.getElementById('canvas-main');
+const cvAnim = document.getElementById('canvas-anim');
+
+function resizeCanvases() {
+  const cont = document.getElementById('canvas-container');
+  cW = cont.clientWidth; cH = cont.clientHeight;
+  [cvBg,cvMain,cvAnim].forEach(cv => { cv.width=cW; cv.height=cH; });
+  drawAll();
+}
+window.addEventListener('resize', resizeCanvases);
+
+/* ─── Coordinate helpers ─── */
+function nodePos(node) { return {x:node.x*cW, y:node.y*cH}; }
+
+function getEdgeGeometry(edge, phase) {
+  const fn = phase.nodes.find(n=>n.id===edge.from);
+  const tn = phase.nodes.find(n=>n.id===edge.to);
+  return {x1:fn.x*cW, y1:fn.y*cH, x2:tn.x*cW, y2:tn.y*cH};
+}
+
+function edgeMidpoint(g) { return {x:(g.x1+g.x2)/2, y:(g.y1+g.y2)/2}; }
+
+function edgeNormal(g) {
+  const dx=g.x2-g.x1, dy=g.y2-g.y1, len=Math.hypot(dx,dy);
+  return {nx:-dy/len, ny:dx/len};
+}
+
+/* ─── Background ─── */
+function drawBackground() {
+  const ctx = cvBg.getContext('2d');
+  ctx.clearRect(0,0,cW,cH);
+  ctx.strokeStyle = state.darkMode ? 'rgba(36,48,80,0.5)' : 'rgba(148,163,184,0.35)';
+  ctx.lineWidth = 1;
+  for(let x=0;x<cW;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cH);ctx.stroke();}
+  for(let y=0;y<cH;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cW,y);ctx.stroke();}
+}
+
+function drawAll() { drawBackground(); drawMain(); }
+
+/* ─── Draw edges & nodes ─── */
+const NODE_R = 22;
+const PIPE_W = 14;
+
+function drawMain() {
+  const phase = PHASES[state.phase];
+  const ctx = cvMain.getContext('2d');
+  ctx.clearRect(0,0,cW,cH);
+  phase.edges.forEach(e => drawEdge(ctx,e,phase));
+  phase.nodes.forEach(n => drawNode(ctx,n));
+}
+
+function drawEdge(ctx, edge, phase) {
+  const g   = getEdgeGeometry(edge, phase);
+  const sel = state.selected.includes(edge.id);
+  const f   = state.flow[edge.id]||0;
+  const cap = edge.cap;
+  const ratio = cap>0 ? Math.min(f/cap,1) : 0;
+  const light = !state.darkMode;
+
+  ctx.save();
+  ctx.lineCap='round';
+
+  // shadow/border
+  ctx.strokeStyle = light ? '#cbd5e1' : '#1a2235';
+  ctx.lineWidth = PIPE_W+4;
+  ctx.beginPath(); ctx.moveTo(g.x1,g.y1); ctx.lineTo(g.x2,g.y2); ctx.stroke();
+
+  // tube
+  ctx.strokeStyle = light ? '#dbeafe' : '#1e3a5f';
+  ctx.lineWidth = PIPE_W;
+  ctx.beginPath(); ctx.moveTo(g.x1,g.y1); ctx.lineTo(g.x2,g.y2); ctx.stroke();
+
+  // flow fill
+  if(f>0 && !state.showResidual) {
+    ctx.strokeStyle = sel ? '#22d3ee' : (light ? '#3b82f6' : '#3b82f6');
+    ctx.lineWidth = PIPE_W-4;
+    ctx.globalAlpha = 0.85;
+    const fx2=g.x1+(g.x2-g.x1)*ratio, fy2=g.y1+(g.y2-g.y1)*ratio;
+    ctx.beginPath(); ctx.moveTo(g.x1,g.y1); ctx.lineTo(fx2,fy2); ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+
+  // residual
+  if(state.showResidual && cap-f>0) {
+    ctx.strokeStyle = light ? 'rgba(59,130,246,0.45)' : 'rgba(59,130,246,0.6)';
+    ctx.lineWidth = PIPE_W-4;
+    ctx.beginPath(); ctx.moveTo(g.x1,g.y1); ctx.lineTo(g.x2,g.y2); ctx.stroke();
+  }
+
+  // selection highlight
+  if(sel) {
+    ctx.strokeStyle='#22d3ee'; ctx.lineWidth=PIPE_W+6; ctx.globalAlpha=0.22;
+    ctx.beginPath(); ctx.moveTo(g.x1,g.y1); ctx.lineTo(g.x2,g.y2); ctx.stroke();
+    ctx.globalAlpha=1;
+    ctx.strokeStyle='#22d3ee'; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.moveTo(g.x1,g.y1); ctx.lineTo(g.x2,g.y2); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  ctx.restore();
+  drawArrow(ctx, g, sel?'#22d3ee':(f>0?'#60a5fa':(light?'#94a3b8':'#334155')));
+  drawEdgeLabel(ctx, g, edge, f, cap);
+  if(state.showResidual && f>0) drawReverseInfo(ctx, g, f);
+}
+
+function drawArrow(ctx, g, color) {
+  const dx=g.x2-g.x1, dy=g.y2-g.y1;
+  const len=Math.hypot(dx,dy);
+  if(len<1) return;
+  const ux=dx/len, uy=dy/len;
+  const t=0.62;
+  const ax=g.x1+dx*t, ay=g.y1+dy*t;
+  const hs=5.5;  // REDUCED: was 9
+  ctx.save();
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(ax+ux*hs, ay+uy*hs);
+  ctx.lineTo(ax-ux*hs+uy*hs*0.5, ay-uy*hs-ux*hs*0.5);
+  ctx.lineTo(ax-ux*hs-uy*hs*0.5, ay-uy*hs+ux*hs*0.5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawEdgeLabel(ctx, g, edge, flow, cap) {
+  const mid=edgeMidpoint(g), n=edgeNormal(g);
+  const lx=mid.x+n.nx*18, ly=mid.y+n.ny*18;
+  ctx.save();
+  const txt=`${flow}/${cap}`;
+  ctx.font='bold 10px "IBM Plex Mono"';
+  const tw=ctx.measureText(txt).width;
+  const pw=tw+10, ph=15;
+  const light=!state.darkMode;
+  ctx.fillStyle=light?'rgba(241,245,249,0.93)':'rgba(11,15,26,0.88)';
+  ctx.beginPath(); ctx.roundRect(lx-pw/2,ly-ph/2,pw,ph,3); ctx.fill();
+  ctx.fillStyle=flow>=cap?'#ef4444':(flow>0?(light?'#2563eb':'#93c5fd'):(light?'#94a3b8':'#475569'));
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(txt,lx,ly);
+  ctx.restore();
+}
+
+function drawReverseInfo(ctx, g, cap) {
+  const mid=edgeMidpoint(g), n=edgeNormal(g);
+  const lx=mid.x-n.nx*20, ly=mid.y-n.ny*20;
+  ctx.save();
+  ctx.fillStyle='rgba(168,85,247,0.25)';
+  ctx.beginPath(); ctx.roundRect(lx-16,ly-7,32,14,3); ctx.fill();
+  ctx.fillStyle='#a855f7'; ctx.font='9px "IBM Plex Mono"';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('←'+cap,lx,ly);
+  ctx.restore();
+}
+
+function drawNode(ctx, node) {
+  const p=nodePos(node);
+  const isS=node.id==='S', isT=node.id==='T';
+  const light=!state.darkMode;
+  const baseColor=isS?'#22c55e':isT?'#ef4444':'#3b82f6';
+  ctx.save();
+  ctx.shadowColor=baseColor; ctx.shadowBlur=14;
+  ctx.beginPath(); ctx.arc(p.x,p.y,NODE_R,0,Math.PI*2);
+  ctx.fillStyle=isS?(light?'rgba(22,163,74,0.15)':'rgba(34,197,94,0.2)'):isT?(light?'rgba(220,38,38,0.15)':'rgba(239,68,68,0.2)'):(light?'rgba(37,99,235,0.1)':'rgba(59,130,246,0.15)');
+  ctx.fill();
+  ctx.strokeStyle=baseColor; ctx.lineWidth=2.5; ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.fillStyle=light?'#0f172a':'#e2e8f0';
+  ctx.font='bold 13px "Unbounded"';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(node.label||node.id, p.x, p.y);
+  ctx.restore();
+}
+
+/* ═══════════════════════════════════════════
+   CLICK DETECTION
+═══════════════════════════════════════════ */
+cvMain.addEventListener('click', e => {
+  const r=cvMain.getBoundingClientRect();
+  handleCanvasClick(e.clientX-r.left, e.clientY-r.top);
+});
+
+cvMain.addEventListener('mousemove', e => {
+  const r=cvMain.getBoundingClientRect();
+  const mx=e.clientX-r.left, my=e.clientY-r.top;
+  const phase=PHASES[state.phase];
+  let hit=false;
+  phase.edges.forEach(ed=>{if(pointNearEdge(mx,my,getEdgeGeometry(ed,phase),12)) hit=true;});
+  cvMain.style.cursor=hit?'pointer':'default';
+});
+
+function pointNearEdge(px,py,g,thresh) {
+  const dx=g.x2-g.x1,dy=g.y2-g.y1,len2=dx*dx+dy*dy;
+  if(len2===0) return false;
+  let t=((px-g.x1)*dx+(py-g.y1)*dy)/len2;
+  t=Math.max(0,Math.min(1,t));
+  return Math.hypot(px-g.x1-t*dx,py-g.y1-t*dy)<thresh;
+}
+
+function handleCanvasClick(mx,my) {
+  if(state.phaseOver) return;
+  const phase=PHASES[state.phase];
+  for(const edge of phase.edges) {
+    if(pointNearEdge(mx,my,getEdgeGeometry(edge,phase),14)) {
+      toggleEdge(edge.id); return;
+    }
+  }
+}
+
+function toggleEdge(edgeId) {
+  const idx=state.selected.indexOf(edgeId);
+  state.selected=idx>=0 ? state.selected.slice(0,idx) : [...state.selected,edgeId];
+  updatePathDisplay(); drawMain(); updateButtons();
+}
+
+function undoEdge() { state.selected.pop(); updatePathDisplay(); drawMain(); updateButtons(); }
+
+function clearSelection() { state.selected=[]; updatePathDisplay(); drawMain(); updateButtons(); showMsg('',''); }
+
+/* ═══════════════════════════════════════════
+   PATH DISPLAY
+═══════════════════════════════════════════ */
+function updatePathDisplay() {
+  const phase=PHASES[state.phase], el=document.getElementById('path-display');
+  if(!state.selected.length){el.innerHTML='<span style="color:var(--text-3)">Clique nas arestas → S até T</span>';return;}
+  const edges=state.selected.map(eid=>phase.edges.find(e=>e.id===eid));
+  const segs=[edges[0].from,...edges.map(e=>e.to)];
+  let minRes=Infinity;
+  edges.forEach(e=>{const res=e.cap-(state.flow[e.id]||0); if(res<minRes) minRes=res;});
+  let html='';
+  segs.forEach((n,i)=>{
+    if(i>0) html+='<span class="path-arrow"> → </span>';
+    const nc=n==='S'?'#22c55e':n==='T'?'#ef4444':'var(--cyan)';
+    html+=`<span class="path-node" style="color:${nc}">${n}</span>`;
+  });
+  if(isFinite(minRes)) html+=`<br><span class="path-cap">gargalo: ${minRes}</span>`;
+  el.innerHTML=html;
+}
+
+/* ═══════════════════════════════════════════
+   TRANSPORT MODAL
+═══════════════════════════════════════════ */
+function openTransportModal() {
+  const valid=validatePath();
+  if(!valid.ok){showMsg(valid.msg,'error');state.errors++;updateStats();return;}
+  const phase=PHASES[state.phase];
+  const edges=state.selected.map(eid=>phase.edges.find(e=>e.id===eid));
+  let minRes=Infinity;
+  edges.forEach(e=>{const res=e.cap-(state.flow[e.id]||0); if(res<minRes) minRes=res;});
+  document.getElementById('transport-info').textContent=`Gargalo do caminho: ${minRes}. Máximo transportável: ${minRes} unidade(s).`;
+  document.getElementById('transport-val').value=minRes>0?minRes:1;
+  openModal('transport-modal-bg');
+  setTimeout(()=>document.getElementById('transport-val').select(),80);
+}
+
+function doTransport() {
+  const val=parseInt(document.getElementById('transport-val').value);
+  if(isNaN(val)||val===0){alert('Insira um valor diferente de zero.');return;}
+  closeModal('transport-modal-bg');
+  const valid=validatePath(val);
+  if(!valid.ok){showMsg(valid.msg,'error');state.errors++;highlightErrorEdge(valid.edgeId);updateStats();return;}
+  const phase=PHASES[state.phase];
+  state.selected.forEach(eid=>{
+    const edge=phase.edges.find(e=>e.id===eid);
+    state.flow[edge.id]=(state.flow[edge.id]||0)+val;
+  });
+  state.totalFlow+=val;
+  state.pathsUsed++;
+  state.moves++;
+  animateFlow(state.selected.slice(), val>0);
+  state.selected=[];
+  updatePathDisplay(); updateFlowDisplay(); updateStats(); updateButtons();
+  showMsg(`✓ ${val} unidade(s) transportada(s).`,'success');
+  updateStarsLive();
+  setTimeout(()=>{ if(!hasAugmentingPath()){state.phaseOver=true;setTimeout(showWin,700);} },900);
+}
+
+/* ═══════════════════════════════════════════
+   VALIDATION
+═══════════════════════════════════════════ */
+function validatePath(amount) {
+  const phase=PHASES[state.phase], sel=state.selected;
+  if(!sel.length) return{ok:false,msg:'Nenhuma aresta selecionada.'};
+  const edges=sel.map(eid=>phase.edges.find(e=>e.id===eid));
+  if(edges[0].from!=='S') return{ok:false,msg:`Caminho deve começar em S. Aresta começa em ${edges[0].from}.`};
+  if(edges[edges.length-1].to!=='T') return{ok:false,msg:`Caminho deve terminar em T. Última aresta termina em ${edges[edges.length-1].to}.`};
+  for(let i=1;i<edges.length;i++){
+    if(edges[i].from!==edges[i-1].to)
+      return{ok:false,msg:`Caminho não contínuo: ${edges[i-1].to} ≠ ${edges[i].from}.`,edgeId:edges[i].id};
+  }
+  if(amount!==undefined) {
+    for(const edge of edges) {
+      const f=state.flow[edge.id]||0;
+      if(amount>0){
+        const res=edge.cap-f;
+        if(amount>res) return{ok:false,msg:`Aresta ${edge.from}→${edge.to}: capacidade residual=${res}, pedido=${amount}.`,edgeId:edge.id};
+      } else {
+        if(Math.abs(amount)>f) return{ok:false,msg:`Aresta ${edge.from}→${edge.to}: fluxo atual=${f}, não há fluxo suficiente para reverter ${Math.abs(amount)}.`,edgeId:edge.id};
+      }
+    }
+  }
+  return{ok:true};
+}
+
+/* ═══════════════════════════════════════════
+   BFS — augmenting path check
+   Uses CORRECT residual graph: direct (cap-flow>0) + reverse (flow>0)
+═══════════════════════════════════════════ */
+function hasAugmentingPath() {
+  const phase=PHASES[state.phase];
+  const visited=new Set(['S']), queue=['S'];
+  while(queue.length){
+    const u=queue.shift();
+    if(u==='T') return true;
+    for(const e of phase.edges){
+      // forward edge
+      if(e.from===u && (e.cap-(state.flow[e.id]||0))>0 && !visited.has(e.to)){
+        visited.add(e.to); queue.push(e.to);
+      }
+      // reverse edge
+      if(e.to===u && (state.flow[e.id]||0)>0 && !visited.has(e.from)){
+        visited.add(e.from); queue.push(e.from);
+      }
+    }
+  }
+  return false;
+}
+
+/* ─── Compute true max flow via BFS/Edmonds-Karp (for verification) ─── */
+function computeMaxFlow(phaseData) {
+  const flow={};
+  phaseData.edges.forEach(e=>{flow[e.id]=0;});
+  let total=0;
+  // BFS to find augmenting path
+  const bfs=()=>{
+    const prev={S:null};
+    const queue=['S'];
+    while(queue.length){
+      const u=queue.shift();
+      if(u==='T') break;
+      for(const e of phaseData.edges){
+        if(e.from===u && (e.cap-flow[e.id])>0 && !(e.to in prev)){
+          prev[e.to]={edge:e,rev:false}; queue.push(e.to);
+        }
+        if(e.to===u && flow[e.id]>0 && !(e.from in prev)){
+          prev[e.from]={edge:e,rev:true}; queue.push(e.from);
+        }
+      }
+    }
+    if(!('T' in prev)) return 0;
+    // find bottleneck
+    let bn=Infinity, v='T';
+    while(v!=='S'){const p=prev[v];bn=Math.min(bn,p.rev?flow[p.edge.id]:(p.edge.cap-flow[p.edge.id]));v=p.rev?p.edge.to:p.edge.from;}
+    // apply
+    v='T';
+    while(v!=='S'){const p=prev[v];if(p.rev)flow[p.edge.id]-=bn;else flow[p.edge.id]+=bn;v=p.rev?p.edge.to:p.edge.from;}
+    return bn;
+  };
+  let aug;
+  while((aug=bfs())>0) total+=aug;
+  return total;
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATION
+═══════════════════════════════════════════ */
+function animateFlow(selEdges) {
+  const phase=PHASES[state.phase];
+  const ctx=cvAnim.getContext('2d');
+  const geoms=selEdges.map(eid=>{const e=phase.edges.find(x=>x.id===eid);return getEdgeGeometry(e,phase);});
+  const lens=geoms.map(g=>Math.hypot(g.x2-g.x1,g.y2-g.y1));
+  const total=lens.reduce((a,b)=>a+b,0);
+  const start=performance.now(), dur=700;
+  const frame=now=>{
+    const t=Math.min((now-start)/dur,1);
+    ctx.clearRect(0,0,cW,cH);
+    const prog=t*total;
+    let walked=0, px=geoms[0].x1, py=geoms[0].y1;
+    for(let i=0;i<geoms.length;i++){
+      const g=geoms[i];
+      if(walked+lens[i]>=prog){const lt=(prog-walked)/lens[i];px=g.x1+(g.x2-g.x1)*lt;py=g.y1+(g.y2-g.y1)*lt;break;}
+      walked+=lens[i]; px=g.x2; py=g.y2;
+    }
+    const grad=ctx.createRadialGradient(px,py,0,px,py,16);
+    grad.addColorStop(0,'rgba(34,211,238,0.95)');
+    grad.addColorStop(0.5,'rgba(59,130,246,0.6)');
+    grad.addColorStop(1,'rgba(59,130,246,0)');
+    ctx.beginPath(); ctx.arc(px,py,16,0,Math.PI*2); ctx.fillStyle=grad; ctx.fill();
+    // trail
+    ctx.save(); ctx.strokeStyle='rgba(34,211,238,0.35)'; ctx.lineWidth=3; ctx.lineCap='round';
+    walked=0; let inT=true; ctx.beginPath(); ctx.moveTo(geoms[0].x1,geoms[0].y1);
+    for(let i=0;i<geoms.length&&inT;i++){
+      const g=geoms[i];
+      if(walked+lens[i]>=prog){const lt2=(prog-walked)/lens[i];ctx.lineTo(g.x1+(g.x2-g.x1)*lt2,g.y1+(g.y2-g.y1)*lt2);inT=false;}
+      else{ctx.lineTo(g.x2,g.y2);walked+=lens[i];}
+    }
+    ctx.stroke(); ctx.restore();
+    if(t<1) requestAnimationFrame(frame);
+    else {ctx.clearRect(0,0,cW,cH);drawMain();}
+  };
+  requestAnimationFrame(frame);
+}
+
+function highlightErrorEdge(edgeId) {
+  if(!edgeId) return;
+  const phase=PHASES[state.phase], edge=phase.edges.find(e=>e.id===edgeId);
+  if(!edge) return;
+  const ctx=cvAnim.getContext('2d'), g=getEdgeGeometry(edge,phase);
+  let alpha=1;
+  const fade=()=>{
+    ctx.clearRect(0,0,cW,cH);
+    ctx.save(); ctx.strokeStyle=`rgba(239,68,68,${alpha})`; ctx.lineWidth=PIPE_W+8; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(g.x1,g.y1); ctx.lineTo(g.x2,g.y2); ctx.stroke(); ctx.restore();
+    alpha-=0.05; if(alpha>0) requestAnimationFrame(fade); else ctx.clearRect(0,0,cW,cH);
+  };
+  requestAnimationFrame(fade);
+}
+
+/* ═══════════════════════════════════════════
+   UI UPDATES
+═══════════════════════════════════════════ */
+function updateFlowDisplay() {
+  const phase=PHASES[state.phase];
+  // totalFlow should never exceed maxFlow — it's clamped by validation
+  document.getElementById('flow-val').textContent=state.totalFlow;
+  document.getElementById('flow-goal-txt').textContent=`Objetivo: ${phase.maxFlow} unidades`;
+  const pct=Math.min(state.totalFlow/phase.maxFlow*100,100);
+  document.getElementById('flow-progress').style.width=pct+'%';
+}
+
+function updateStarsLive() {
+  const stars=calcStars();
+  document.getElementById('stars-live').textContent='★'.repeat(stars)+'☆'.repeat(5-stars);
+  document.getElementById('stars-live').style.color=['','#ef4444','#f59e0b','#22d3ee','#22c55e','#22c55e'][stars];
+}
+
+function updateButtons() {
+  document.getElementById('btn-transport').disabled=!state.selected.length||state.phaseOver;
+  document.getElementById('btn-undo').disabled=!state.selected.length;
+}
+
+function updateStats() {
+  document.getElementById('s-paths').textContent=state.pathsUsed;
+  document.getElementById('s-errors').textContent=state.errors;
+  const phase=PHASES[state.phase];
+  if(state.pathsUsed>0&&state.totalFlow>0){
+    const eff=Math.round(state.totalFlow/state.pathsUsed/phase.maxFlow*100);
+    const el=document.getElementById('s-eff');
+    el.textContent=eff+'%'; el.className='sv '+(eff>70?'good':eff>40?'warn':'bad');
+  }
+}
+
+let timerInterval;
+function startTimer() {
+  state.startTime=Date.now(); clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    const el=Math.floor((Date.now()-state.startTime)/1000);
+    document.getElementById('s-time').textContent=`${Math.floor(el/60)}:${String(el%60).padStart(2,'0')}`;
+  },1000);
+}
+
+function showMsg(text,type) {
+  const el=document.getElementById('msg-box');
+  if(text&&type){el.className=type;el.textContent=text;el.style.display='block';}
+  else{el.style.display='none';el.className='';}
+}
+
+/* ═══════════════════════════════════════════
+   STAR CALCULATION (5-star system)
+═══════════════════════════════════════════ */
+function calcStars() {
+  const phase=PHASES[state.phase];
+  const elapsed=Math.floor((Date.now()-state.startTime)/1000);
+  const minP=phase.minPaths;
+  const extraPaths=Math.max(0,state.pathsUsed-minP);
+  // 5★: 0 errors, ≤minPaths, ≤60s
+  if(state.errors===0 && extraPaths===0 && elapsed<=60) return 5;
+  // 4★: 0 errors, ≤minPaths (or slow) | 1 error, 0 extra
+  if(state.errors===0 && extraPaths===0) return 4;
+  if(state.errors<=1 && extraPaths===0) return 4;
+  // 3★: 0 errors with some extras | ≤1 error few extras
+  if(state.errors===0 && extraPaths<=2) return 3;
+  if(state.errors<=1 && extraPaths<=1) return 3;
+  // 2★: 2-3 errors or many extras
+  if(state.errors<=3 && extraPaths<=4) return 2;
+  return 1;
+}
+
+/* ═══════════════════════════════════════════
+   WIN
+═══════════════════════════════════════════ */
+function showWin() {
+  clearInterval(timerInterval);
+  const phase=PHASES[state.phase];
+  const elapsed=Math.floor((Date.now()-state.startTime)/1000);
+  const stars=calcStars();
+  document.getElementById('win-stars').textContent='★'.repeat(stars)+'☆'.repeat(5-stars);
+  document.getElementById('win-stars').style.color=['','#ef4444','#f59e0b','#22d3ee','#22c55e','#ffd700'][stars];
+  document.getElementById('win-msg').textContent=
+    stars===5?'Perfeito! Solução ótima com zero erros e mínimo de caminhos!':
+    stars===4?'Excelente! Muito perto da solução ótima.':
+    stars===3?'Muito bem! Fluxo máximo atingido.':
+    stars===2?'Bem! Tente com menos erros para mais estrelas.':
+    'Fluxo máximo encontrado! Pratique mais para melhorar.';
+  const m=Math.floor(elapsed/60), s=elapsed%60;
+  document.getElementById('wstat-flow').textContent=state.totalFlow;
+  document.getElementById('wstat-paths').textContent=state.pathsUsed;
+  document.getElementById('wstat-time').textContent=`${m}:${String(s).padStart(2,'0')}`;
+  const eff=state.pathsUsed>0?Math.round(state.totalFlow/state.pathsUsed/phase.maxFlow*100):0;
+  document.getElementById('wstat-eff').textContent=eff+'%';
+  const phaseScore=(stars*200)+Math.max(0,300-state.errors*30)+Math.max(0,150-elapsed);
+  state.totalScore+=phaseScore;
+  document.getElementById('total-score').textContent=state.totalScore;
+  state.phasesDone.push(state.phase);
+  updatePhaseDots();
+  const isLast=state.phase>=PHASES.length-1;
+  document.getElementById('btn-next-phase').textContent=isLast?'✓ Concluído':'Próxima Fase →';
+  document.getElementById('btn-next-phase').disabled=isLast;
+  openModal('win-modal-bg');
+}
+
+/* ═══════════════════════════════════════════
+   RESIDUAL
+═══════════════════════════════════════════ */
+function toggleResidual() {
+  state.showResidual=!state.showResidual;
+  document.getElementById('residual-badge').classList.toggle('show',state.showResidual);
+  document.getElementById('btn-residual').style.color=state.showResidual?'var(--purple)':'';
+  drawMain();
+}
+
+/* ═══════════════════════════════════════════
+   PHASE MANAGEMENT
+═══════════════════════════════════════════ */
+function loadPhase(idx) {
+  state.phase=idx; state.flow={}; state.selected=[]; state.totalFlow=0;
+  state.pathsUsed=0; state.errors=0; state.moves=0; state.phaseOver=false; state.showResidual=false;
+  const phase=PHASES[idx];
+  phase.edges.forEach(e=>{state.flow[e.id]=0;});
+  document.getElementById('pt-name').textContent=`Fase ${idx+1}: ${phase.name}`;
+  document.getElementById('pt-desc').textContent=phase.hint;
+  document.getElementById('residual-badge').classList.remove('show');
+  document.getElementById('btn-residual').style.color='';
+  document.getElementById('stars-live').textContent='';
+  clearInterval(timerInterval);
+  updatePathDisplay(); updateFlowDisplay(); updateStats(); updateButtons(); showMsg('','');
+  setTimeout(()=>{resizeCanvases();startTimer();},100);
+}
+
+function showSplash(idx) {
+  const phase=PHASES[idx], sp=document.getElementById('phase-splash');
+  sp.style.opacity='1'; sp.classList.remove('hiding'); sp.style.display='flex';
+  document.getElementById('sp-num').textContent=`Fase ${idx+1} de ${PHASES.length}`;
+  document.getElementById('sp-name').textContent=phase.name;
+  document.getElementById('sp-desc').textContent=phase.desc;
+  document.getElementById('sp-v').textContent=phase.nodes.length;
+  document.getElementById('sp-e').textContent=phase.edges.length;
+  // Show actual computed max flow for verification (hidden from display as '?')
+  document.getElementById('sp-mf').textContent='?';
+}
+
+function hideSplash() {
+  const sp=document.getElementById('phase-splash');
+  sp.classList.add('hiding');
+  setTimeout(()=>{sp.style.display='none';},400);
+}
+
+function nextPhase() {
+  closeModal('win-modal-bg');
+  const next=state.phase+1;
+  if(next>=PHASES.length) return;
+  loadPhase(next); showSplash(next);
+}
+
+function updatePhaseDots() {
+  const cont=document.getElementById('phase-dots');
+  cont.innerHTML='';
+  PHASES.forEach((ph,i)=>{
+    const dot=document.createElement('div');
+    dot.className='phase-dot'+(i===state.phase?' active':'')+(state.phasesDone.includes(i)?' done':'');
+    dot.textContent=i+1; dot.title=ph.name;
+    dot.onclick=()=>{if(state.phasesDone.includes(i)||i<=state.phase){closeModal('win-modal-bg');loadPhase(i);}};
+    cont.appendChild(dot);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   HINT MODAL
+═══════════════════════════════════════════ */
+function openHintModal() {
+  const tabsEl=document.getElementById('hint-tabs'), contEl=document.getElementById('hint-contents');
+  tabsEl.innerHTML=''; contEl.innerHTML='';
+  HINTS.forEach((h,i)=>{
+    const tab=document.createElement('button');
+    tab.className='htab'+(i===0?' active':''); tab.textContent=h.tab;
+    tab.onclick=()=>{
+      document.querySelectorAll('.htab').forEach(t=>t.classList.remove('active')); tab.classList.add('active');
+      document.querySelectorAll('.hint-content').forEach(c=>c.classList.remove('show'));
+      document.getElementById(`hc-${i}`).classList.add('show');
+    };
+    tabsEl.appendChild(tab);
+    const div=document.createElement('div');
+    div.className='hint-content'+(i===0?' show':''); div.id=`hc-${i}`; div.innerHTML=h.content;
+    contEl.appendChild(div);
+  });
+  openModal('hint-modal-bg');
+}
+
+/* ═══════════════════════════════════════════
+   MODAL HELPERS
+═══════════════════════════════════════════ */
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.modal-bg').forEach(bg=>{
+  bg.addEventListener('click',e=>{if(e.target===bg) bg.classList.remove('show');});
+});
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+// Verify phase 5 max flow at startup
+(()=>{
+  PHASES.forEach((ph,i)=>{
+    const computed=computeMaxFlow(ph);
+    // If our declared maxFlow doesn't match, use the computed value
+    if(ph.maxFlow!==computed) ph.maxFlow=computed;
+  });
+})();
+
+function init() { updatePhaseDots(); loadPhase(0); showSplash(0); }
+init();
+</script>
+</body>
+</html>

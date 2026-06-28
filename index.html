@@ -476,11 +476,13 @@
 </div>
 
 <!-- SECTION: AVANÇADO -->
+
 <div class="section-header" data-level="avancado" id="sec-avancado">
   <span class="sh-badge ava">⭐⭐⭐ Avançado</span>
   <span class="sh-line"></span>
   <span class="sh-count">5 jogos</span>
 </div>
+
 <div class="container" id="grid-avancado">
 
   <div class="card" data-level="avancado">
@@ -491,6 +493,7 @@
         <span class="star on"></span><span class="star on"></span><span class="star on"></span><span class="star"></span>
       </span>
     </div>
+
     <div class="card-concept">Espaço de Estados · Teoria da Informação</div>
     <h2>Jogo da Permutação</h2>
     <p>O computador gera uma permutação secreta com 3 a 8 números distintos. Você propõe sequências e o oráculo responde quantos elementos estão na posição correta — mas não quais.</p>
@@ -585,6 +588,7 @@
   <span class="sh-line"></span>
   <span class="sh-count">1 jogo</span>
 </div>
+
 <div class="container" id="grid-expert">
 
 
@@ -656,7 +660,70 @@
   </div>
 
   </div>
+
+  <div class="card" data-level="expert">
+    <div class="card-meta">
+      <span class="badge badge-level exp">⭐⭐⭐⭐ Expert</span>
+      <span class="badge age">👤 15+ anos</span>
+      <span class="stars">
+        <span class="star on"></span><span class="star on"></span><span class="star on"></span><span class="star on"></span>
+      </span>
+    </div>
+
+<div class="card-concept">Grafos e Otimização</div>
+<h2>Fluxo Máximo</h2>
+<p>
+Imagine uma rede de canos conectando uma fonte de água a um destino final.
+Cada cano tem uma capacidade máxima de vazão. A pergunta natural é:
+<strong>qual é o maior volume de água que pode fluir da fonte até o destino, respeitando
+as capacidades de cada cano?</strong>
+</p>
+<p>
+Esse é o <strong>Problema do Fluxo Máximo</strong> — um dos problemas centrais da
+teoria dos grafos e da otimização combinatória. A mesma estrutura matemática modela
+situações muito distintas: roteamento de dados em redes de internet, transporte de
+mercadorias em malhas ferroviárias, distribuição de energia elétrica e até alocação
+de tarefas em projetos.
+</p>
+<p>
+A história do algoritmo mais famoso para resolver esse problema está ligada à análise
+da rede ferroviária soviética, estudada tanto por pesquisadores russos quanto americanos
+nas décadas de 1930, 1940 e 1950.  Foi nesse contexto que
+Lester Randolph Ford Jr. e Delbert Ray Fulkerson desenvolveram o algoritmo que
+leva seus nomes,  publicado em 1956.
+</p>
+<p>
+A ideia central do método é iterativa: enquanto existir um <strong>caminho aumentante</strong>
+— uma rota da fonte ao destino com capacidade disponível —, envia-se mais fluxo por ele.
+Para cada aresta, define-se uma capacidade residual igual à capacidade menos o fluxo
+já utilizado. A partir dessas capacidades residuais constrói-se a rede residual,
+que permite inclusive "desfazer" fluxo enviado por rotas subótimas, usando arestas reversas. 
+O processo continua até que nenhum caminho aumentante exista — garantia de que o
+fluxo encontrado é de fato máximo.
+</p>
+<p>
+Um resultado elegante conecta esse problema a outro conceito: o
+<strong>Teorema do Fluxo Máximo e Corte Mínimo</strong>, que afirma que o maior fluxo
+possível entre dois pontos é igual à menor capacidade total que, se removida,
+desconectaria completamente a fonte do destino.
+</p>
+<p>
+Nesta atividade interativa, você constrói manualmente os caminhos aumentantes,
+observa como o fluxo se distribui pelos arcos, ativa a visualização da rede residual
+e descobre como as arestas reversas permitem corrigir escolhas anteriores.
+O jogo possui 13 fases de dificuldade crescente, culminando em redes que exigem
+o uso obrigatório de fluxo reverso para atingir o ótimo.
+</p>
+<p class="age-note">
+Recomendado para estudantes de computação, matemática aplicada e engenharia —
+a partir dos 16 anos, com noções de grafos e otimização.
+</p>
+<div class="btn-wrap">
+  <a class="btn" href="https://wladimirtavares.github.io/FluxoMaximo/index.html" target="_blank">Jogar →</a>
 </div>
+
+</div>
+
 
 <footer>
   Jogos educativos de lógica, matemática e pensamento computacional.
