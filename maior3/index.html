@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Menor3 — Encontre o Mínimo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─── */
+:root{
+  --bg:#0c0e14;
+  --surface:#13161f;
+  --card:#191d29;
+  --card2:#1f2333;
+  --border:#272c3d;
+  --border2:#323850;
+  --gold:#e8c84a;
+  --gold-d:#b89c2a;
+  --gold-dim:rgba(232,200,74,.10);
+  --gold-glow:rgba(232,200,74,.18);
+  --red:#e84a5f;
+  --red-dim:rgba(232,74,95,.12);
+  --green:#3ecf8e;
+  --green-dim:rgba(62,207,142,.12);
+  --blue:#4a90e8;
+  --blue-dim:rgba(74,144,232,.12);
+  --text:#e8eaf0;
+  --text2:#8b92a8;
+  --text3:#424a62;
+  --mono:'Space Mono',monospace;
+  --sans:'Space Grotesk',system-ui,sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:14px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 16px 60px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* grid bg */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(74,144,232,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(74,144,232,.04) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ─── HEADER ─── */
+header{
+  width:100%;max-width:860px;
+  padding:32px 0 20px;
+  position:relative;z-index:1;
+}
+.logo{
+  font-family:var(--mono);
+  font-size:1.45rem;
+  font-weight:700;
+  color:var(--gold);
+  letter-spacing:.04em;
+  display:flex;align-items:center;gap:10px;
+}
+.logo-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 12px var(--gold);
+  flex-shrink:0;
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.logo small{
+  display:block;
+  font-family:var(--sans);
+  font-size:.72rem;
+  font-weight:400;
+  color:var(--text2);
+  letter-spacing:.06em;
+  margin-top:2px;
+}
+
+/* ─── MAIN CONTAINER ─── */
+#app{
+  width:100%;max-width:860px;
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;gap:20px;
+}
+
+/* ─── CARD ─── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:22px 24px;
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:.5;
+}
+.card-title{
+  font-family:var(--mono);
+  font-size:.65rem;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:16px;
+}
+
+/* ─── SETUP PHASE ─── */
+#setup-card{text-align:center}
+#setup-card h2{
+  font-size:1.5rem;font-weight:700;
+  color:var(--text);
+  margin-bottom:8px;
+  line-height:1.3;
+}
+#setup-card p{color:var(--text2);line-height:1.6;margin-bottom:24px;max-width:480px;margin-left:auto;margin-right:auto}
+
+.n-picker{
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;
+}
+.n-btn{
+  width:56px;height:56px;
+  border-radius:10px;
+  border:1.5px solid var(--border2);
+  background:var(--card2);
+  color:var(--text2);
+  font-family:var(--mono);
+  font-size:1.3rem;font-weight:700;
+  cursor:pointer;
+  transition:all .15s;
+}
+.n-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.n-btn.active{
+  border-color:var(--gold);
+  background:var(--gold-dim);
+  color:var(--gold);
+  box-shadow:0 0 0 3px var(--gold-glow);
+}
+
+.btn-start{
+  padding:13px 40px;
+  background:var(--gold);
+  color:#0c0e14;
+  border:none;
+  border-radius:8px;
+  font-family:var(--mono);
+  font-size:.88rem;font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all .15s;
+  box-shadow:0 4px 20px rgba(232,200,74,.3);
+}
+.btn-start:hover{background:#f0d55a;transform:translateY(-1px);box-shadow:0 6px 24px rgba(232,200,74,.4)}
+.btn-start:active{transform:translateY(0)}
+
+/* ─── HOW-TO BOX ─── */
+.howto{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px 18px;
+  margin-top:20px;
+  text-align:left;
+}
+.howto h3{
+  font-family:var(--mono);font-size:.68rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:10px;
+}
+.howto ol{
+  padding-left:18px;
+  color:var(--text2);
+  line-height:1.85;
+  font-size:.82rem;
+}
+.howto ol li strong{color:var(--text)}
+
+/* ─── GAME PHASE ─── */
+#game-area{display:none}
+
+/* Stats bar */
+.stats-bar{
+  display:flex;gap:12px;flex-wrap:wrap;
+}
+.stat{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:10px 16px;
+  display:flex;flex-direction:column;gap:3px;
+  flex:1;min-width:100px;
+}
+.stat-label{
+  font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text3);
+}
+.stat-val{
+  font-family:var(--mono);
+  font-size:1.2rem;font-weight:700;
+  color:var(--gold);
+  line-height:1;
+}
+
+/* ─── BUTTON GRID ─── */
+.btn-grid-wrap{
+  display:flex;flex-direction:column;gap:12px;
+}
+.grid-label{
+  font-family:var(--mono);font-size:.62rem;
+  letter-spacing:.25em;text-transform:uppercase;
+  color:var(--text3);
+}
+#btn-grid{
+  display:flex;flex-wrap:wrap;gap:10px;
+}
+
+/* Secret button */
+.secret-btn{
+  width:72px;height:72px;
+  border-radius:10px;
+  border:1.5px solid var(--border2);
+  background:var(--card2);
+  color:var(--text2);
+  font-family:var(--mono);
+  font-size:.72rem;font-weight:700;
+  letter-spacing:.05em;
+  cursor:pointer;
+  transition:all .18s;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:5px;
+  position:relative;
+  user-select:none;
+}
+.secret-btn .btn-num{
+  font-size:.58rem;letter-spacing:.15em;
+  color:var(--text3);
+  line-height:1;
+}
+.secret-btn .btn-val{
+  font-size:1.1rem;font-weight:700;
+  line-height:1;
+  color:var(--text2);
+}
+/* states */
+.secret-btn:hover:not(.revealed):not(.disabled-btn){
+  border-color:var(--gold);
+  background:var(--gold-dim);
+  color:var(--gold);
+  transform:translateY(-2px);
+  box-shadow:0 4px 16px rgba(232,200,74,.2);
+}
+.secret-btn:hover:not(.revealed):not(.disabled-btn) .btn-val{color:var(--gold)}
+.secret-btn.selected-maior3{
+  border-color:var(--blue) !important;
+  background:var(--blue-dim) !important;
+  box-shadow:0 0 0 2px rgba(74,144,232,.3) !important;
+}
+.secret-btn.selected-maior3 .btn-val{color:var(--blue) !important}
+.secret-btn.selected-maior3 .btn-num{color:rgba(74,144,232,.6) !important}
+.secret-btn.selected-guess{
+  border-color:var(--gold) !important;
+  background:var(--gold-dim) !important;
+  box-shadow:0 0 0 2px var(--gold-glow) !important;
+}
+.secret-btn.selected-guess .btn-val{color:var(--gold) !important}
+.secret-btn.selected-guess .btn-num{color:rgba(232,200,74,.6) !important}
+.secret-btn.revealed{
+  cursor:default;
+  border-color:var(--border2);
+}
+.secret-btn.revealed-winner{
+  border-color:var(--green) !important;
+  background:var(--green-dim) !important;
+}
+.secret-btn.revealed-winner .btn-val{color:var(--green) !important}
+.secret-btn.revealed-loser{
+  border-color:var(--border) !important;
+  background:var(--card) !important;
+  opacity:.65;
+}
+.secret-btn.revealed-loser .btn-val{color:var(--text3) !important}
+.secret-btn.revealed-wrong-guess{
+  border-color:var(--red) !important;
+  background:var(--red-dim) !important;
+}
+.secret-btn.revealed-wrong-guess .btn-val{color:var(--red) !important}
+.secret-btn.disabled-btn{
+  opacity:.35;cursor:not-allowed;
+  transform:none !important;
+  box-shadow:none !important;
+}
+.secret-btn .crown{
+  position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  font-size:16px;line-height:1;
+  display:none;
+}
+.secret-btn.revealed-winner .crown{display:block}
+
+/* ─── MODES / ACTIONS ─── */
+.mode-row{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+}
+.mode-card{
+  background:var(--card2);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:14px 18px;
+  flex:1;min-width:240px;
+  transition:border-color .15s;
+}
+.mode-card.active-mode{border-color:var(--blue);background:var(--blue-dim)}
+.mode-card.active-mode .mode-title{color:var(--blue)}
+.mode-card.active-guess-mode{border-color:var(--gold);background:var(--gold-dim)}
+.mode-card.active-guess-mode .mode-title{color:var(--gold)}
+.mode-title{
+  font-family:var(--mono);font-size:.7rem;
+  font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:6px;
+}
+.mode-desc{font-size:.78rem;color:var(--text2);line-height:1.5}
+.mode-desc strong{color:var(--text)}
+
+.action-row{
+  display:flex;gap:10px;flex-wrap:wrap;
+}
+.btn-action{
+  padding:11px 22px;
+  border-radius:8px;
+  border:none;
+  font-family:var(--mono);
+  font-size:.78rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.btn-blue{
+  background:var(--blue);color:#fff;
+  box-shadow:0 3px 14px rgba(74,144,232,.3);
+}
+.btn-blue:hover{background:#5da0f0;transform:translateY(-1px)}
+.btn-gold{
+  background:var(--gold);color:#0c0e14;
+  box-shadow:0 3px 14px rgba(232,200,74,.3);
+}
+.btn-gold:hover{background:#f0d55a;transform:translateY(-1px)}
+.btn-ghost{
+  background:transparent;color:var(--text2);
+  border:1.5px solid var(--border2);
+}
+.btn-ghost:hover{border-color:var(--text2);color:var(--text)}
+.btn-action:disabled{opacity:.35;cursor:not-allowed;transform:none !important}
+
+/* ─── LOG ─── */
+#log-wrap{display:flex;flex-direction:column;gap:8px}
+#log-entries{display:flex;flex-direction:column;gap:7px}
+.log-entry{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:11px 16px;
+  display:flex;align-items:center;gap:14px;
+  animation:slideIn .25s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.log-n{
+  font-family:var(--mono);font-size:.62rem;
+  color:var(--text3);width:24px;flex-shrink:0;
+  text-align:right;
+}
+.log-icon{font-size:1.1rem;flex-shrink:0}
+.log-text{font-size:.82rem;color:var(--text2);line-height:1.5;flex:1}
+.log-text strong{color:var(--text)}
+.log-highlight{
+  font-family:var(--mono);font-size:.9rem;font-weight:700;
+  color:var(--gold);
+  background:var(--gold-dim);
+  border:1px solid var(--gold-d);
+  border-radius:5px;
+  padding:2px 9px;
+  white-space:nowrap;
+}
+
+/* ─── RESULT OVERLAY ─── */
+#result-overlay{
+  position:fixed;inset:0;
+  background:rgba(12,14,20,.88);
+  backdrop-filter:blur(8px);
+  display:none;
+  align-items:center;justify-content:center;
+  z-index:100;
+  padding:20px;
+}
+#result-overlay.show{display:flex}
+.result-box{
+  background:var(--card);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  padding:36px 40px;
+  max-width:480px;width:100%;
+  text-align:center;
+  box-shadow:0 24px 60px rgba(0,0,0,.6);
+  animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+.result-icon{font-size:3rem;margin-bottom:10px;line-height:1}
+.result-title{
+  font-family:var(--mono);font-size:1.5rem;font-weight:700;
+  margin-bottom:8px;
+}
+.result-title.win{color:var(--green)}
+.result-title.lose{color:var(--red)}
+.result-msg{
+  color:var(--text2);font-size:.85rem;line-height:1.65;
+  margin-bottom:20px;
+}
+.result-stats{
+  display:flex;gap:12px;justify-content:center;margin-bottom:24px;
+  flex-wrap:wrap;
+}
+.rs{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:10px 18px;text-align:center;
+}
+.rs-v{
+  font-family:var(--mono);font-size:1.2rem;font-weight:700;
+  color:var(--gold);line-height:1;
+}
+.rs-l{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-top:4px}
+.btn-result{
+  padding:12px 32px;
+  border-radius:8px;border:none;
+  font-family:var(--mono);font-size:.82rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;
+  background:var(--gold);color:#0c0e14;
+  box-shadow:0 4px 16px rgba(232,200,74,.3);
+  transition:all .15s;
+}
+.btn-result:hover{background:#f0d55a;transform:translateY(-1px)}
+
+/* ─── REVEALED NUMBERS GRID ─── */
+.reveal-grid{
+  display:flex;flex-wrap:wrap;gap:8px;
+  justify-content:center;
+  margin:16px 0;
+}
+.reveal-chip{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:7px;padding:8px 14px;
+  font-family:var(--mono);font-size:.82rem;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.reveal-chip .rc-n{font-size:.58rem;color:var(--text3);letter-spacing:.1em}
+.reveal-chip .rc-v{font-size:1rem;font-weight:700;color:var(--text)}
+.reveal-chip.rc-min{border-color:var(--green);background:var(--green-dim)}
+.reveal-chip.rc-min .rc-v{color:var(--green)}
+.reveal-chip.rc-guess-ok{border-color:var(--green);background:var(--green-dim)}
+.reveal-chip.rc-guess-wrong{border-color:var(--red);background:var(--red-dim)}
+.reveal-chip.rc-guess-wrong .rc-v{color:var(--red)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:560px){
+  .secret-btn{width:60px;height:60px}
+  .secret-btn .btn-val{font-size:.95rem}
+  .result-box{padding:24px 20px}
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    MENOR<span style="color:var(--text2)">3</span>
+    <small>Encontre o botão com o menor valor secreto</small>
+  </div>
+</header>
+
+<div id="app">
+
+  <!-- ══════════ SETUP ══════════ -->
+  <div class="card" id="setup-card">
+    <h2>Quantos botões secretos<br>você quer explorar?</h2>
+    <p>Escolha o tamanho do conjunto. Quanto maior, mais difícil — mas você pode usar o comando <strong style="color:var(--gold);font-family:var(--mono)">maior3</strong> para comparar três botões por vez.</p>
+
+    <div class="n-picker" id="n-picker">
+      <!-- gerado via JS -->
+    </div>
+
+    <button class="btn-start" id="btn-start" onclick="startGame()">Iniciar Jogo ▶</button>
+
+    <div class="howto">
+      <h3>Como jogar</h3>
+      <ol>
+        <li>Escolha a <strong>quantidade de botões</strong> (3 a 12).</li>
+        <li>Use o comando <strong>maior3</strong>: selecione exatamente 3 botões e clique em <strong>Executar maior3</strong>. O jogo revela qual dos três tem o <em>maior</em> valor.</li>
+        <li>Repita quantas vezes precisar até ter certeza de qual é o <strong>menor</strong>.</li>
+        <li>Clique em <strong>modo palpite</strong>, selecione o botão que acredita ser o mínimo e clique em <strong>Enviar palpite</strong>.</li>
+        <li>O jogo revela todos os números e indica se você acertou!</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ══════════ JOGO ══════════ -->
+  <div id="game-area">
+
+    <!-- Stats -->
+    <div class="card">
+      <div class="card-title">Sessão atual</div>
+      <div class="stats-bar">
+        <div class="stat">
+          <div class="stat-label">Botões</div>
+          <div class="stat-val" id="stat-n">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Consultas maior3</div>
+          <div class="stat-val" id="stat-q">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Teórico mínimo</div>
+          <div class="stat-val" id="stat-theory" style="font-size:.85rem;padding-top:4px">—</div>
+        </div>
+        <div class="stat" style="flex:2">
+          <div class="stat-label">Dica</div>
+          <div id="hint-text" style="font-size:.78rem;color:var(--text2);line-height:1.5;padding-top:2px">Selecione 3 botões para usar o comando maior3.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões secretos -->
+    <div class="card">
+      <div class="card-title">Botões secretos</div>
+      <div class="btn-grid-wrap">
+        <div id="btn-grid"></div>
+      </div>
+    </div>
+
+    <!-- Modos de ação -->
+    <div class="card">
+      <div class="card-title">Ações</div>
+      <div class="mode-row" style="margin-bottom:14px">
+        <div class="mode-card active-mode" id="mode-maior3-card">
+          <div class="mode-title">Modo: maior3</div>
+          <div class="mode-desc">Selecione <strong>exatamente 3</strong> botões e execute. O jogo revela qual deles tem o <strong>maior</strong> valor secreto.</div>
+        </div>
+        <div class="mode-card" id="mode-guess-card">
+          <div class="mode-title">Modo: palpite</div>
+          <div class="mode-desc">Quando tiver certeza, ative este modo, selecione <strong>1 botão</strong> (o que acredita ser o mínimo) e envie.</div>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn-action btn-blue" id="btn-exec" onclick="execMaior3()" disabled>Executar maior3</button>
+        <button class="btn-action btn-ghost" id="btn-clear-sel" onclick="clearSel()">Limpar seleção</button>
+        <button class="btn-action btn-ghost" id="btn-toggle-mode" onclick="toggleMode()">Ativar modo palpite</button>
+        <button class="btn-action btn-gold" id="btn-guess" onclick="submitGuess()" disabled style="display:none">Enviar palpite ✓</button>
+        <button class="btn-action btn-ghost" onclick="resetGame()" style="margin-left:auto">↺ Reiniciar</button>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="card" id="log-card" style="display:none">
+      <div class="card-title">Registro de consultas</div>
+      <div id="log-wrap">
+        <div id="log-entries"></div>
+      </div>
+    </div>
+
+  </div><!-- /game-area -->
+</div><!-- /app -->
+
+<!-- ══════════ RESULT OVERLAY ══════════ -->
+<div id="result-overlay">
+  <div class="result-box">
+    <div class="result-icon" id="res-icon"></div>
+    <div class="result-title" id="res-title"></div>
+    <div class="result-msg" id="res-msg"></div>
+    <div class="result-stats">
+      <div class="rs"><div class="rs-v" id="rs-q">—</div><div class="rs-l">Consultas</div></div>
+      <div class="rs"><div class="rs-v" id="rs-min">—</div><div class="rs-l">Teórico mín.</div></div>
+      <div class="rs"><div class="rs-v" id="rs-eff">—</div><div class="rs-l">Eficiência</div></div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Todos os valores secretos</div>
+      <div class="reveal-grid" id="reveal-grid"></div>
+    </div>
+    <button class="btn-result" onclick="resetGame()">Jogar novamente</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let S = {
+  n: 5,           // number of buttons
+  secrets: [],    // secret values (1..n shuffled or random)
+  selected: [],   // currently selected button indices (0-based)
+  mode: 'maior3', // 'maior3' | 'guess'
+  queries: 0,     // number of maior3 calls
+  guessIdx: -1,   // which button the player thinks is minimum
+  done: false,
+};
+
+/* ═══════════════════════════════════════════
+   SETUP
+═══════════════════════════════════════════ */
+(function buildPicker(){
+  const picker = document.getElementById('n-picker');
+  for(let n = 3; n <= 12; n++){
+    const btn = document.createElement('button');
+    btn.className = 'n-btn' + (n === 5 ? ' active' : '');
+    btn.textContent = n;
+    btn.dataset.n = n;
+    btn.onclick = () => {
+      document.querySelectorAll('.n-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      S.n = n;
+    };
+    picker.appendChild(btn);
+  }
+})();
+
+function startGame(){
+  document.getElementById('setup-card').style.display = 'none';
+  document.getElementById('game-area').style.display = 'flex';
+  document.getElementById('game-area').style.flexDirection = 'column';
+  document.getElementById('game-area').style.gap = '20px';
+  initGame();
+}
+
+/* ═══════════════════════════════════════════
+   INIT GAME
+═══════════════════════════════════════════ */
+function initGame(){
+  const n = S.n;
+  // Generate distinct random integers 1..99
+  const pool = [];
+  while(pool.length < n){
+    const v = Math.floor(Math.random()*98)+1;
+    if(!pool.includes(v)) pool.push(v);
+  }
+  S.secrets = pool;
+  S.selected = [];
+  S.mode = 'maior3';
+  S.queries = 0;
+  S.guessIdx = -1;
+  S.done = false;
+
+  // Stats
+  document.getElementById('stat-n').textContent = n;
+  document.getElementById('stat-q').textContent = '0';
+  const theory = theoreticalMin(n);
+  document.getElementById('stat-theory').textContent = theory + ' consultas';
+  setHint('Selecione 3 botões e use <strong style="color:var(--gold);font-family:var(--mono)">maior3</strong> para descobrir qual deles é o maior.');
+
+  // Mode UI
+  setModeUI('maior3');
+
+  // Clear log
+  document.getElementById('log-entries').innerHTML = '';
+  document.getElementById('log-card').style.display = 'none';
+
+  // Build grid
+  buildGrid();
+}
+
+/* theoreticalMin: minimum number of maior3 calls needed to identify the minimum
+   With maior3 (reveals the maximum of 3), to find the global minimum we can do:
+   Similar to finding min with pairwise comparisons (n-1) but here each query
+   gives partial info. A lower bound is ceil((n-1)/2) since each call eliminates
+   at most 2 candidates for minimum (the two non-maxima could still be minimum).
+   Simple bound: ceil((n-1)/2). */
+function theoreticalMin(n){
+  return Math.ceil((n-1)/2);
+}
+
+/* ═══════════════════════════════════════════
+   BUILD BUTTON GRID
+═══════════════════════════════════════════ */
+function buildGrid(){
+  const grid = document.getElementById('btn-grid');
+  grid.innerHTML = '';
+  for(let i = 0; i < S.n; i++){
+    const btn = document.createElement('button');
+    btn.className = 'secret-btn';
+    btn.id = `sb-${i}`;
+    btn.innerHTML = `
+      <div class="crown">👑</div>
+      <div class="btn-num">Btn ${i+1}</div>
+      <div class="btn-val" id="sbv-${i}">?</div>
+    `;
+    btn.onclick = () => handleBtnClick(i);
+    grid.appendChild(btn);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   BUTTON CLICK
+═══════════════════════════════════════════ */
+function handleBtnClick(idx){
+  if(S.done) return;
+  const el = document.getElementById(`sb-${idx}`);
+  if(el.classList.contains('revealed') || el.classList.contains('disabled-btn')) return;
+
+  if(S.mode === 'maior3'){
+    const pos = S.selected.indexOf(idx);
+    if(pos >= 0){
+      S.selected.splice(pos,1);
+      el.classList.remove('selected-maior3');
+    } else {
+      if(S.selected.length >= 3){
+        // deselect oldest
+        const old = S.selected.shift();
+        document.getElementById(`sb-${old}`).classList.remove('selected-maior3');
+      }
+      S.selected.push(idx);
+      el.classList.add('selected-maior3');
+    }
+    updateExecBtn();
+  } else {
+    // guess mode: pick exactly 1
+    if(S.guessIdx === idx){
+      S.guessIdx = -1;
+      el.classList.remove('selected-guess');
+    } else {
+      if(S.guessIdx >= 0){
+        document.getElementById(`sb-${S.guessIdx}`)?.classList.remove('selected-guess');
+      }
+      S.guessIdx = idx;
+      el.classList.add('selected-guess');
+    }
+    document.getElementById('btn-guess').disabled = S.guessIdx < 0;
+  }
+}
+
+function updateExecBtn(){
+  document.getElementById('btn-exec').disabled = S.selected.length !== 3;
+}
+
+/* ═══════════════════════════════════════════
+   EXEC MAIOR3
+═══════════════════════════════════════════ */
+function execMaior3(){
+  if(S.selected.length !== 3 || S.done) return;
+
+  const [a,b,c] = S.selected;
+  const va = S.secrets[a], vb = S.secrets[b], vc = S.secrets[c];
+  const maxVal = Math.max(va,vb,vc);
+  const maxIdx = [a,b,c][[va,vb,vc].indexOf(maxVal)];
+
+  S.queries++;
+  document.getElementById('stat-q').textContent = S.queries;
+
+  // Log entry
+  addLog(S.queries, [a,b,c], maxIdx, maxVal);
+
+  // Highlight winner on button (subtle)
+  // After query: deselect all
+  S.selected.forEach(i => {
+    document.getElementById(`sb-${i}`)?.classList.remove('selected-maior3');
+  });
+  S.selected = [];
+  updateExecBtn();
+
+  document.getElementById('log-card').style.display = '';
+  updateHintAfterQuery();
+}
+
+function addLog(qNum, indices, winnerIdx, winnerVal){
+  const entries = document.getElementById('log-entries');
+  const [a,b,c] = indices;
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerHTML = `
+    <div class="log-n">#${qNum}</div>
+    <div class="log-icon">🔎</div>
+    <div class="log-text">
+      maior3(<strong>Btn ${a+1}</strong>, <strong>Btn ${b+1}</strong>, <strong>Btn ${c+1}</strong>)
+      → o maior é <span class="log-highlight">Btn ${winnerIdx+1}</span>
+    </div>
+  `;
+  entries.prepend(div);
+}
+
+function updateHintAfterQuery(){
+  const q = S.queries;
+  const theory = theoreticalMin(S.n);
+  if(q < theory){
+    setHint(`Você usou ${q} consulta(s). O teórico mínimo é ${theory}. Continue investigando!`);
+  } else if(q === theory){
+    setHint(`Você atingiu o mínimo teórico de ${theory} consulta(s)! Se já sabe a resposta, ative o modo palpite.`);
+  } else {
+    setHint(`Você usou ${q} consultas (mínimo teórico: ${theory}). Quando tiver certeza, use o modo palpite.`);
+  }
+}
+
+function setHint(html){
+  document.getElementById('hint-text').innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════
+   CLEAR SELECTION
+═══════════════════════════════════════════ */
+function clearSel(){
+  S.selected.forEach(i => {
+    document.getElementById(`sb-${i}`)?.classList.remove('selected-maior3');
+  });
+  S.selected = [];
+  if(S.guessIdx >= 0){
+    document.getElementById(`sb-${S.guessIdx}`)?.classList.remove('selected-guess');
+    S.guessIdx = -1;
+  }
+  updateExecBtn();
+  document.getElementById('btn-guess').disabled = true;
+}
+
+/* ═══════════════════════════════════════════
+   TOGGLE MODE
+═══════════════════════════════════════════ */
+function toggleMode(){
+  clearSel();
+  if(S.mode === 'maior3'){
+    S.mode = 'guess';
+    setModeUI('guess');
+    setHint('Modo palpite ativo! Clique no botão que você acredita ter o <strong style="color:var(--gold)">menor</strong> valor secreto, depois clique em <strong>Enviar palpite</strong>.');
+  } else {
+    S.mode = 'maior3';
+    setModeUI('maior3');
+    setHint('Voltou ao modo maior3. Selecione 3 botões para consultar.');
+  }
+}
+
+function setModeUI(mode){
+  const m3c  = document.getElementById('mode-maior3-card');
+  const gsc  = document.getElementById('mode-guess-card');
+  const exec = document.getElementById('btn-exec');
+  const guess= document.getElementById('btn-guess');
+  const tog  = document.getElementById('btn-toggle-mode');
+
+  if(mode === 'maior3'){
+    m3c.classList.add('active-mode'); m3c.classList.remove('active-guess-mode');
+    gsc.classList.remove('active-mode','active-guess-mode');
+    exec.style.display = '';
+    guess.style.display = 'none';
+    tog.textContent = 'Ativar modo palpite';
+  } else {
+    gsc.classList.add('active-guess-mode'); gsc.classList.remove('active-mode');
+    m3c.classList.remove('active-mode','active-guess-mode');
+    exec.style.display = 'none';
+    guess.style.display = '';
+    guess.disabled = true;
+    tog.textContent = 'Voltar ao maior3';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SUBMIT GUESS
+═══════════════════════════════════════════ */
+function submitGuess(){
+  if(S.guessIdx < 0 || S.done) return;
+  S.done = true;
+
+  const guess = S.guessIdx;
+  const minVal = Math.min(...S.secrets);
+  const minIdx = S.secrets.indexOf(minVal);
+  const correct = guess === minIdx;
+
+  // Reveal all buttons
+  revealAll(guess, minIdx);
+
+  // Show overlay
+  showResult(correct, guess, minIdx, minVal);
+}
+
+function revealAll(guessIdx, minIdx){
+  for(let i = 0; i < S.n; i++){
+    const el = document.getElementById(`sb-${i}`);
+    const valEl = document.getElementById(`sbv-${i}`);
+    valEl.textContent = S.secrets[i];
+    el.classList.add('revealed');
+    el.onclick = null;
+
+    if(i === minIdx && i === guessIdx){
+      el.classList.add('revealed-winner');
+    } else if(i === minIdx){
+      el.classList.add('revealed-winner');
+    } else if(i === guessIdx){
+      el.classList.remove('selected-guess');
+      el.classList.add('revealed-wrong-guess');
+    } else {
+      el.classList.add('revealed-loser');
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   RESULT OVERLAY
+═══════════════════════════════════════════ */
+function showResult(correct, guessIdx, minIdx, minVal){
+  const theory = theoreticalMin(S.n);
+  const eff = S.queries <= theory ? '100%' : Math.round(theory/S.queries*100)+'%';
+
+  document.getElementById('res-icon').textContent = correct ? '🏆' : '💡';
+  document.getElementById('res-title').className = 'result-title ' + (correct?'win':'lose');
+  document.getElementById('res-title').textContent = correct ? 'Acertou!' : 'Não foi desta vez…';
+  document.getElementById('res-msg').innerHTML = correct
+    ? `O <strong>Btn ${minIdx+1}</strong> tem o menor valor secreto (<strong>${minVal}</strong>). Você identificou corretamente!`
+    : `Você escolheu <strong>Btn ${guessIdx+1}</strong>, mas o menor valor era o <strong>Btn ${minIdx+1}</strong> (valor <strong>${minVal}</strong>).`;
+
+  document.getElementById('rs-q').textContent = S.queries;
+  document.getElementById('rs-min').textContent = theory;
+  document.getElementById('rs-eff').textContent = eff;
+
+  // Reveal grid
+  const rg = document.getElementById('reveal-grid');
+  rg.innerHTML = '';
+  for(let i = 0; i < S.n; i++){
+    const chip = document.createElement('div');
+    const isMin = i === minIdx;
+    const isGuess = i === guessIdx;
+    let cls = 'reveal-chip';
+    if(isMin && isGuess) cls += ' rc-min rc-guess-ok';
+    else if(isMin) cls += ' rc-min';
+    else if(isGuess) cls += ' rc-guess-wrong';
+    chip.className = cls;
+    chip.innerHTML = `<div class="rc-n">Btn ${i+1}${isMin?' ★':''}</div><div class="rc-v">${S.secrets[i]}</div>`;
+    rg.appendChild(chip);
+  }
+
+  setTimeout(()=>document.getElementById('result-overlay').classList.add('show'), 300);
+}
+
+/* ═══════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════ */
+function resetGame(){
+  document.getElementById('result-overlay').classList.remove('show');
+  document.getElementById('setup-card').style.display = '';
+  document.getElementById('game-area').style.display = 'none';
+  // restore n-picker to current S.n
+  document.querySelectorAll('.n-btn').forEach(b=>{
+    b.classList.toggle('active', parseInt(b.dataset.n) === S.n);
+  });
+}
+</script>
+</body>
+</html>
+

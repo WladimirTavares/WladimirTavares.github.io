@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Enigma do Gato Fugitivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   TOKENS
+   ========================================================= */
+:root {
+  --bg:        #0a0d1a;
+  --surface:   #111428;
+  --card:      #1a1f3a;
+  --card-hi:   #222848;
+  --border:    #2a3060;
+  --amber:     #f0a500;
+  --amber-dim: rgba(240,165,0,.12);
+  --amber-glow:rgba(240,165,0,.30);
+  --blue-soft: #5b6dce;
+  --green:     #3ecf8e;
+  --red:       #f05a5a;
+  --text:      #e8edf8;
+  --text2:     #7b82a8;
+  --text3:     #3a4060;
+  --font-d:    'Syne', system-ui, sans-serif;
+  --font-b:    'Inter', system-ui, sans-serif;
+}
+
+/* =========================================================
+   RESET + BASE
+   ========================================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { height: 100%; }
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-b);
+  font-size: 15px;
+  line-height: 1.6;
+  /* Subtle dot-grid background — the cat's world */
+  background-image:
+    radial-gradient(circle, rgba(91,109,206,.18) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px 80px;
+}
+
+/* =========================================================
+   HEADER / BRAND
+   ========================================================= */
+.brand {
+  margin-top: 48px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+.brand-emoji {
+  display: block;
+  font-size: 3.2rem;
+  line-height: 1;
+  margin-bottom: 12px;
+  /* CSS-only pulsing glow — the signature element */
+  filter: drop-shadow(0 0 18px var(--amber-glow));
+  animation: catglow 3s ease-in-out infinite;
+}
+@keyframes catglow {
+  0%,100% { filter: drop-shadow(0 0 10px rgba(240,165,0,.25)); }
+  50%      { filter: drop-shadow(0 0 28px rgba(240,165,0,.60)); }
+}
+.brand-title {
+  font-family: var(--font-d);
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  line-height: 1.1;
+}
+.brand-title span { color: var(--amber); }
+.brand-sub {
+  margin-top: 8px;
+  font-size: .92rem;
+  color: var(--text2);
+  max-width: 440px;
+  margin-inline: auto;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 32px;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* =========================================================
+   SETUP SCREEN
+   ========================================================= */
+#screen-setup { display: flex; flex-direction: column; gap: 28px; }
+
+.rules-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+.rules-box h2 {
+  font-family: var(--font-d);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--amber);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.rules-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rules-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: .88rem;
+  color: var(--text2);
+}
+.rules-list li::before {
+  content: '▸';
+  color: var(--amber);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* N-selector */
+.n-section { display: flex; flex-direction: column; gap: 12px; }
+.n-label {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.n-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.n-chip {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  font-family: var(--font-d);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.n-chip:hover { border-color: var(--amber); color: var(--amber); background: var(--amber-dim); }
+.n-chip.active {
+  border-color: var(--amber);
+  background: var(--amber-dim);
+  color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-glow);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 10px;
+  border: none;
+  font-family: var(--font-b);
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  letter-spacing: .02em;
+}
+.btn-primary {
+  background: var(--amber);
+  color: #0a0d1a;
+  box-shadow: 0 4px 20px var(--amber-glow);
+}
+.btn-primary:hover { background: #fbb820; transform: translateY(-1px); box-shadow: 0 6px 28px var(--amber-glow); }
+.btn-primary:active { transform: translateY(0); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text2);
+  border: 1.5px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--text2); color: var(--text); }
+.btn-sm { padding: 8px 16px; font-size: .82rem; border-radius: 8px; }
+
+/* =========================================================
+   GAME SCREEN
+   ========================================================= */
+#screen-game { display: none; flex-direction: column; gap: 24px; align-items: center; width: 100%; max-width: 860px; }
+
+/* Top bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.round-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.round-num {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-family: var(--font-d);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+.round-num span { color: var(--amber); }
+.top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* =========================================================
+   BOX GRID
+   ========================================================= */
+.boxes-area {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+.boxes-label {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  align-self: flex-start;
+}
+.boxes-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+}
+
+/* Individual box — CSS 3D flip reveal */
+.box-wrap {
+  perspective: 600px;
+  width: 72px;
+  height: 80px;
+  flex-shrink: 0;
+}
+/* Responsive: smaller on narrow screens */
+@media (max-width: 480px) {
+  .box-wrap { width: 56px; height: 64px; }
+  .box-front { font-size: .88rem; }
+  .box-num   { font-size: .6rem; }
+}
+
+.box-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .55s cubic-bezier(.34,1.2,.64,1);
+}
+.box-wrap.flipped .box-inner { transform: rotateY(180deg); }
+
+/* Both faces share positioning */
+.box-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  gap: 4px;
+}
+
+/* Front face — the closed lid */
+.box-front {
+  background: var(--card-hi);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: border-color .15s, background .15s, box-shadow .15s, transform .1s;
+  user-select: none;
+}
+.box-front:hover {
+  border-color: var(--amber);
+  background: var(--amber-dim);
+  box-shadow: 0 0 18px var(--amber-glow), 0 4px 12px rgba(0,0,0,.3);
+  transform: translateY(-3px);
+}
+.box-front:active { transform: translateY(-1px); }
+
+/* Label inside closed box */
+.box-icon { font-size: 1.4rem; line-height: 1; pointer-events: none; }
+.box-num {
+  font-family: var(--font-d);
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: .04em;
+  pointer-events: none;
+}
+
+/* Back face — the opened box */
+.box-back {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  transform: rotateY(180deg);
+  font-size: 1.6rem;
+  cursor: default;
+}
+.box-back.found {
+  border-color: var(--amber);
+  background: var(--amber-dim);
+  box-shadow: 0 0 24px var(--amber-glow);
+}
+.box-back.miss {
+  border-color: var(--text3);
+  background: var(--surface);
+}
+
+/* State classes controlling hover */
+.box-wrap.disabled .box-front { pointer-events: none; opacity: .45; }
+.box-wrap.opened   .box-front { pointer-events: none; }
+
+/* =========================================================
+   MESSAGE PANEL
+   ========================================================= */
+.msg-panel {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 24px;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: border-color .3s;
+}
+.msg-panel.msg-ok   { border-color: var(--green);  }
+.msg-panel.msg-miss { border-color: var(--blue-soft); }
+.msg-panel.msg-win  { border-color: var(--amber); background: var(--amber-dim); }
+
+.msg-icon { font-size: 1.8rem; flex-shrink: 0; }
+.msg-text { flex: 1; }
+.msg-title {
+  font-family: var(--font-d);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 3px;
+}
+.msg-title.ok   { color: var(--green); }
+.msg-title.miss { color: var(--text); }
+.msg-title.win  { color: var(--amber); }
+.msg-body { font-size: .85rem; color: var(--text2); }
+
+/* =========================================================
+   HINT BOX
+   ========================================================= */
+.hint-panel {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--blue-soft);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: none;
+  animation: fadein .3s ease;
+}
+.hint-panel.visible { display: block; }
+@keyframes fadein { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+.hint-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--blue-soft);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.hint-steps { display: flex; flex-direction: column; gap: 8px; }
+.hint-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: .85rem;
+  color: var(--text2);
+  opacity: .35;
+  transition: opacity .4s;
+}
+.hint-step.revealed { opacity: 1; }
+.hint-step-n {
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex;align-items:center;justify-content:center;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--blue-soft);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* =========================================================
+   WIN OVERLAY
+   ========================================================= */
+#win-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,13,26,.82);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#win-overlay.visible { display: flex; }
+.win-box {
+  background: var(--card);
+  border: 1px solid var(--amber);
+  border-radius: 24px;
+  padding: 44px 40px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 60px var(--amber-glow), 0 24px 60px rgba(0,0,0,.5);
+  animation: popIn .4s cubic-bezier(.34,1.4,.64,1);
+}
+@keyframes popIn {
+  from { opacity:0; transform:scale(.80); }
+  to   { opacity:1; transform:scale(1); }
+}
+.win-cat { font-size: 4rem; margin-bottom: 12px; display: block;
+  animation: catglow 2s ease-in-out infinite; }
+.win-title {
+  font-family: var(--font-d);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--amber);
+  margin-bottom: 8px;
+  letter-spacing: -.02em;
+}
+.win-msg {
+  font-size: .95rem;
+  color: var(--text2);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.win-msg strong { color: var(--text); }
+.win-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* =========================================================
+   FOOTER NOTE
+   ========================================================= */
+.footer {
+  margin-top: 48px;
+  font-size: .78rem;
+  color: var(--text3);
+  text-align: center;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div id="root">
+
+  <!-- ══════════════════════════════
+       HEADER / BRAND
+       ══════════════════════════════ -->
+  <div class="brand">
+    <span class="brand-emoji">🐱</span>
+    <h1 class="brand-title">Enigma do <span>Gato Fugitivo</span></h1>
+    <p class="brand-sub">Abra caixas, pense com estratégia e capture o gato antes que ele escape.</p>
+  </div>
+
+  <!-- ══════════════════════════════
+       SETUP SCREEN
+       ══════════════════════════════ -->
+  <div id="screen-setup">
+    <div class="card">
+      <div class="rules-box">
+        <h2>🐾 Como funciona</h2>
+        <ul class="rules-list">
+          <li>Um gato está escondido em uma das caixas numeradas.</li>
+          <li>A cada rodada, você abre uma caixa. Se o gato estiver lá, você vence!</li>
+          <li>Caso contrário, durante a "noite" o gato se move para uma caixa vizinha.</li>
+          <li>Você não sabe onde o gato está — use lógica para encontrá-lo.</li>
+          <li>Existe uma estratégia que garante capturar o gato. Você consegue descobrir?</li>
+        </ul>
+      </div>
+
+      <div class="n-section" style="margin-top:24px">
+        <div class="n-label">Número de caixas</div>
+        <div class="n-picker" id="n-picker">
+          <!-- preenchido via JS -->
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="margin-top:24px;width:100%" onclick="iniciarJogo()">
+        🎮 Iniciar Jogo
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       GAME SCREEN
+       ══════════════════════════════ -->
+  <div id="screen-game">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="round-badge">
+        <div class="round-num">Rodada <span id="rodada-num">1</span></div>
+        <div class="round-num" id="n-display" style="color:var(--text2);font-size:.82rem;padding:8px 14px"></div>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-ghost btn-sm" onclick="mostrarDica()">💡 Dica</button>
+        <button class="btn btn-ghost btn-sm" onclick="voltarSetup()">← Voltar</button>
+      </div>
+    </div>
+
+    <!-- Boxes -->
+    <div class="boxes-area">
+      <div class="boxes-label">Clique em uma caixa para abrir</div>
+      <div class="boxes-row" id="boxes-row"></div>
+    </div>
+
+    <!-- Message panel -->
+    <div class="msg-panel" id="msg-panel">
+      <div class="msg-icon" id="msg-icon">🔍</div>
+      <div class="msg-text">
+        <div class="msg-title" id="msg-title">Sua vez</div>
+        <div class="msg-body" id="msg-body">Escolha uma caixa para abrir. O gato está se escondendo…</div>
+      </div>
+    </div>
+
+    <!-- Hint panel -->
+    <div class="hint-panel" id="hint-panel">
+      <div class="hint-header">💡 Dicas progressivas</div>
+      <div class="hint-steps" id="hint-steps">
+        <div class="hint-step" id="hint-1">
+          <div class="hint-step-n">1</div>
+          <span>Observe que o gato <strong style="color:var(--text)">sempre</strong> precisa se mover para uma caixa vizinha após cada rodada — ele nunca fica parado.</span>
+        </div>
+        <div class="hint-step" id="hint-2">
+          <div class="hint-step-n">2</div>
+          <span>Experimente resolver primeiro o caso com <strong style="color:var(--text)">apenas 2 caixas</strong>. Qual a única jogada possível?</span>
+        </div>
+        <div class="hint-step" id="hint-3">
+          <div class="hint-step-n">3</div>
+          <span>Depois tente descobrir uma estratégia para <strong style="color:var(--text)">3 caixas</strong>. Pense em quais posições o gato pode estar após cada movimento.</span>
+        </div>
+        <div class="hint-step" id="hint-4">
+          <div class="hint-step-n">4</div>
+          <span>Será que existe um padrão para <strong style="color:var(--text)">qualquer quantidade de caixas</strong>? Tente varrer as posições de forma sistemática.</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screen-game -->
+
+  <p class="footer">Um puzzle de lógica e estratégia • Enigma do Gato Fugitivo</p>
+</div><!-- /root -->
+
+<!-- ══════════════════════════════
+     WIN OVERLAY
+     ══════════════════════════════ -->
+<div id="win-overlay">
+  <div class="win-box">
+    <span class="win-cat">🐱</span>
+    <div class="win-title">Você pegou o gato!</div>
+    <div class="win-msg">
+      Parabéns! Você encontrou o gato fugitivo em
+      <strong id="win-rodadas"></strong>.
+      <br><br>
+      <span id="win-extra" style="color:var(--text2)"></span>
+    </div>
+    <div class="win-actions">
+      <button class="btn btn-primary" onclick="reiniciarJogo()">🔄 Jogar novamente</button>
+      <button class="btn btn-ghost" onclick="voltarSetup()">← Mudar N</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     JAVASCRIPT
+     ══════════════════════════════ -->
+<script>
+/* =========================================================
+   ESTADO DO JOGO
+   ========================================================= */
+let estado = {
+  n:           5,       // número de caixas
+  gatoPos:     0,       // posição atual do gato (0-indexed)
+  rodada:      1,       // rodada atual
+  emJogo:      false,   // jogo em andamento
+  bloqueado:   false,   // bloqueia cliques durante animação
+  dicaNivel:   0,       // quantas dicas já foram reveladas
+};
+
+/* =========================================================
+   SETUP — SELETOR DE N
+   ========================================================= */
+(function construirSeletor() {
+  const picker = document.getElementById('n-picker');
+  for (let n = 2; n <= 15; n++) {
+    const chip = document.createElement('button');
+    chip.className = 'n-chip' + (n === estado.n ? ' active' : '');
+    chip.textContent = n;
+    chip.dataset.n = n;
+    chip.onclick = () => {
+      document.querySelectorAll('.n-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      estado.n = parseInt(chip.dataset.n);
+    };
+    picker.appendChild(chip);
+  }
+})();
+
+/* =========================================================
+   INICIAR JOGO
+   ========================================================= */
+function iniciarJogo() {
+  const n = estado.n;
+
+  // Posição inicial aleatória do gato
+  estado.gatoPos   = Math.floor(Math.random() * n);
+  estado.rodada    = 1;
+  estado.emJogo    = true;
+  estado.bloqueado = false;
+  estado.dicaNivel = 0;
+
+  // Alterna telas
+  document.getElementById('screen-setup').style.display = 'none';
+  document.getElementById('screen-game').style.display  = 'flex';
+  document.getElementById('screen-game').style.flexDirection = 'column';
+  document.getElementById('screen-game').style.alignItems = 'center';
+  document.getElementById('screen-game').style.gap = '20px';
+  document.getElementById('screen-game').style.width = '100%';
+  document.getElementById('screen-game').style.maxWidth = '860px';
+
+  // Atualiza display
+  document.getElementById('n-display').textContent = n + (n === 1 ? ' caixa' : ' caixas');
+  atualizarRodada();
+
+  // Constrói caixas
+  construirCaixas(n);
+
+  // Reseta UI
+  resetarMensagem();
+  resetarDicas();
+  document.getElementById('win-overlay').classList.remove('visible');
+}
+
+/* =========================================================
+   CONSTRUIR CAIXAS
+   ========================================================= */
+function construirCaixas(n) {
+  const row = document.getElementById('boxes-row');
+  row.innerHTML = '';
+
+  for (let i = 0; i < n; i++) {
+    /* Estrutura:
+       .box-wrap
+         .box-inner
+           .box-face.box-front  ← fechada (clicável)
+           .box-face.box-back   ← aberta  (revelada após flip) */
+
+    const wrap = document.createElement('div');
+    wrap.className = 'box-wrap';
+    wrap.id = `box-${i}`;
+
+    const inner = document.createElement('div');
+    inner.className = 'box-inner';
+
+    // Frente
+    const front = document.createElement('div');
+    front.className = 'box-face box-front';
+    front.innerHTML = `
+      <span class="box-icon">📦</span>
+      <span class="box-num">${i + 1}</span>
+    `;
+    front.addEventListener('click', () => abrirCaixa(i));
+
+    // Verso (revelado)
+    const back = document.createElement('div');
+    back.className = 'box-face box-back';
+    back.id = `box-back-${i}`;
+    back.innerHTML = '&nbsp;'; // preenchido dinamicamente
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    wrap.appendChild(inner);
+    row.appendChild(wrap);
+  }
+}
+
+/* =========================================================
+   ABRIR CAIXA
+   ========================================================= */
+function abrirCaixa(i) {
+  if (!estado.emJogo || estado.bloqueado) return;
+
+  const wrap = document.getElementById(`box-${i}`);
+  if (!wrap || wrap.classList.contains('opened') || wrap.classList.contains('disabled')) return;
+
+  estado.bloqueado = true;
+  bloquearTodasCaixas();
+
+  const gatoAqui = (i === estado.gatoPos);
+
+  // Executa o flip visual
+  flipCaixa(i, gatoAqui, () => {
+    if (gatoAqui) {
+      // VITÓRIA
+      mostrarMensagem('win', '🎉', 'Você pegou o gato!', `O gato estava na caixa ${i + 1}. Uau!`);
+      setTimeout(() => revelarVitoria(), 700);
+    } else {
+      // ERROU — o gato se move
+      const rodadaAtual = estado.rodada;
+      mostrarMensagem(
+        'miss',
+        '🌙',
+        `Caixa ${i + 1} estava vazia.`,
+        'Durante a noite o gato mudou para uma caixa vizinha...'
+      );
+
+      // O callback de flipCaixa só é chamado depois que a caixa
+      // já fechou de volta — agora é seguro mover o gato e
+      // reabilitar todas as caixas para a próxima rodada.
+      moverGato();
+      estado.rodada++;
+      atualizarRodada();
+      setTimeout(() => {
+        desbloquearCaixasNaoAbertas();
+        estado.bloqueado = false;
+      }, 120);
+    }
+  });
+}
+
+/* =========================================================
+   FLIP DA CAIXA (CSS 3D)
+   Se achou: fica aberta (vitória).
+   Se errou: abre, mostra ❌ por um momento, depois fecha de volta
+   para que a mesma caixa possa ser escolhida na próxima rodada.
+   ========================================================= */
+function flipCaixa(i, achou, callback) {
+  const wrap = document.getElementById(`box-${i}`);
+  const back = document.getElementById(`box-back-${i}`);
+
+  // Conteúdo do verso
+  if (achou) {
+    back.textContent = '🐱';
+    back.classList.add('found');
+    back.classList.remove('miss');
+  } else {
+    back.textContent = '❌';
+    back.classList.add('miss');
+    back.classList.remove('found');
+  }
+
+  // Abre a caixa (flip para frente)
+  wrap.classList.add('flipped', 'opened');
+
+  if (achou) {
+    // Vitória: mantém aberta e chama callback
+    setTimeout(callback, 580);
+  } else {
+    // Erro: aguarda o jogador ver o ❌, depois fecha de volta.
+    // A caixa deve voltar a estar disponível para reclique.
+    setTimeout(() => {
+      // Flip de volta para fechada
+      wrap.classList.remove('flipped');
+      // Aguarda a animação de fechamento (~550ms) e limpa estados
+      setTimeout(() => {
+        wrap.classList.remove('opened');
+        wrap.style.opacity = '';
+        callback();
+      }, 560);
+    }, 800); // tempo que o ❌ fica visível
+  }
+}
+
+/* =========================================================
+   MOVER GATO
+   ========================================================= */
+function moverGato() {
+  const n   = estado.n;
+  const pos = estado.gatoPos;
+  const viz = [];
+
+  if (pos > 0)     viz.push(pos - 1);  // vizinho esquerdo
+  if (pos < n - 1) viz.push(pos + 1);  // vizinho direito
+
+  // Escolhe aleatoriamente entre os vizinhos disponíveis
+  estado.gatoPos = viz[Math.floor(Math.random() * viz.length)];
+}
+
+/* =========================================================
+   BLOQUEAR / DESBLOQUEAR CAIXAS
+   ========================================================= */
+function bloquearTodasCaixas() {
+  for (let i = 0; i < estado.n; i++) {
+    const w = document.getElementById(`box-${i}`);
+    if (w) w.classList.add('disabled-btn');
+  }
+}
+
+function desbloquearCaixasNaoAbertas() {
+  // Após um erro todas as caixas voltam a ser fechadas,
+  // por isso liberamos todas sem exceção.
+  for (let i = 0; i < estado.n; i++) {
+    const w = document.getElementById(`box-${i}`);
+    if (w) w.classList.remove('disabled-btn');
+  }
+}
+
+/* =========================================================
+   REVELAR VITÓRIA
+   ========================================================= */
+function revelarVitoria() {
+  estado.emJogo = false;
+
+  const r = estado.rodada;
+  document.getElementById('win-rodadas').textContent =
+    r === 1 ? 'apenas 1 rodada' : `${r} rodadas`;
+
+  // Mensagem extra dependendo do número de rodadas
+  const extra =
+    r <= estado.n
+      ? 'Impressionante! Você foi muito eficiente. 🏆'
+      : 'Continue praticando para encontrar a estratégia ótima! 🧠';
+  document.getElementById('win-extra').textContent = extra;
+
+  document.getElementById('win-overlay').classList.add('visible');
+}
+
+/* =========================================================
+   MENSAGENS
+   ========================================================= */
+function mostrarMensagem(tipo, icone, titulo, corpo) {
+  const panel = document.getElementById('msg-panel');
+  const icon  = document.getElementById('msg-icon');
+  const titEl = document.getElementById('msg-title');
+  const bodEl = document.getElementById('msg-body');
+
+  panel.className = 'msg-panel';
+  titEl.className = 'msg-title';
+
+  if (tipo === 'win') {
+    panel.classList.add('msg-win');
+    titEl.classList.add('win');
+  } else if (tipo === 'miss') {
+    panel.classList.add('msg-miss');
+    titEl.classList.add('miss');
+  } else {
+    titEl.classList.add('ok');
+  }
+
+  icon.textContent  = icone;
+  titEl.textContent = titulo;
+  bodEl.textContent = corpo;
+}
+
+function resetarMensagem() {
+  mostrarMensagem('', '🔍', 'Sua vez', 'Escolha uma caixa para abrir. O gato está se escondendo…');
+  document.getElementById('msg-panel').className = 'msg-panel';
+}
+
+/* =========================================================
+   DICAS PROGRESSIVAS
+   ========================================================= */
+function mostrarDica() {
+  const panel = document.getElementById('hint-panel');
+  panel.classList.add('visible');
+
+  // Revela próximo nível
+  if (estado.dicaNivel < 4) {
+    estado.dicaNivel++;
+    const el = document.getElementById(`hint-${estado.dicaNivel}`);
+    if (el) el.classList.add('revealed');
+  }
+}
+
+function resetarDicas() {
+  document.getElementById('hint-panel').classList.remove('visible');
+  document.querySelectorAll('.hint-step').forEach(el => el.classList.remove('revealed'));
+  estado.dicaNivel = 0;
+}
+
+/* =========================================================
+   ATUALIZAR RODADA
+   ========================================================= */
+function atualizarRodada() {
+  document.getElementById('rodada-num').textContent = estado.rodada;
+}
+
+/* =========================================================
+   REINICIAR / VOLTAR
+   ========================================================= */
+function reiniciarJogo() {
+  document.getElementById('win-overlay').classList.remove('visible');
+  iniciarJogo();
+}
+
+function voltarSetup() {
+  estado.emJogo = false;
+  document.getElementById('win-overlay').classList.remove('visible');
+  document.getElementById('screen-game').style.display = 'none';
+  document.getElementById('screen-setup').style.display = '';
+}
+</script>
+</body>
+</html>
